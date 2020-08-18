@@ -127,7 +127,10 @@ public class LoginEncryptionUtils {
             JWSObject clientJwt = JWSObject.parse(clientData);
             EncryptionUtils.verifyJwt(clientJwt, identityPublicKey);
 
-            session.setClientData(JSON_MAPPER.convertValue(JSON_MAPPER.readTree(clientJwt.getPayload().toBytes()), BedrockClientData.class));
+            System.out.println(clientJwt.getPayload().toString());
+            BedrockClientData data = JSON_MAPPER.convertValue(JSON_MAPPER.readTree(clientJwt.getPayload().toBytes()), BedrockClientData.class);
+            data.setJsonData(clientJwt.getPayload().toJSONObject());
+            session.setClientData(data);
 
             if (EncryptionUtils.canUseEncryption()) {
                 LoginEncryptionUtils.startEncryptionHandshake(session, identityPublicKey);

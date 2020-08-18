@@ -222,13 +222,11 @@ public class GeyserSession implements CommandSender {
                             String encrypted = "";
                             try {
                                 encrypted = EncryptionUtil.encryptBedrockData(publicKey, new BedrockData(
-                                        clientData.getGameVersion(),
-                                        authData.getName(),
-                                        authData.getXboxUUID(),
-                                        clientData.getDeviceOS().ordinal(),
-                                        clientData.getLanguageCode(),
-                                        clientData.getCurrentInputMode().ordinal(),
-                                        upstream.getSession().getAddress().getAddress().getHostAddress()
+                                        authData.getXboxUUID(), authData.getName(),
+                                        clientData.getGameVersion(), clientData.getDeviceOS(),
+                                        clientData.getLanguageCode(), clientData.getCurrentInputMode(),
+                                        upstream.getSession().getAddress().getAddress().getHostAddress(),
+                                        clientData.getImage("Skin")
                                 ));
                             } catch (Exception e) {
                                 connector.getLogger().error("Failed to encrypt message", e);
