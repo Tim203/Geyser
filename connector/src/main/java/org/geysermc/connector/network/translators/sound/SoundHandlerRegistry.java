@@ -25,7 +25,7 @@
 
 package org.geysermc.connector.network.translators.sound;
 
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.utils.FileUtils;
 import org.reflections.Reflections;
 

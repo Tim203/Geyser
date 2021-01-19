@@ -26,7 +26,7 @@
 package org.geysermc.geyser.platform.sponge;
 
 import lombok.Getter;
-import org.geysermc.connector.dump.BootstrapDumpInfo;
+import org.geysermc.geyser.connector.dump.BootstrapDumpInfo;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;

@@ -29,7 +29,7 @@ import com.github.steveice10.mc.protocol.data.game.entity.metadata.Position;
 import com.github.steveice10.mc.protocol.data.game.entity.player.PlayerAction;
 import com.github.steveice10.mc.protocol.data.game.world.block.BlockFace;
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerActionPacket;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandSender;
 import org.geysermc.geyser.connector.command.GeyserCommand;
 import org.geysermc.connector.network.session.GeyserSession;

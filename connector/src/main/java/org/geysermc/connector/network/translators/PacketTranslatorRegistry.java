@@ -30,7 +30,7 @@ import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerUpdate
 import com.github.steveice10.packetlib.packet.Packet;
 import com.nukkitx.protocol.bedrock.BedrockPacket;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.FileUtils;
 import org.geysermc.geyser.connector.utils.LanguageUtils;

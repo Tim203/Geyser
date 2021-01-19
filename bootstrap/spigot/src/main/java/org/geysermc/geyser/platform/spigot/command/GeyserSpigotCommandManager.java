@@ -28,7 +28,7 @@ package org.geysermc.geyser.platform.spigot.command;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandManager;
 import org.geysermc.geyser.platform.spigot.GeyserSpigotPlugin;
 

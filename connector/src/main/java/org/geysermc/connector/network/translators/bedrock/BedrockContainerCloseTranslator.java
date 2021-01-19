@@ -27,7 +27,7 @@ package org.geysermc.connector.network.translators.bedrock;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.window.ClientCloseWindowPacket;
 import com.nukkitx.protocol.bedrock.packet.ContainerClosePacket;
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

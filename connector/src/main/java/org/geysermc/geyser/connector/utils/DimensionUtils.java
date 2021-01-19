@@ -32,8 +32,8 @@ import com.nukkitx.math.vector.Vector3i;
 import com.nukkitx.protocol.bedrock.packet.ChangeDimensionPacket;
 import com.nukkitx.protocol.bedrock.packet.MobEffectPacket;
 import com.nukkitx.protocol.bedrock.packet.StopSoundPacket;
-import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.entity.Entity;
+import org.geysermc.geyser.connector.GeyserConnector;
+import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.connector.network.session.GeyserSession;
 
 public class DimensionUtils {

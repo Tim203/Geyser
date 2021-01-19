@@ -28,7 +28,7 @@ package org.geysermc.connector.network.translators;
 import com.nukkitx.nbt.NBTInputStream;
 import com.nukkitx.nbt.NbtMap;
 import com.nukkitx.nbt.NbtUtils;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.utils.FileUtils;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 

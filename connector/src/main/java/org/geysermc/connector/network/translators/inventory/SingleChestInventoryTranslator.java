@@ -26,7 +26,7 @@
 package org.geysermc.connector.network.translators.inventory;
 
 import com.nukkitx.protocol.bedrock.data.inventory.ContainerType;
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.holder.BlockInventoryHolder;
 import org.geysermc.connector.network.translators.inventory.holder.InventoryHolder;

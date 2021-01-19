@@ -34,7 +34,7 @@ import com.nukkitx.protocol.bedrock.data.inventory.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.updater.CursorInventoryUpdater;
 

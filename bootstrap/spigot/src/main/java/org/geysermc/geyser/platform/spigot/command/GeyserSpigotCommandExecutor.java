@@ -29,7 +29,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandExecutor;
 import org.geysermc.geyser.connector.command.GeyserCommand;
 import org.geysermc.connector.network.session.GeyserSession;

@@ -29,7 +29,7 @@ import com.nukkitx.protocol.bedrock.BedrockPacket;
 import com.nukkitx.protocol.bedrock.data.ResourcePackType;
 import com.nukkitx.protocol.bedrock.BedrockPacketCodec;
 import com.nukkitx.protocol.bedrock.packet.*;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.common.AuthType;
 import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
 import org.geysermc.connector.network.session.GeyserSession;

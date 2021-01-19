@@ -29,7 +29,7 @@ import com.github.steveice10.mc.protocol.data.game.chunk.Chunk;
 import com.github.steveice10.mc.protocol.data.game.chunk.Column;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import org.geysermc.connector.bootstrap.GeyserBootstrap;
+import org.geysermc.geyser.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
 import org.geysermc.geyser.connector.utils.MathUtils;

@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import net.md_5.bungee.api.plugin.Plugin;
-import org.geysermc.connector.FloodgateKeyLoader;
+import org.geysermc.geyser.connector.FloodgateKeyLoader;
 import org.geysermc.geyser.connector.configuration.GeyserJacksonConfiguration;
 
 import java.nio.file.Path;

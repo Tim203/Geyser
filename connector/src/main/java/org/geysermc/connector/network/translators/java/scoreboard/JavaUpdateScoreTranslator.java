@@ -27,8 +27,8 @@ package org.geysermc.connector.network.translators.java.scoreboard;
 
 import com.github.steveice10.mc.protocol.data.game.scoreboard.ScoreboardAction;
 import com.github.steveice10.mc.protocol.packet.ingame.server.scoreboard.ServerUpdateScorePacket;
-import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.GeyserLogger;
+import org.geysermc.geyser.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserLogger;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.session.cache.WorldCache;
 import org.geysermc.connector.network.translators.PacketTranslator;

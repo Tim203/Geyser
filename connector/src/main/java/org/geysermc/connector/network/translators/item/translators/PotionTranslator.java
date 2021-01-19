@@ -29,7 +29,7 @@ import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
 import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.connector.network.translators.item.ItemRegistry;
 import org.geysermc.connector.network.translators.item.ItemTranslator;
 import org.geysermc.connector.network.translators.ItemRemapper;

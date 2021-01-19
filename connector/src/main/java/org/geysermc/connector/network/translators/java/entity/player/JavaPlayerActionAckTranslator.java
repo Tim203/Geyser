@@ -33,7 +33,7 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.protocol.bedrock.data.LevelEventType;
 import com.nukkitx.protocol.bedrock.packet.LevelEventPacket;
-import org.geysermc.connector.inventory.PlayerInventory;
+import org.geysermc.geyser.connector.inventory.PlayerInventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

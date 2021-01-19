@@ -32,7 +32,7 @@ import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.nukkitx.nbt.NbtMap;
 import com.nukkitx.nbt.NbtMapBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.utils.BlockEntityUtils;
 import org.geysermc.geyser.connector.utils.FileUtils;
 import org.geysermc.geyser.connector.utils.LanguageUtils;

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.steveice10.mc.protocol.MinecraftConstants;
 import lombok.Getter;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 
 import java.io.*;
 import java.nio.file.Files;

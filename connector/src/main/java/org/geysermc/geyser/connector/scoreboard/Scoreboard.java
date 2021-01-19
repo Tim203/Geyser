@@ -31,8 +31,8 @@ import com.nukkitx.protocol.bedrock.packet.RemoveObjectivePacket;
 import com.nukkitx.protocol.bedrock.packet.SetDisplayObjectivePacket;
 import com.nukkitx.protocol.bedrock.packet.SetScorePacket;
 import lombok.Getter;
-import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.GeyserLogger;
+import org.geysermc.geyser.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserLogger;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 

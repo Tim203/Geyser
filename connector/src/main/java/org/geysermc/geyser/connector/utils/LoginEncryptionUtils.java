@@ -35,7 +35,7 @@ import com.nukkitx.network.util.Preconditions;
 import com.nukkitx.protocol.bedrock.packet.LoginPacket;
 import com.nukkitx.protocol.bedrock.packet.ServerToClientHandshakePacket;
 import com.nukkitx.protocol.bedrock.util.EncryptionUtils;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.session.auth.AuthData;
 import org.geysermc.connector.network.session.auth.BedrockClientData;

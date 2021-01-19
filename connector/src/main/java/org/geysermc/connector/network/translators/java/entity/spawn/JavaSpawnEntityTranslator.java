@@ -31,10 +31,10 @@ import com.github.steveice10.mc.protocol.data.game.entity.object.ProjectileData;
 import com.github.steveice10.mc.protocol.data.game.entity.type.EntityType;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnEntityPacket;
 import com.nukkitx.math.vector.Vector3f;
-import org.geysermc.connector.entity.*;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.entity.*;
 import org.geysermc.geyser.connector.utils.EntityUtils;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 
@@ -51,7 +51,7 @@ public class JavaSpawnEntityTranslator extends PacketTranslator<ServerSpawnEntit
         Vector3f motion = Vector3f.from(packet.getMotionX(), packet.getMotionY(), packet.getMotionZ());
         Vector3f rotation = Vector3f.from(packet.getYaw(), packet.getPitch(), 0);
 
-        org.geysermc.connector.entity.type.EntityType type = EntityUtils.toBedrockEntity(packet.getType());
+        org.geysermc.geyser.connector.entity.type.EntityType type = EntityUtils.toBedrockEntity(packet.getType());
         if (type == null) {
             session.getConnector().getLogger().warning(LanguageUtils.getLocaleStringLog("geyser.entity.type_null", packet.getType()));
             return;
@@ -76,7 +76,7 @@ public class JavaSpawnEntityTranslator extends PacketTranslator<ServerSpawnEntit
                 entity = new BoatEntity(packet.getEntityId(), session.getEntityCache().getNextEntityId().incrementAndGet(),
                         type, position, motion, Vector3f.from(packet.getYaw(), 0, packet.getYaw()));
             } else {
-                Constructor<? extends Entity> entityConstructor = entityClass.getConstructor(long.class, long.class, org.geysermc.connector.entity.type.EntityType.class,
+                Constructor<? extends Entity> entityConstructor = entityClass.getConstructor(long.class, long.class, org.geysermc.geyser.connector.entity.type.EntityType.class,
                         Vector3f.class, Vector3f.class, Vector3f.class);
 
                 entity = entityConstructor.newInstance(packet.getEntityId(), session.getEntityCache().getNextEntityId().incrementAndGet(),

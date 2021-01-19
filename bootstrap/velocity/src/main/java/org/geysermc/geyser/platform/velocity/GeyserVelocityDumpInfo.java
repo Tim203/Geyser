@@ -29,7 +29,7 @@ import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import org.geysermc.geyser.connector.common.serializer.AsteriskSerializer;
-import org.geysermc.connector.dump.BootstrapDumpInfo;
+import org.geysermc.geyser.connector.dump.BootstrapDumpInfo;
 
 import java.util.ArrayList;
 import java.util.List;

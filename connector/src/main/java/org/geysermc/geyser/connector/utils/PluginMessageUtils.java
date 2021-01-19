@@ -25,7 +25,7 @@
 
 package org.geysermc.geyser.connector.utils;
 
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 
 import java.nio.charset.StandardCharsets;
 

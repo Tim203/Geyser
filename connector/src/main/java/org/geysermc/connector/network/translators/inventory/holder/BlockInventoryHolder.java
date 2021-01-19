@@ -33,7 +33,7 @@ import com.nukkitx.protocol.bedrock.packet.BlockEntityDataPacket;
 import com.nukkitx.protocol.bedrock.packet.ContainerOpenPacket;
 import com.nukkitx.protocol.bedrock.packet.UpdateBlockPacket;
 import lombok.AllArgsConstructor;
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.InventoryTranslator;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;

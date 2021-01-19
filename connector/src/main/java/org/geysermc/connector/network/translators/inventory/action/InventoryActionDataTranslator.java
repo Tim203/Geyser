@@ -36,7 +36,7 @@ import com.nukkitx.protocol.bedrock.data.inventory.ContainerId;
 import com.nukkitx.protocol.bedrock.data.inventory.InventoryActionData;
 import com.nukkitx.protocol.bedrock.data.inventory.InventorySource;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.InventoryTranslator;
 import org.geysermc.connector.network.translators.inventory.SlotType;

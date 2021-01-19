@@ -34,7 +34,7 @@ import net.kyori.adventure.text.renderer.TranslatableComponentRenderer;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import net.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSerializer;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 

@@ -27,7 +27,7 @@ package org.geysermc.geyser.platform.spigot.command;
 
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandSender;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 

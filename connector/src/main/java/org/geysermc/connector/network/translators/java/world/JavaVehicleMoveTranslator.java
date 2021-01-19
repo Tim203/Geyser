@@ -27,7 +27,7 @@ package org.geysermc.connector.network.translators.java.world;
 
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerVehicleMovePacket;
 import com.nukkitx.math.vector.Vector3f;
-import org.geysermc.connector.entity.Entity;
+import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

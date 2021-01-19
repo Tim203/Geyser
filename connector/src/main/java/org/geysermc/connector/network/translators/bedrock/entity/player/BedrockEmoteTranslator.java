@@ -26,7 +26,7 @@
 package org.geysermc.connector.network.translators.bedrock.entity.player;
 
 import com.nukkitx.protocol.bedrock.packet.EmotePacket;
-import org.geysermc.connector.entity.Entity;
+import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
-import org.geysermc.connector.FloodgateKeyLoader;
+import org.geysermc.geyser.connector.FloodgateKeyLoader;
 import org.geysermc.geyser.connector.configuration.GeyserJacksonConfiguration;
 
 import java.io.File;

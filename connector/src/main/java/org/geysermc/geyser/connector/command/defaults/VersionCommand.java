@@ -26,7 +26,7 @@
 package org.geysermc.geyser.connector.command.defaults;
 
 import com.nukkitx.protocol.bedrock.BedrockPacketCodec;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandSender;
 import org.geysermc.geyser.connector.command.GeyserCommand;
 import org.geysermc.geyser.connector.common.ChatColor;

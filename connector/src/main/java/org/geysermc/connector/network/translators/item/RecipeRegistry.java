@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.nukkitx.protocol.bedrock.data.inventory.CraftingData;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.utils.FileUtils;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 

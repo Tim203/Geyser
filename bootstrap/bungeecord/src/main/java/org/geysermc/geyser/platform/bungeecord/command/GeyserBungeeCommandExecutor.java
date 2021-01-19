@@ -29,7 +29,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandExecutor;
 import org.geysermc.geyser.connector.command.GeyserCommand;
 import org.geysermc.connector.network.session.GeyserSession;

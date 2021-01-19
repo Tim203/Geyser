@@ -29,8 +29,8 @@ import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntit
 import com.nukkitx.protocol.bedrock.data.LevelEventType;
 import com.nukkitx.protocol.bedrock.packet.LevelEventPacket;
 import com.nukkitx.protocol.bedrock.packet.TakeItemEntityPacket;
-import org.geysermc.connector.entity.Entity;
-import org.geysermc.connector.entity.ExpOrbEntity;
+import org.geysermc.geyser.connector.entity.Entity;
+import org.geysermc.geyser.connector.entity.ExpOrbEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

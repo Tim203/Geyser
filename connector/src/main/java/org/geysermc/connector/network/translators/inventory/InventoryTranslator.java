@@ -29,7 +29,7 @@ import com.github.steveice10.mc.protocol.data.game.window.WindowType;
 import com.nukkitx.protocol.bedrock.data.inventory.ContainerType;
 import com.nukkitx.protocol.bedrock.data.inventory.InventoryActionData;
 import lombok.AllArgsConstructor;
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.updater.ContainerInventoryUpdater;
 import org.geysermc.connector.network.translators.inventory.updater.InventoryUpdater;

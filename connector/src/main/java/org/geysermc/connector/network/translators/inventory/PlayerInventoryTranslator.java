@@ -34,7 +34,7 @@ import com.nukkitx.protocol.bedrock.data.inventory.InventorySource;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
 import com.nukkitx.protocol.bedrock.packet.InventoryContentPacket;
 import com.nukkitx.protocol.bedrock.packet.InventorySlotPacket;
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.action.InventoryActionDataTranslator;
 import org.geysermc.connector.network.translators.item.ItemTranslator;

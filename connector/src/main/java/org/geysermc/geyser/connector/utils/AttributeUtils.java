@@ -28,8 +28,8 @@ package org.geysermc.geyser.connector.utils;
 import com.github.steveice10.mc.protocol.data.game.entity.attribute.AttributeModifier;
 import com.github.steveice10.mc.protocol.data.game.entity.attribute.ModifierOperation;
 import com.nukkitx.protocol.bedrock.data.AttributeData;
-import org.geysermc.connector.entity.attribute.Attribute;
-import org.geysermc.connector.entity.attribute.AttributeType;
+import org.geysermc.geyser.connector.entity.attribute.Attribute;
+import org.geysermc.geyser.connector.entity.attribute.AttributeType;
 
 public class AttributeUtils {
 

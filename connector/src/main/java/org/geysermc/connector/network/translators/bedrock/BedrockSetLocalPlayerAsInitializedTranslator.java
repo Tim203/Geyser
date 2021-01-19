@@ -27,7 +27,7 @@ package org.geysermc.connector.network.translators.bedrock;
 
 import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
 import com.nukkitx.protocol.bedrock.packet.SetLocalPlayerAsInitializedPacket;
-import org.geysermc.connector.entity.player.PlayerEntity;
+import org.geysermc.geyser.connector.entity.player.PlayerEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

@@ -35,7 +35,7 @@ import com.nukkitx.protocol.bedrock.packet.LevelChunkPacket;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBufOutputStream;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.BiomeTranslator;
 import org.geysermc.connector.network.translators.PacketTranslator;

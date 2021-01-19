@@ -30,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.geysermc.connector.FloodgateKeyLoader;
+import org.geysermc.geyser.connector.FloodgateKeyLoader;
 import org.geysermc.geyser.connector.configuration.GeyserJacksonConfiguration;
 
 import java.nio.file.Path;

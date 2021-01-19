@@ -26,7 +26,7 @@
 package org.geysermc.geyser.connector.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.geysermc.connector.GeyserLogger;
+import org.geysermc.geyser.connector.GeyserLogger;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.nio.file.Path;

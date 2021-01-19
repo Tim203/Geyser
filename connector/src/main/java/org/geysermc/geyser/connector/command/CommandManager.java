@@ -27,7 +27,7 @@ package org.geysermc.geyser.connector.command;
 
 import lombok.Getter;
 
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.defaults.*;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.LanguageUtils;

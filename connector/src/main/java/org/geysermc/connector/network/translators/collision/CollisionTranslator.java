@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.BiMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.collision.translators.BlockCollision;
 import org.geysermc.connector.network.translators.collision.translators.EmptyCollision;

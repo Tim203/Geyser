@@ -25,7 +25,7 @@
 
 package org.geysermc.geyser.connector.scoreboard;
 
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.session.cache.WorldCache;

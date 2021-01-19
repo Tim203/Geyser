@@ -30,7 +30,7 @@ import com.nukkitx.protocol.bedrock.data.entity.EntityData;
 import com.nukkitx.protocol.bedrock.data.entity.EntityEventType;
 import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
 import com.nukkitx.protocol.bedrock.packet.EntityEventPacket;
-import org.geysermc.connector.entity.Entity;
+import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

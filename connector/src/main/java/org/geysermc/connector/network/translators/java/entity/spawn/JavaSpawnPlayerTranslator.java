@@ -27,8 +27,8 @@ package org.geysermc.connector.network.translators.java.entity.spawn;
 
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPlayerPacket;
 import com.nukkitx.math.vector.Vector3f;
-import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.entity.player.PlayerEntity;
+import org.geysermc.geyser.connector.GeyserConnector;
+import org.geysermc.geyser.connector.entity.player.PlayerEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

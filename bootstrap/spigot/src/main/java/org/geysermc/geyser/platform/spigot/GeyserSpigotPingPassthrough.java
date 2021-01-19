@@ -32,7 +32,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.util.CachedServerIcon;
 import org.geysermc.geyser.connector.common.ping.GeyserPingInfo;
-import org.geysermc.connector.ping.IGeyserPingPassthrough;
+import org.geysermc.geyser.connector.ping.IGeyserPingPassthrough;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

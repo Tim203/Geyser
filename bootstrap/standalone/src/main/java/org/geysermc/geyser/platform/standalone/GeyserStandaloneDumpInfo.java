@@ -26,7 +26,7 @@
 package org.geysermc.geyser.platform.standalone;
 
 import lombok.Getter;
-import org.geysermc.connector.dump.BootstrapDumpInfo;
+import org.geysermc.geyser.connector.dump.BootstrapDumpInfo;
 
 @Getter
 public class GeyserStandaloneDumpInfo extends BootstrapDumpInfo {

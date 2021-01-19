@@ -27,13 +27,13 @@ package org.geysermc.geyser.platform.bungeecord;
 
 import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
-import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.bootstrap.GeyserBootstrap;
+import org.geysermc.geyser.connector.GeyserConnector;
+import org.geysermc.geyser.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.geyser.connector.command.CommandManager;
 import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
-import org.geysermc.connector.dump.BootstrapDumpInfo;
-import org.geysermc.connector.ping.GeyserLegacyPingPassthrough;
-import org.geysermc.connector.ping.IGeyserPingPassthrough;
+import org.geysermc.geyser.connector.dump.BootstrapDumpInfo;
+import org.geysermc.geyser.connector.ping.GeyserLegacyPingPassthrough;
+import org.geysermc.geyser.connector.ping.IGeyserPingPassthrough;
 import org.geysermc.geyser.connector.utils.FileUtils;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 import org.geysermc.geyser.common.PlatformType;

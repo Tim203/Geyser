@@ -33,7 +33,7 @@ import com.velocitypowered.api.proxy.server.ServerPing;
 import lombok.AllArgsConstructor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.geysermc.geyser.connector.common.ping.GeyserPingInfo;
-import org.geysermc.connector.ping.IGeyserPingPassthrough;
+import org.geysermc.geyser.connector.ping.IGeyserPingPassthrough;
 
 import java.net.InetSocketAddress;
 import java.util.Optional;

@@ -28,7 +28,7 @@ package org.geysermc.connector.network.translators.world.block.entity;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.nukkitx.nbt.NbtMapBuilder;
-import org.geysermc.connector.entity.type.EntityType;
+import org.geysermc.geyser.connector.entity.type.EntityType;
 
 @BlockEntity(name = "MobSpawner", regex = "mob_spawner")
 public class SpawnerBlockEntityTranslator extends BlockEntityTranslator {

@@ -25,7 +25,7 @@
 
 package org.geysermc.geyser.platform.bungeecord.command;
 
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandManager;
 
 public class GeyserBungeeCommandManager extends CommandManager {

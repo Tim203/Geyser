@@ -28,7 +28,7 @@ package org.geysermc.connector.network.translators.bedrock;
 import com.github.steveice10.mc.protocol.data.game.entity.player.GameMode;
 import com.nukkitx.protocol.bedrock.data.entity.EntityData;
 import com.nukkitx.protocol.bedrock.packet.EntityPickRequestPacket;
-import org.geysermc.connector.entity.Entity;
+import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

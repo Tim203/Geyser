@@ -39,7 +39,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.geysermc.geyser.connector.common.ChatColor;
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.updater.InventoryUpdater;
 import org.geysermc.connector.network.translators.item.ItemRegistry;

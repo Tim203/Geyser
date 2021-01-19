@@ -25,7 +25,7 @@
 
 package org.geysermc.connector.network.translators.inventory.holder;
 
-import org.geysermc.connector.inventory.Inventory;
+import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.InventoryTranslator;
 

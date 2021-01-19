@@ -34,8 +34,8 @@ import com.nukkitx.protocol.bedrock.packet.MovePlayerPacket;
 import com.nukkitx.protocol.bedrock.packet.SetEntityDataPacket;
 import lombok.Getter;
 import lombok.Setter;
-import org.geysermc.connector.entity.player.PlayerEntity;
-import org.geysermc.connector.entity.type.EntityType;
+import org.geysermc.geyser.connector.entity.player.PlayerEntity;
+import org.geysermc.geyser.connector.entity.type.EntityType;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.collision.translators.BlockCollision;
 

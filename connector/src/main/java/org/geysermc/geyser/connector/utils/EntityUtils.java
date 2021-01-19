@@ -26,7 +26,7 @@
 package org.geysermc.geyser.connector.utils;
 
 import com.github.steveice10.mc.protocol.data.game.entity.Effect;
-import org.geysermc.connector.entity.type.EntityType;
+import org.geysermc.geyser.connector.entity.type.EntityType;
 
 public class EntityUtils {
 

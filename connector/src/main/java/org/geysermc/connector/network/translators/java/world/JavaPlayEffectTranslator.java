@@ -34,7 +34,7 @@ import com.nukkitx.protocol.bedrock.data.SoundEvent;
 import com.nukkitx.protocol.bedrock.packet.LevelEventPacket;
 import com.nukkitx.protocol.bedrock.packet.LevelSoundEventPacket;
 import com.nukkitx.protocol.bedrock.packet.TextPacket;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

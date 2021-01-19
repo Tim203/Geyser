@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.nukkitx.protocol.bedrock.data.SoundEvent;
 import lombok.Data;
 import lombok.ToString;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.utils.FileUtils;
 import java.io.IOException;
 import java.io.InputStream;

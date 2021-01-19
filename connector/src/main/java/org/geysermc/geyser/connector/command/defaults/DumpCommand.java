@@ -27,12 +27,12 @@ package org.geysermc.geyser.connector.command.defaults;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandSender;
 import org.geysermc.geyser.connector.command.GeyserCommand;
 import org.geysermc.geyser.connector.common.ChatColor;
 import org.geysermc.geyser.connector.common.serializer.AsteriskSerializer;
-import org.geysermc.connector.dump.DumpInfo;
+import org.geysermc.geyser.connector.dump.DumpInfo;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 import org.geysermc.geyser.connector.utils.WebUtils;

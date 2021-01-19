@@ -33,7 +33,7 @@ import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.math.vector.Vector3i;
 import com.nukkitx.nbt.NbtMapBuilder;
 import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
-import org.geysermc.connector.entity.player.SkullPlayerEntity;
+import org.geysermc.geyser.connector.entity.player.SkullPlayerEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.world.block.BlockStateValues;
 import org.geysermc.geyser.connector.skin.SkinProvider;

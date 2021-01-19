@@ -25,8 +25,8 @@
 
 package org.geysermc.connector.network.translators.java.entity.spawn;
 
-import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.entity.PaintingEntity;
+import org.geysermc.geyser.connector.GeyserConnector;
+import org.geysermc.geyser.connector.entity.PaintingEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;

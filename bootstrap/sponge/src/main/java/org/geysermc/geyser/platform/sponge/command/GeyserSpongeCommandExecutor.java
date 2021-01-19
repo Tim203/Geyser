@@ -25,7 +25,7 @@
 
 package org.geysermc.geyser.platform.sponge.command;
 
-import org.geysermc.connector.GeyserConnector;
+import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandExecutor;
 import org.geysermc.geyser.connector.command.CommandSender;
 import org.geysermc.geyser.connector.command.GeyserCommand;
