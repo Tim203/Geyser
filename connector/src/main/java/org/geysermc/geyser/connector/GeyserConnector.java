@@ -250,7 +250,7 @@ public class GeyserConnector {
         // This will check if we are in standalone and get the 'useGui' variable from there
         if (platformType == PlatformType.STANDALONE) {
             try {
-                Class<?> cls = Class.forName("org.geysermc.platform.standalone.GeyserStandaloneBootstrap");
+                Class<?> cls = Class.forName("org.geysermc.geyser.platform.standalone.GeyserStandaloneBootstrap");
                 isGui = (boolean) cls.getMethod("isUseGui").invoke(cls.cast(bootstrap));
             } catch (Exception e) {
                 logger.debug("Failed detecting if standalone is using a GUI; if this is a GeyserConnect instance this can be safely ignored.");

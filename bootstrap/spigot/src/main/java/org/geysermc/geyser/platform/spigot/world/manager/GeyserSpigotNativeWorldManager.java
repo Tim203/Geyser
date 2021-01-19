@@ -27,8 +27,8 @@ package org.geysermc.geyser.platform.spigot.world.manager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.geysermc.adapters.spigot.SpigotAdapters;
-import org.geysermc.adapters.spigot.SpigotWorldAdapter;
+import org.geysermc.geyser.adapters.spigot.SpigotAdapters;
+import org.geysermc.geyser.adapters.spigot.SpigotWorldAdapter;
 import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
 

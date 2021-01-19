@@ -28,7 +28,7 @@ package org.geysermc.geyser.platform.spigot;
 import com.github.steveice10.mc.protocol.MinecraftConstants;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.geysermc.adapters.spigot.SpigotAdapters;
+import org.geysermc.geyser.adapters.spigot.SpigotAdapters;
 import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.geyser.connector.command.CommandManager;
