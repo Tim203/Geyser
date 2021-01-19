@@ -31,8 +31,8 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.nukkitx.math.vector.Vector3i;
 import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
-import org.geysermc.connector.network.translators.item.ItemEntry;
-import org.geysermc.connector.network.translators.item.ToolItemEntry;
+import org.geysermc.geyser.connector.network.translators.item.ItemEntry;
+import org.geysermc.geyser.connector.network.translators.item.ToolItemEntry;
 
 import java.util.Optional;
 

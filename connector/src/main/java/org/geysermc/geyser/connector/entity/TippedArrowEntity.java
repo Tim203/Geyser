@@ -30,7 +30,7 @@ import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.protocol.bedrock.data.entity.EntityData;
 import org.geysermc.geyser.connector.entity.type.EntityType;
 import org.geysermc.geyser.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.item.TippedArrowPotion;
+import org.geysermc.geyser.connector.network.translators.item.TippedArrowPotion;
 
 /**
  * Internally this is known as TippedArrowEntity but is used with tipped arrows and normal arrows

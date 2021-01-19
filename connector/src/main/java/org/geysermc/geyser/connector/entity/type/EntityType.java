@@ -26,7 +26,6 @@
 package org.geysermc.geyser.connector.entity.type;
 
 import lombok.Getter;
-import org.geysermc.connector.entity.living.*;
 import org.geysermc.geyser.connector.entity.living.*;
 import org.geysermc.geyser.connector.entity.living.animal.*;
 import org.geysermc.geyser.connector.entity.living.animal.horse.*;

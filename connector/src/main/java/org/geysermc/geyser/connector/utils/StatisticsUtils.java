@@ -29,7 +29,7 @@ import com.github.steveice10.mc.protocol.data.MagicValues;
 import com.github.steveice10.mc.protocol.data.game.entity.type.EntityType;
 import com.github.steveice10.mc.protocol.data.game.statistic.*;
 import org.geysermc.geyser.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.item.ItemRegistry;
+import org.geysermc.geyser.connector.network.translators.item.ItemRegistry;
 import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
 import org.geysermc.geyser.common.window.SimpleFormWindow;
 import org.geysermc.geyser.common.window.button.FormButton;

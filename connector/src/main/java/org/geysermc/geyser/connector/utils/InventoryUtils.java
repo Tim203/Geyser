@@ -41,11 +41,11 @@ import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.common.ChatColor;
 import org.geysermc.geyser.connector.inventory.Inventory;
 import org.geysermc.geyser.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.inventory.DoubleChestInventoryTranslator;
-import org.geysermc.connector.network.translators.inventory.InventoryTranslator;
-import org.geysermc.connector.network.translators.item.ItemEntry;
-import org.geysermc.connector.network.translators.item.ItemRegistry;
-import org.geysermc.connector.network.translators.item.ItemTranslator;
+import org.geysermc.geyser.connector.network.translators.inventory.DoubleChestInventoryTranslator;
+import org.geysermc.geyser.connector.network.translators.inventory.InventoryTranslator;
+import org.geysermc.geyser.connector.network.translators.item.ItemEntry;
+import org.geysermc.geyser.connector.network.translators.item.ItemRegistry;
+import org.geysermc.geyser.connector.network.translators.item.ItemTranslator;
 
 import java.util.Collections;
 import java.util.Objects;

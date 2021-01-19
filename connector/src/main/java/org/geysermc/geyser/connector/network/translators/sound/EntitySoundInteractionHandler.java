@@ -29,7 +29,7 @@ import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
 import com.nukkitx.math.vector.Vector3f;
 import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.geyser.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.item.ItemRegistry;
+import org.geysermc.geyser.connector.network.translators.item.ItemRegistry;
 
 import java.util.Map;
 

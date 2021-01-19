@@ -31,7 +31,7 @@ import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.protocol.bedrock.packet.AddItemEntityPacket;
 import org.geysermc.geyser.connector.entity.type.EntityType;
 import org.geysermc.geyser.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.item.ItemTranslator;
+import org.geysermc.geyser.connector.network.translators.item.ItemTranslator;
 
 public class ItemEntity extends Entity {
 

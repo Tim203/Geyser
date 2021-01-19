@@ -29,7 +29,7 @@ import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.protocol.bedrock.data.SoundEvent;
 import com.nukkitx.protocol.bedrock.packet.LevelSoundEventPacket;
 import org.geysermc.geyser.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.item.ItemRegistry;
+import org.geysermc.geyser.connector.network.translators.item.ItemRegistry;
 import org.geysermc.geyser.connector.network.translators.sound.BlockSoundInteractionHandler;
 import org.geysermc.geyser.connector.network.translators.sound.SoundHandler;
 

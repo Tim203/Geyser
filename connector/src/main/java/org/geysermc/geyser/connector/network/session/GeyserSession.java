@@ -83,8 +83,8 @@ import org.geysermc.geyser.connector.network.translators.EntityIdentifierRegistr
 import org.geysermc.geyser.connector.network.translators.PacketTranslatorRegistry;
 import org.geysermc.geyser.connector.network.translators.chat.MessageTranslator;
 import org.geysermc.geyser.connector.network.translators.collision.CollisionManager;
-import org.geysermc.connector.network.translators.inventory.EnchantmentInventoryTranslator;
-import org.geysermc.connector.network.translators.item.ItemRegistry;
+import org.geysermc.geyser.connector.network.translators.inventory.EnchantmentInventoryTranslator;
+import org.geysermc.geyser.connector.network.translators.item.ItemRegistry;
 import org.geysermc.geyser.connector.skin.SkinManager;
 import org.geysermc.geyser.connector.utils.*;
 import org.geysermc.floodgate.util.BedrockData;

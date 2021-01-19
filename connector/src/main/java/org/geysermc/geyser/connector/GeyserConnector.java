@@ -45,10 +45,10 @@ import org.geysermc.geyser.connector.network.translators.EntityIdentifierRegistr
 import org.geysermc.geyser.connector.network.translators.PacketTranslatorRegistry;
 import org.geysermc.geyser.connector.network.translators.collision.CollisionTranslator;
 import org.geysermc.geyser.connector.network.translators.effect.EffectRegistry;
-import org.geysermc.connector.network.translators.item.ItemRegistry;
-import org.geysermc.connector.network.translators.item.ItemTranslator;
-import org.geysermc.connector.network.translators.item.PotionMixRegistry;
-import org.geysermc.connector.network.translators.item.RecipeRegistry;
+import org.geysermc.geyser.connector.network.translators.item.ItemRegistry;
+import org.geysermc.geyser.connector.network.translators.item.ItemTranslator;
+import org.geysermc.geyser.connector.network.translators.item.PotionMixRegistry;
+import org.geysermc.geyser.connector.network.translators.item.RecipeRegistry;
 import org.geysermc.geyser.connector.network.translators.sound.SoundHandlerRegistry;
 import org.geysermc.geyser.connector.network.translators.sound.SoundRegistry;
 import org.geysermc.geyser.connector.network.translators.world.WorldManager;

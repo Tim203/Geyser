@@ -28,7 +28,7 @@ package org.geysermc.geyser.connector.network.translators.world.block.entity;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.ListTag;
 import com.nukkitx.nbt.NbtMapBuilder;
-import org.geysermc.connector.network.translators.item.translators.BannerTranslator;
+import org.geysermc.geyser.connector.network.translators.item.translators.BannerTranslator;
 import org.geysermc.geyser.connector.network.translators.world.block.BlockStateValues;
 
 @BlockEntity(name = "Banner", regex = "banner")
