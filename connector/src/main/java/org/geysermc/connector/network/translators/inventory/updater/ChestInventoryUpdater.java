@@ -33,8 +33,8 @@ import org.geysermc.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.InventoryTranslator;
 import org.geysermc.connector.network.translators.item.ItemTranslator;
-import org.geysermc.connector.utils.InventoryUtils;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.InventoryUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.util.ArrayList;
 import java.util.List;

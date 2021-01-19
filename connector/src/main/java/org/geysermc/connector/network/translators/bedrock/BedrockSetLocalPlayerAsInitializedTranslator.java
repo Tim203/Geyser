@@ -31,8 +31,8 @@ import org.geysermc.connector.entity.player.PlayerEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.skin.SkinManager;
-import org.geysermc.connector.skin.SkullSkinManager;
+import org.geysermc.geyser.connector.skin.SkinManager;
+import org.geysermc.geyser.connector.skin.SkullSkinManager;
 
 @Translator(packet = SetLocalPlayerAsInitializedPacket.class)
 public class BedrockSetLocalPlayerAsInitializedTranslator extends PacketTranslator<SetLocalPlayerAsInitializedPacket> {

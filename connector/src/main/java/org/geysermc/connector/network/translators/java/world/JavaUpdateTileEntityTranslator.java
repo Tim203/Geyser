@@ -37,8 +37,8 @@ import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.world.block.entity.BlockEntityTranslator;
 import org.geysermc.connector.network.translators.world.block.entity.SkullBlockEntityTranslator;
-import org.geysermc.connector.utils.BlockEntityUtils;
-import org.geysermc.connector.utils.ChunkUtils;
+import org.geysermc.geyser.connector.utils.BlockEntityUtils;
+import org.geysermc.geyser.connector.utils.ChunkUtils;
 
 @Translator(packet = ServerUpdateTileEntityPacket.class)
 public class JavaUpdateTileEntityTranslator extends PacketTranslator<ServerUpdateTileEntityPacket> {

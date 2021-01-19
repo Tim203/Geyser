@@ -32,8 +32,8 @@ import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.inventory.InventoryTranslator;
-import org.geysermc.connector.utils.InventoryUtils;
-import org.geysermc.connector.utils.LocaleUtils;
+import org.geysermc.geyser.connector.utils.InventoryUtils;
+import org.geysermc.geyser.connector.utils.LocaleUtils;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
 
 @Translator(packet = ServerOpenWindowPacket.class)

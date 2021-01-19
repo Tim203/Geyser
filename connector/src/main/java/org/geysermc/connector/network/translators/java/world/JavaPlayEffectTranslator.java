@@ -41,7 +41,7 @@ import org.geysermc.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
 import org.geysermc.connector.network.translators.effect.Effect;
 import org.geysermc.connector.network.translators.effect.EffectRegistry;
-import org.geysermc.connector.utils.LocaleUtils;
+import org.geysermc.geyser.connector.utils.LocaleUtils;
 
 import java.util.ArrayList;
 import java.util.List;

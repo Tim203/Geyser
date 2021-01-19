@@ -33,9 +33,9 @@ import com.nukkitx.nbt.NbtMap;
 import com.nukkitx.nbt.NbtMapBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.utils.BlockEntityUtils;
-import org.geysermc.connector.utils.FileUtils;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.BlockEntityUtils;
+import org.geysermc.geyser.connector.utils.FileUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 import org.reflections.Reflections;
 
 import java.util.HashMap;

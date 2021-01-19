@@ -35,8 +35,8 @@ import org.geysermc.connector.entity.*;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.EntityUtils;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.EntityUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

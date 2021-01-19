@@ -40,8 +40,8 @@ import org.geysermc.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.item.ItemEntry;
 import org.geysermc.connector.network.translators.item.ItemRegistry;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
-import org.geysermc.connector.utils.BlockUtils;
-import org.geysermc.connector.utils.ChunkUtils;
+import org.geysermc.geyser.connector.utils.BlockUtils;
+import org.geysermc.geyser.connector.utils.ChunkUtils;
 
 @Translator(packet = ServerPlayerActionAckPacket.class)
 public class JavaPlayerActionAckTranslator extends PacketTranslator<ServerPlayerActionAckPacket> {

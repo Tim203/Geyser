@@ -31,8 +31,8 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.GeyserLogger;
-import org.geysermc.connector.command.CommandSender;
-import org.geysermc.connector.common.ChatColor;
+import org.geysermc.geyser.connector.command.CommandSender;
+import org.geysermc.geyser.connector.common.ChatColor;
 
 @Log4j2
 public class GeyserStandaloneLogger extends SimpleTerminalConsole implements GeyserLogger, CommandSender {

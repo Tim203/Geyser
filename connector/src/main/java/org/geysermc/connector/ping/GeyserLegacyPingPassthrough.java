@@ -29,7 +29,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.github.steveice10.mc.protocol.MinecraftConstants;
 import com.nukkitx.nbt.util.VarInts;
-import org.geysermc.connector.common.ping.GeyserPingInfo;
+import org.geysermc.geyser.connector.common.ping.GeyserPingInfo;
 import org.geysermc.connector.GeyserConnector;
 
 import java.io.ByteArrayOutputStream;

@@ -50,8 +50,8 @@ import org.geysermc.connector.entity.attribute.AttributeType;
 import org.geysermc.connector.entity.living.animal.tameable.ParrotEntity;
 import org.geysermc.connector.entity.type.EntityType;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.scoreboard.Team;
-import org.geysermc.connector.utils.AttributeUtils;
+import org.geysermc.geyser.connector.scoreboard.Team;
+import org.geysermc.geyser.connector.utils.AttributeUtils;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
 
 import java.util.ArrayList;

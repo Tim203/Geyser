@@ -30,7 +30,7 @@ import com.nukkitx.protocol.bedrock.packet.LevelSoundEventPacket;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.CooldownUtils;
+import org.geysermc.geyser.connector.utils.CooldownUtils;
 
 @Translator(packet = LevelSoundEventPacket.class)
 public class BedrockLevelSoundEventTranslator extends PacketTranslator<LevelSoundEventPacket> {

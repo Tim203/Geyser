@@ -31,7 +31,7 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.geysermc.connector.FloodgateKeyLoader;
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
+import org.geysermc.geyser.connector.configuration.GeyserJacksonConfiguration;
 
 import java.nio.file.Path;
 

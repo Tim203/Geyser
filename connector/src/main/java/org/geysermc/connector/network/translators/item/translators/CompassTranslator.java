@@ -32,7 +32,7 @@ import org.geysermc.connector.network.translators.ItemRemapper;
 import org.geysermc.connector.network.translators.item.ItemEntry;
 import org.geysermc.connector.network.translators.item.ItemRegistry;
 import org.geysermc.connector.network.translators.item.ItemTranslator;
-import org.geysermc.connector.utils.LoadstoneTracker;
+import org.geysermc.geyser.connector.utils.LoadstoneTracker;
 
 import java.util.List;
 import java.util.stream.Collectors;

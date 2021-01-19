@@ -28,7 +28,7 @@ package org.geysermc.connector.network.translators.world.block.entity;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.nukkitx.nbt.NbtMapBuilder;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
-import org.geysermc.connector.utils.SignUtils;
+import org.geysermc.geyser.connector.utils.SignUtils;
 
 @BlockEntity(name = "Sign", regex = "sign")
 public class SignBlockEntityTranslator extends BlockEntityTranslator {

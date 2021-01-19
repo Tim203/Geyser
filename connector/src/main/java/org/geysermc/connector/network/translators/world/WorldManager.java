@@ -31,7 +31,7 @@ import com.github.steveice10.mc.protocol.data.game.entity.player.GameMode;
 import com.github.steveice10.mc.protocol.data.game.setting.Difficulty;
 import com.nukkitx.math.vector.Vector3i;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.utils.GameRule;
+import org.geysermc.geyser.connector.utils.GameRule;
 
 /**
  * Class that manages or retrieves various information

@@ -32,7 +32,7 @@ import org.geysermc.connector.entity.attribute.AttributeType;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.AttributeUtils;
+import org.geysermc.geyser.connector.utils.AttributeUtils;
 
 @Translator(packet = ServerEntityPropertiesPacket.class)
 public class JavaEntityPropertiesTranslator extends PacketTranslator<ServerEntityPropertiesPacket> {

@@ -34,7 +34,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.session.cache.ChunkCache;
-import org.geysermc.connector.utils.GameRule;
+import org.geysermc.geyser.connector.utils.GameRule;
 
 public class GeyserWorldManager extends WorldManager {
 

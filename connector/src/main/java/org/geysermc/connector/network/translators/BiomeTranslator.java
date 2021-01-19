@@ -29,8 +29,8 @@ import com.nukkitx.nbt.NBTInputStream;
 import com.nukkitx.nbt.NbtMap;
 import com.nukkitx.nbt.NbtUtils;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.utils.FileUtils;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.FileUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.io.InputStream;
 import java.util.Arrays;

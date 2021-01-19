@@ -29,7 +29,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.translation.Translator;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.geysermc.connector.utils.LocaleUtils;
+import org.geysermc.geyser.connector.utils.LocaleUtils;
 
 import java.text.MessageFormat;
 import java.util.Locale;

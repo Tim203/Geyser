@@ -33,10 +33,10 @@ import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.session.cache.WorldCache;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.scoreboard.Objective;
-import org.geysermc.connector.scoreboard.Scoreboard;
-import org.geysermc.connector.scoreboard.ScoreboardUpdater;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.scoreboard.Objective;
+import org.geysermc.geyser.connector.scoreboard.Scoreboard;
+import org.geysermc.geyser.connector.scoreboard.ScoreboardUpdater;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 @Translator(packet = ServerUpdateScorePacket.class)
 public class JavaUpdateScoreTranslator extends PacketTranslator<ServerUpdateScorePacket> {

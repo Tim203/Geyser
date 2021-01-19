@@ -31,7 +31,7 @@ import com.nukkitx.nbt.NbtMapBuilder;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.world.block.BlockStateValues;
 import org.geysermc.connector.network.translators.world.block.DoubleChestValue;
-import org.geysermc.connector.utils.BlockEntityUtils;
+import org.geysermc.geyser.connector.utils.BlockEntityUtils;
 
 /**
  * Chests have more block entity properties in Bedrock, which is solved by implementing the BedrockOnlyBlockEntity

@@ -36,8 +36,8 @@ import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
 import org.geysermc.connector.entity.player.SkullPlayerEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.world.block.BlockStateValues;
-import org.geysermc.connector.skin.SkinProvider;
-import org.geysermc.connector.skin.SkullSkinManager;
+import org.geysermc.geyser.connector.skin.SkinProvider;
+import org.geysermc.geyser.connector.skin.SkullSkinManager;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

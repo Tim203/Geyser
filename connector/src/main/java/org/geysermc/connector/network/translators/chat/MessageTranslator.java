@@ -36,7 +36,7 @@ import net.kyori.adventure.text.serializer.gson.legacyimpl.NBTLegacyHoverEventSe
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.util.HashMap;
 import java.util.Locale;

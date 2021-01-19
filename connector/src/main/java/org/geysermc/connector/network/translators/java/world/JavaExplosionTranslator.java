@@ -37,7 +37,7 @@ import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
-import org.geysermc.connector.utils.ChunkUtils;
+import org.geysermc.geyser.connector.utils.ChunkUtils;
 
 @Translator(packet = ServerExplosionPacket.class)
 public class JavaExplosionTranslator extends PacketTranslator<ServerExplosionPacket> {

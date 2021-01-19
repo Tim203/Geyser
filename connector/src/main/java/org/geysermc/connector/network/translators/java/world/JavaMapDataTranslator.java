@@ -34,9 +34,9 @@ import com.nukkitx.protocol.bedrock.packet.ClientboundMapItemDataPacket;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.BedrockMapIcon;
-import org.geysermc.connector.utils.DimensionUtils;
-import org.geysermc.connector.utils.MapColor;
+import org.geysermc.geyser.connector.utils.BedrockMapIcon;
+import org.geysermc.geyser.connector.utils.DimensionUtils;
+import org.geysermc.geyser.connector.utils.MapColor;
 
 @Translator(packet = ServerMapDataPacket.class)
 public class JavaMapDataTranslator extends PacketTranslator<ServerMapDataPacket> {

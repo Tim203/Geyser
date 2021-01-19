@@ -37,8 +37,8 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.utils.FileUtils;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.FileUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -30,7 +30,7 @@ import com.nukkitx.math.vector.Vector3i;
 import com.nukkitx.protocol.bedrock.packet.BlockEventPacket;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.world.block.BlockStateValues;
-import org.geysermc.connector.utils.ChunkUtils;
+import org.geysermc.geyser.connector.utils.ChunkUtils;
 
 /**
  * Does not implement BlockEntityTranslator because it's only a block entity in Bedrock

@@ -29,7 +29,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.command.CommandManager;
+import org.geysermc.geyser.connector.command.CommandManager;
 import org.geysermc.geyser.platform.spigot.GeyserSpigotPlugin;
 
 import java.lang.reflect.Field;

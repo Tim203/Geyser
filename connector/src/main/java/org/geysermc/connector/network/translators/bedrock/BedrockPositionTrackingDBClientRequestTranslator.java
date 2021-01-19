@@ -35,8 +35,8 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.DimensionUtils;
-import org.geysermc.connector.utils.LoadstoneTracker;
+import org.geysermc.geyser.connector.utils.DimensionUtils;
+import org.geysermc.geyser.connector.utils.LoadstoneTracker;
 
 @Translator(packet = PositionTrackingDBClientRequestPacket.class)
 public class BedrockPositionTrackingDBClientRequestTranslator extends PacketTranslator<PositionTrackingDBClientRequestPacket> {

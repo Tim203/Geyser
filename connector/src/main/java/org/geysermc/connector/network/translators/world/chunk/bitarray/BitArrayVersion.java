@@ -25,7 +25,7 @@
 
 package org.geysermc.connector.network.translators.world.chunk.bitarray;
 
-import org.geysermc.connector.utils.MathUtils;
+import org.geysermc.geyser.connector.utils.MathUtils;
 
 public enum BitArrayVersion {
     V16(16, 2, null),

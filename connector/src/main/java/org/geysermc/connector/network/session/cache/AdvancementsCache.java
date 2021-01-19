@@ -31,12 +31,12 @@ import lombok.Getter;
 import lombok.Setter;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
-import org.geysermc.connector.utils.GeyserAdvancement;
-import org.geysermc.connector.utils.LanguageUtils;
-import org.geysermc.connector.utils.LocaleUtils;
 import org.geysermc.geyser.common.window.SimpleFormWindow;
 import org.geysermc.geyser.common.window.button.FormButton;
 import org.geysermc.geyser.common.window.response.SimpleFormResponse;
+import org.geysermc.geyser.connector.utils.GeyserAdvancement;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.LocaleUtils;
 
 import java.util.HashMap;
 import java.util.List;

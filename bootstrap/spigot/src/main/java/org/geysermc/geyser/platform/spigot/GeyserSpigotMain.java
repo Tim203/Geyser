@@ -25,7 +25,7 @@
 
 package org.geysermc.geyser.platform.spigot;
 
-import org.geysermc.connector.common.main.IGeyserMain;
+import org.geysermc.geyser.connector.common.main.IGeyserMain;
 
 public class GeyserSpigotMain extends IGeyserMain {
 

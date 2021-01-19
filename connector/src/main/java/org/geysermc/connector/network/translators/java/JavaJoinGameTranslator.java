@@ -38,8 +38,8 @@ import org.geysermc.connector.entity.player.PlayerEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.DimensionUtils;
-import org.geysermc.connector.utils.PluginMessageUtils;
+import org.geysermc.geyser.connector.utils.DimensionUtils;
+import org.geysermc.geyser.connector.utils.PluginMessageUtils;
 
 import java.util.Arrays;
 import java.util.List;

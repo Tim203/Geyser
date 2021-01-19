@@ -30,12 +30,12 @@ import com.nukkitx.protocol.bedrock.data.ResourcePackType;
 import com.nukkitx.protocol.bedrock.BedrockPacketCodec;
 import com.nukkitx.protocol.bedrock.packet.*;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.common.AuthType;
-import org.geysermc.connector.configuration.GeyserConfiguration;
+import org.geysermc.geyser.connector.common.AuthType;
+import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.session.cache.AdvancementsCache;
 import org.geysermc.connector.network.translators.PacketTranslatorRegistry;
-import org.geysermc.connector.utils.*;
+import org.geysermc.geyser.connector.utils.*;
 
 import java.io.FileInputStream;
 import java.io.InputStream;

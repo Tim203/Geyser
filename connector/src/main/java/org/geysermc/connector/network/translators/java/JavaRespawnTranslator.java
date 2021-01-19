@@ -35,7 +35,7 @@ import org.geysermc.connector.entity.attribute.AttributeType;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.DimensionUtils;
+import org.geysermc.geyser.connector.utils.DimensionUtils;
 
 @Translator(packet = ServerRespawnPacket.class)
 public class JavaRespawnTranslator extends PacketTranslator<ServerRespawnPacket> {

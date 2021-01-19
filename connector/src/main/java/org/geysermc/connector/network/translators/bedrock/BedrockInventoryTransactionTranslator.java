@@ -58,8 +58,8 @@ import org.geysermc.connector.network.translators.item.ItemEntry;
 import org.geysermc.connector.network.translators.item.ItemRegistry;
 import org.geysermc.connector.network.translators.sound.EntitySoundInteractionHandler;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
-import org.geysermc.connector.utils.BlockUtils;
-import org.geysermc.connector.utils.InventoryUtils;
+import org.geysermc.geyser.connector.utils.BlockUtils;
+import org.geysermc.geyser.connector.utils.InventoryUtils;
 
 import java.util.concurrent.TimeUnit;
 

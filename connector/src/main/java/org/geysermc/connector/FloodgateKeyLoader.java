@@ -25,8 +25,8 @@
 
 package org.geysermc.connector;
 
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.configuration.GeyserJacksonConfiguration;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.nio.file.Files;
 import java.nio.file.Path;

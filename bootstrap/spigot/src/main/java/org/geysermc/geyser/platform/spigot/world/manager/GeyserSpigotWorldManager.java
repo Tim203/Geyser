@@ -40,9 +40,9 @@ import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.world.GeyserWorldManager;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
-import org.geysermc.connector.utils.FileUtils;
-import org.geysermc.connector.utils.GameRule;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.FileUtils;
+import org.geysermc.geyser.connector.utils.GameRule;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.io.InputStream;
 

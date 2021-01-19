@@ -34,7 +34,7 @@ import org.geysermc.connector.inventory.PlayerInventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.InventoryTranslator;
 import org.geysermc.connector.network.translators.inventory.SlotType;
-import org.geysermc.connector.utils.InventoryUtils;
+import org.geysermc.geyser.connector.utils.InventoryUtils;
 
 import java.util.ArrayList;
 import java.util.List;

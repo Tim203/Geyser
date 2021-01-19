@@ -32,11 +32,11 @@ import org.geysermc.connector.GeyserLogger;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.scoreboard.Scoreboard;
-import org.geysermc.connector.scoreboard.ScoreboardUpdater;
-import org.geysermc.connector.scoreboard.Team;
-import org.geysermc.connector.scoreboard.UpdateType;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.scoreboard.Scoreboard;
+import org.geysermc.geyser.connector.scoreboard.ScoreboardUpdater;
+import org.geysermc.geyser.connector.scoreboard.Team;
+import org.geysermc.geyser.connector.scoreboard.UpdateType;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
 
 import java.util.Arrays;

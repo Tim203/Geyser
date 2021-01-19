@@ -31,12 +31,12 @@ import com.nukkitx.protocol.bedrock.BedrockServerSession;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.common.ping.GeyserPingInfo;
-import org.geysermc.connector.configuration.GeyserConfiguration;
+import org.geysermc.geyser.connector.common.ping.GeyserPingInfo;
+import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
 import org.geysermc.connector.ping.IGeyserPingPassthrough;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;

@@ -27,7 +27,7 @@ package org.geysermc.connector.network;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import org.geysermc.connector.common.ping.GeyserPingInfo;
+import org.geysermc.geyser.connector.common.ping.GeyserPingInfo;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
 

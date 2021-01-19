@@ -39,8 +39,8 @@ import org.geysermc.connector.entity.attribute.AttributeType;
 import org.geysermc.connector.entity.living.InsentientEntity;
 import org.geysermc.connector.entity.type.EntityType;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.utils.AttributeUtils;
-import org.geysermc.connector.utils.DimensionUtils;
+import org.geysermc.geyser.connector.utils.AttributeUtils;
+import org.geysermc.geyser.connector.utils.DimensionUtils;
 
 import java.util.ArrayList;
 import java.util.List;

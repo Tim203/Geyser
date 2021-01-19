@@ -43,7 +43,7 @@ import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.inventory.PlayerInventoryTranslator;
-import org.geysermc.connector.utils.LocaleUtils;
+import org.geysermc.geyser.connector.utils.LocaleUtils;
 
 @Translator(packet = ServerNotifyClientPacket.class)
 public class JavaNotifyClientTranslator extends PacketTranslator<ServerNotifyClientPacket> {

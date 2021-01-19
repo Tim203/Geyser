@@ -35,12 +35,12 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.bootstrap.GeyserBootstrap;
-import org.geysermc.connector.configuration.GeyserConfiguration;
+import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
 import org.geysermc.connector.dump.BootstrapDumpInfo;
 import org.geysermc.connector.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.connector.ping.IGeyserPingPassthrough;
-import org.geysermc.connector.utils.FileUtils;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.FileUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 import org.geysermc.geyser.common.PlatformType;
 import org.geysermc.geyser.platform.velocity.command.GeyserVelocityCommandExecutor;
 import org.geysermc.geyser.platform.velocity.command.GeyserVelocityCommandManager;
@@ -145,7 +145,7 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
     }
 
     @Override
-    public org.geysermc.connector.command.CommandManager getGeyserCommandManager() {
+    public org.geysermc.geyser.connector.command.CommandManager getGeyserCommandManager() {
         return this.geyserCommandManager;
     }
 

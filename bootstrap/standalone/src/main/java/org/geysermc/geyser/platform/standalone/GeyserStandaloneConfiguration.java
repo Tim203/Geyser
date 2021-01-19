@@ -27,7 +27,7 @@ package org.geysermc.geyser.platform.standalone;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
+import org.geysermc.geyser.connector.configuration.GeyserJacksonConfiguration;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;

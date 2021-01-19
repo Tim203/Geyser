@@ -39,8 +39,8 @@ import com.nukkitx.protocol.bedrock.packet.SetEntityMotionPacket;
 import org.geysermc.connector.entity.player.PlayerEntity;
 import org.geysermc.connector.entity.type.EntityType;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.utils.FireworkColor;
-import org.geysermc.connector.utils.MathUtils;
+import org.geysermc.geyser.connector.utils.FireworkColor;
+import org.geysermc.geyser.connector.utils.MathUtils;
 import org.geysermc.floodgate.util.DeviceOS;
 
 import java.util.ArrayList;

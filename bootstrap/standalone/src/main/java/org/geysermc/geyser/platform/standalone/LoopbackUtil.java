@@ -25,8 +25,8 @@
 
 package org.geysermc.geyser.platform.standalone;
 
-import org.geysermc.connector.common.ChatColor;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.common.ChatColor;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.io.InputStream;
 import java.nio.file.Files;

@@ -29,8 +29,8 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.kyori.text.TextComponent;
-import org.geysermc.connector.command.CommandSender;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.command.CommandSender;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.util.Locale;
 

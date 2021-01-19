@@ -33,7 +33,7 @@ import com.nukkitx.protocol.bedrock.data.inventory.InventorySource;
 import org.geysermc.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.updater.CursorInventoryUpdater;
-import org.geysermc.connector.utils.InventoryUtils;
+import org.geysermc.geyser.connector.utils.InventoryUtils;
 
 import java.util.List;
 

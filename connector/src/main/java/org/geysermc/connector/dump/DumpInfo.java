@@ -31,12 +31,12 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.common.serializer.AsteriskSerializer;
-import org.geysermc.connector.configuration.GeyserConfiguration;
+import org.geysermc.geyser.connector.common.serializer.AsteriskSerializer;
+import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
 import org.geysermc.connector.network.BedrockProtocol;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.utils.DockerCheck;
-import org.geysermc.connector.utils.FileUtils;
+import org.geysermc.geyser.connector.utils.DockerCheck;
+import org.geysermc.geyser.connector.utils.FileUtils;
 import org.geysermc.floodgate.util.DeviceOS;
 
 import java.io.IOException;

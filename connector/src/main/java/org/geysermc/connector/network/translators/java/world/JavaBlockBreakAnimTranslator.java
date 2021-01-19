@@ -35,7 +35,7 @@ import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.item.ItemEntry;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
-import org.geysermc.connector.utils.BlockUtils;
+import org.geysermc.geyser.connector.utils.BlockUtils;
 
 @Translator(packet = ServerBlockBreakAnimPacket.class)
 public class JavaBlockBreakAnimTranslator extends PacketTranslator<ServerBlockBreakAnimPacket> {

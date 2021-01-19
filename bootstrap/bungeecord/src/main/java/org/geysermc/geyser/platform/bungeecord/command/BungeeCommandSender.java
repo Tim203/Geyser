@@ -27,8 +27,8 @@ package org.geysermc.geyser.platform.bungeecord.command;
 
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.geysermc.connector.command.CommandSender;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.command.CommandSender;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 public class BungeeCommandSender implements CommandSender {
 

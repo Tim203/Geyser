@@ -29,9 +29,9 @@ import com.github.steveice10.mc.protocol.data.game.setting.Difficulty;
 import lombok.Getter;
 import lombok.Setter;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.scoreboard.Objective;
-import org.geysermc.connector.scoreboard.Scoreboard;
-import org.geysermc.connector.scoreboard.ScoreboardUpdater;
+import org.geysermc.geyser.connector.scoreboard.Objective;
+import org.geysermc.geyser.connector.scoreboard.Scoreboard;
+import org.geysermc.geyser.connector.scoreboard.ScoreboardUpdater;
 
 @Getter
 public class WorldCache {

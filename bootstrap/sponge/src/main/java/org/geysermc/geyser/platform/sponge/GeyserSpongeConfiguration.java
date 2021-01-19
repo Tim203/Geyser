@@ -25,7 +25,7 @@
 
 package org.geysermc.geyser.platform.sponge;
 
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
+import org.geysermc.geyser.connector.configuration.GeyserJacksonConfiguration;
 
 import java.nio.file.Path;
 

@@ -36,7 +36,7 @@ import org.geysermc.connector.network.translators.collision.translators.EmptyCol
 import org.geysermc.connector.network.translators.collision.translators.OtherCollision;
 import org.geysermc.connector.network.translators.collision.translators.SolidCollision;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
-import org.geysermc.connector.utils.FileUtils;
+import org.geysermc.geyser.connector.utils.FileUtils;
 import org.reflections.Reflections;
 
 import java.io.InputStream;

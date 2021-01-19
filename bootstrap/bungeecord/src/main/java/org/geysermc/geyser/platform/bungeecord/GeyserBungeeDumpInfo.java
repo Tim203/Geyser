@@ -28,7 +28,7 @@ package org.geysermc.geyser.platform.bungeecord;
 import lombok.Getter;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
-import org.geysermc.connector.common.serializer.AsteriskSerializer;
+import org.geysermc.geyser.connector.common.serializer.AsteriskSerializer;
 import org.geysermc.connector.dump.BootstrapDumpInfo;
 
 import java.util.ArrayList;

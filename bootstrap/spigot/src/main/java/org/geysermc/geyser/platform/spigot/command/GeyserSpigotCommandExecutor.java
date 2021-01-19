@@ -30,10 +30,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.command.CommandExecutor;
-import org.geysermc.connector.command.GeyserCommand;
+import org.geysermc.geyser.connector.command.CommandExecutor;
+import org.geysermc.geyser.connector.command.GeyserCommand;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -32,7 +32,7 @@ import org.geysermc.connector.network.translators.Translator;
 import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerSpawnPositionPacket;
 import com.nukkitx.math.vector.Vector3i;
 import com.nukkitx.protocol.bedrock.packet.SetSpawnPositionPacket;
-import org.geysermc.connector.utils.DimensionUtils;
+import org.geysermc.geyser.connector.utils.DimensionUtils;
 
 @Translator(packet = ServerSpawnPositionPacket.class)
 public class JavaSpawnPositionTranslator extends PacketTranslator<ServerSpawnPositionPacket> {

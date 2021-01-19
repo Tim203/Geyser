@@ -26,7 +26,7 @@
 package org.geysermc.geyser.platform.standalone.command;
 
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.command.CommandManager;
+import org.geysermc.geyser.connector.command.CommandManager;
 
 public class GeyserCommandManager extends CommandManager {
 

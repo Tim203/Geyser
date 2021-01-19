@@ -25,7 +25,7 @@
 
 package org.geysermc.connector.ping;
 
-import org.geysermc.connector.common.ping.GeyserPingInfo;
+import org.geysermc.geyser.connector.common.ping.GeyserPingInfo;
 
 import java.net.Inet4Address;
 import java.net.InetSocketAddress;

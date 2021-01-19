@@ -30,7 +30,7 @@ import com.nukkitx.protocol.bedrock.packet.ServerSettingsResponsePacket;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.SettingsUtils;
+import org.geysermc.geyser.connector.utils.SettingsUtils;
 
 @Translator(packet = ServerSettingsRequestPacket.class)
 public class BedrockServerSettingsRequestTranslator extends PacketTranslator<ServerSettingsRequestPacket> {

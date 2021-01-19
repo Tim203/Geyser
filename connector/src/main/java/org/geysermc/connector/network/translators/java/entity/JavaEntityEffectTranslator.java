@@ -31,7 +31,7 @@ import org.geysermc.connector.entity.Entity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.EntityUtils;
+import org.geysermc.geyser.connector.utils.EntityUtils;
 
 @Translator(packet = ServerEntityEffectPacket.class)
 public class JavaEntityEffectTranslator extends PacketTranslator<ServerEntityEffectPacket> {

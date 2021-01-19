@@ -26,7 +26,7 @@
 package org.geysermc.connector.network.translators.world.chunk.bitarray;
 
 import com.nukkitx.network.util.Preconditions;
-import org.geysermc.connector.utils.MathUtils;
+import org.geysermc.geyser.connector.utils.MathUtils;
 
 import java.util.Arrays;
 

@@ -32,7 +32,7 @@ import org.geysermc.connector.network.translators.Translator;
 import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlayerChangeHeldItemPacket;
 import com.nukkitx.protocol.bedrock.data.inventory.ContainerId;
 import com.nukkitx.protocol.bedrock.packet.MobEquipmentPacket;
-import org.geysermc.connector.utils.CooldownUtils;
+import org.geysermc.geyser.connector.utils.CooldownUtils;
 
 @Translator(packet = MobEquipmentPacket.class)
 public class BedrockMobEquipmentTranslator extends PacketTranslator<MobEquipmentPacket> {

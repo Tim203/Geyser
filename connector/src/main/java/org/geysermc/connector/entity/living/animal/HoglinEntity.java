@@ -30,7 +30,7 @@ import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
 import org.geysermc.connector.entity.type.EntityType;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.utils.DimensionUtils;
+import org.geysermc.geyser.connector.utils.DimensionUtils;
 
 public class HoglinEntity extends AnimalEntity {
 

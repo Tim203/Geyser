@@ -25,7 +25,7 @@
 
 package org.geysermc.geyser.platform.velocity;
 
-import org.geysermc.connector.common.main.IGeyserMain;
+import org.geysermc.geyser.connector.common.main.IGeyserMain;
 
 public class GeyserVelocityMain extends IGeyserMain {
 

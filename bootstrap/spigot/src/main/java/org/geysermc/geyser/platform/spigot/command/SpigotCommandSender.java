@@ -28,8 +28,8 @@ package org.geysermc.geyser.platform.spigot.command;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.geysermc.connector.GeyserConnector;
-import org.geysermc.connector.command.CommandSender;
-import org.geysermc.connector.utils.LanguageUtils;
+import org.geysermc.geyser.connector.command.CommandSender;
+import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

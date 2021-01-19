@@ -26,7 +26,7 @@
 package org.geysermc.geyser.platform.sponge;
 
 import com.github.steveice10.mc.protocol.MinecraftConstants;
-import org.geysermc.connector.common.ping.GeyserPingInfo;
+import org.geysermc.geyser.connector.common.ping.GeyserPingInfo;
 import org.geysermc.connector.ping.IGeyserPingPassthrough;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;

@@ -34,7 +34,7 @@ import lombok.experimental.Accessors;
 
 import org.geysermc.connector.entity.type.EntityType;
 import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.utils.PaintingType;
+import org.geysermc.geyser.connector.utils.PaintingType;
 
 @Getter @Setter
 @Accessors(chain = true)

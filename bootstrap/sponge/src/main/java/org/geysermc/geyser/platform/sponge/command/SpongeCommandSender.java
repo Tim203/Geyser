@@ -26,7 +26,7 @@
 package org.geysermc.geyser.platform.sponge.command;
 
 import lombok.AllArgsConstructor;
-import org.geysermc.connector.command.CommandSender;
+import org.geysermc.geyser.connector.command.CommandSender;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.text.Text;

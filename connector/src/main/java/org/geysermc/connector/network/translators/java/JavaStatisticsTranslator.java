@@ -29,7 +29,7 @@ import com.github.steveice10.mc.protocol.packet.ingame.server.ServerStatisticsPa
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.StatisticsUtils;
+import org.geysermc.geyser.connector.utils.StatisticsUtils;
 
 @Translator(packet = ServerStatisticsPacket.class)
 public class JavaStatisticsTranslator extends PacketTranslator<ServerStatisticsPacket> {

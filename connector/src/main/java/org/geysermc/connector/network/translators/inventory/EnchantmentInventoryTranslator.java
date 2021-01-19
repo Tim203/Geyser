@@ -38,14 +38,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.geysermc.connector.common.ChatColor;
+import org.geysermc.geyser.connector.common.ChatColor;
 import org.geysermc.connector.inventory.Inventory;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.updater.InventoryUpdater;
 import org.geysermc.connector.network.translators.item.ItemRegistry;
 import org.geysermc.connector.network.translators.item.ItemTranslator;
-import org.geysermc.connector.utils.InventoryUtils;
-import org.geysermc.connector.utils.LocaleUtils;
+import org.geysermc.geyser.connector.utils.InventoryUtils;
+import org.geysermc.geyser.connector.utils.LocaleUtils;
 
 import java.util.*;
 

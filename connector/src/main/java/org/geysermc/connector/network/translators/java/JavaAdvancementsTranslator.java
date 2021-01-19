@@ -33,8 +33,8 @@ import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
 import org.geysermc.connector.network.session.cache.AdvancementsCache;
-import org.geysermc.connector.utils.GeyserAdvancement;
-import org.geysermc.connector.utils.LocaleUtils;
+import org.geysermc.geyser.connector.utils.GeyserAdvancement;
+import org.geysermc.geyser.connector.utils.LocaleUtils;
 
 import java.util.Map;
 

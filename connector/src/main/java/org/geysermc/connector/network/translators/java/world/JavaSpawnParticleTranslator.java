@@ -40,7 +40,7 @@ import org.geysermc.connector.network.translators.world.block.BlockTranslator;
 import com.github.steveice10.mc.protocol.packet.ingame.server.world.ServerSpawnParticlePacket;
 import com.nukkitx.math.vector.Vector3f;
 import org.geysermc.connector.network.translators.effect.EffectRegistry;
-import org.geysermc.connector.utils.DimensionUtils;
+import org.geysermc.geyser.connector.utils.DimensionUtils;
 
 @Translator(packet = ServerSpawnParticlePacket.class)
 public class JavaSpawnParticleTranslator extends PacketTranslator<ServerSpawnParticlePacket> {

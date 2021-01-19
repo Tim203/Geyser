@@ -30,7 +30,7 @@ import org.geysermc.connector.entity.PaintingEntity;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.utils.PaintingType;
+import org.geysermc.geyser.connector.utils.PaintingType;
 
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.spawn.ServerSpawnPaintingPacket;
 import com.nukkitx.math.vector.Vector3f;

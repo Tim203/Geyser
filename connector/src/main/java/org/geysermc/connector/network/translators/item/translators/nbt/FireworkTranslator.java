@@ -30,8 +30,8 @@ import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.ItemRemapper;
 import org.geysermc.connector.network.translators.item.ItemEntry;
 import org.geysermc.connector.network.translators.item.NbtItemStackTranslator;
-import org.geysermc.connector.utils.FireworkColor;
-import org.geysermc.connector.utils.MathUtils;
+import org.geysermc.geyser.connector.utils.FireworkColor;
+import org.geysermc.geyser.connector.utils.MathUtils;
 
 @ItemRemapper
 public class FireworkTranslator extends NbtItemStackTranslator {

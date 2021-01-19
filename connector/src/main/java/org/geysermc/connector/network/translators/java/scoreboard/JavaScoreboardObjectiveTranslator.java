@@ -29,9 +29,9 @@ import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.session.cache.WorldCache;
 import org.geysermc.connector.network.translators.PacketTranslator;
 import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.scoreboard.Objective;
-import org.geysermc.connector.scoreboard.Scoreboard;
-import org.geysermc.connector.scoreboard.ScoreboardUpdater;
+import org.geysermc.geyser.connector.scoreboard.Objective;
+import org.geysermc.geyser.connector.scoreboard.Scoreboard;
+import org.geysermc.geyser.connector.scoreboard.ScoreboardUpdater;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
 
 import com.github.steveice10.mc.protocol.data.game.scoreboard.ObjectiveAction;
