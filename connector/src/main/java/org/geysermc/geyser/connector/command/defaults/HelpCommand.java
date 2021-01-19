@@ -29,7 +29,7 @@ import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandSender;
 import org.geysermc.geyser.connector.command.GeyserCommand;
 import org.geysermc.geyser.connector.common.ChatColor;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.util.Collections;

@@ -29,8 +29,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.geysermc.adapters.spigot.SpigotAdapters;
 import org.geysermc.adapters.spigot.SpigotWorldAdapter;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.world.block.BlockTranslator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
 
 public class GeyserSpigotNativeWorldManager extends GeyserSpigotWorldManager {
     protected final SpigotWorldAdapter adapter;

@@ -29,8 +29,8 @@ import com.github.steveice10.mc.protocol.data.game.entity.metadata.Position;
 import com.nukkitx.math.vector.Vector3i;
 import com.nukkitx.nbt.NbtMap;
 import com.nukkitx.protocol.bedrock.packet.BlockEntityDataPacket;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.world.block.entity.BlockEntityTranslator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.world.block.entity.BlockEntityTranslator;
 
 public class BlockEntityUtils {
     private static final BlockEntityTranslator EMPTY_TRANSLATOR = BlockEntityTranslator.BLOCK_ENTITY_TRANSLATORS.get("Empty");

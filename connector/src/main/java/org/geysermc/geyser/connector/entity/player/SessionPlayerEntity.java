@@ -27,7 +27,7 @@ package org.geysermc.geyser.connector.entity.player;
 
 import com.github.steveice10.mc.auth.data.GameProfile;
 import com.nukkitx.math.vector.Vector3f;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 
 import java.util.UUID;
 

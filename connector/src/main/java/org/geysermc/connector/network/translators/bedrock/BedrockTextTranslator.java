@@ -25,13 +25,13 @@
 
 package org.geysermc.connector.network.translators.bedrock;
 
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
 
 import com.github.steveice10.mc.protocol.packet.ingame.client.ClientChatPacket;
 import com.nukkitx.protocol.bedrock.packet.TextPacket;
-import org.geysermc.connector.network.translators.chat.MessageTranslator;
+import org.geysermc.geyser.connector.network.translators.chat.MessageTranslator;
 
 @Translator(packet = TextPacket.class)
 public class BedrockTextTranslator extends PacketTranslator<TextPacket> {

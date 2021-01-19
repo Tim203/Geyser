@@ -39,9 +39,9 @@ import com.nukkitx.protocol.bedrock.packet.InteractPacket;
 import lombok.Getter;
 import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.geyser.connector.entity.type.EntityType;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
 import org.geysermc.connector.network.translators.item.ItemEntry;
 import org.geysermc.connector.network.translators.item.ItemRegistry;
 

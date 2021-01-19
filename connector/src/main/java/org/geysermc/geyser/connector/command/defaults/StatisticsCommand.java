@@ -30,7 +30,7 @@ import com.github.steveice10.mc.protocol.packet.ingame.client.ClientRequestPacke
 import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandSender;
 import org.geysermc.geyser.connector.command.GeyserCommand;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 
 public class StatisticsCommand extends GeyserCommand {
 

@@ -27,9 +27,9 @@ package org.geysermc.connector.network.translators.java.entity;
 
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPositionRotationPacket;
 import org.geysermc.geyser.connector.entity.Entity;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
 
 @Translator(packet = ServerEntityPositionRotationPacket.class)
 public class JavaEntityPositionRotationTranslator extends PacketTranslator<ServerEntityPositionRotationPacket> {

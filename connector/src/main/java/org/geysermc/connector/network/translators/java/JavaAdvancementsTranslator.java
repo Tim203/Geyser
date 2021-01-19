@@ -28,11 +28,11 @@ package org.geysermc.connector.network.translators.java;
 import com.github.steveice10.mc.protocol.data.game.advancement.Advancement;
 import com.github.steveice10.mc.protocol.packet.ingame.server.ServerAdvancementsPacket;
 import com.nukkitx.protocol.bedrock.packet.SetTitlePacket;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
-import org.geysermc.connector.network.translators.chat.MessageTranslator;
-import org.geysermc.connector.network.session.cache.AdvancementsCache;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.translators.chat.MessageTranslator;
+import org.geysermc.geyser.connector.network.session.cache.AdvancementsCache;
 import org.geysermc.geyser.connector.utils.GeyserAdvancement;
 import org.geysermc.geyser.connector.utils.LocaleUtils;
 

@@ -27,7 +27,7 @@ package org.geysermc.geyser.connector.utils;
 
 import com.github.steveice10.mc.protocol.data.game.advancement.Advancement;
 import lombok.NonNull;
-import org.geysermc.connector.network.session.cache.AdvancementsCache;
+import org.geysermc.geyser.connector.network.session.cache.AdvancementsCache;
 
 import java.util.List;
 

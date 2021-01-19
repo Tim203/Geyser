@@ -29,9 +29,9 @@ import com.github.steveice10.mc.protocol.data.game.entity.attribute.Attribute;
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.ServerEntityPropertiesPacket;
 import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.geyser.connector.entity.attribute.AttributeType;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
 import org.geysermc.geyser.connector.utils.AttributeUtils;
 
 @Translator(packet = ServerEntityPropertiesPacket.class)

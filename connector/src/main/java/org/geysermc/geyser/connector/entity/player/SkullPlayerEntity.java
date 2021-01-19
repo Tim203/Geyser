@@ -32,7 +32,7 @@ import com.nukkitx.protocol.bedrock.data.entity.EntityData;
 import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
 import lombok.Getter;
 import lombok.Setter;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 
 /**
  * A wrapper to handle skulls more effectively - skulls have to be treated as entities since there are no

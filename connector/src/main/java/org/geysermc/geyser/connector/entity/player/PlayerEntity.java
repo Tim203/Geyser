@@ -49,10 +49,10 @@ import org.geysermc.geyser.connector.entity.attribute.Attribute;
 import org.geysermc.geyser.connector.entity.attribute.AttributeType;
 import org.geysermc.geyser.connector.entity.living.animal.tameable.ParrotEntity;
 import org.geysermc.geyser.connector.entity.type.EntityType;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.scoreboard.Team;
 import org.geysermc.geyser.connector.utils.AttributeUtils;
-import org.geysermc.connector.network.translators.chat.MessageTranslator;
+import org.geysermc.geyser.connector.network.translators.chat.MessageTranslator;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -31,9 +31,9 @@ import com.nukkitx.protocol.bedrock.packet.LevelEventPacket;
 import com.nukkitx.protocol.bedrock.packet.TakeItemEntityPacket;
 import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.geyser.connector.entity.ExpOrbEntity;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
 
 /**
  * This packet is called whenever a player picks up an item.

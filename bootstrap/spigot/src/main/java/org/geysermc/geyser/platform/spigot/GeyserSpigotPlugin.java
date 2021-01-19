@@ -34,7 +34,7 @@ import org.geysermc.geyser.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.geyser.connector.command.CommandManager;
 import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
 import org.geysermc.geyser.connector.dump.BootstrapDumpInfo;
-import org.geysermc.connector.network.translators.world.WorldManager;
+import org.geysermc.geyser.connector.network.translators.world.WorldManager;
 import org.geysermc.geyser.connector.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.geyser.connector.ping.IGeyserPingPassthrough;
 import org.geysermc.geyser.connector.utils.FileUtils;

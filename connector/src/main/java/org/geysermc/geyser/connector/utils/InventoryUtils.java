@@ -40,7 +40,7 @@ import com.nukkitx.protocol.bedrock.packet.PlayerHotbarPacket;
 import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.common.ChatColor;
 import org.geysermc.geyser.connector.inventory.Inventory;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.DoubleChestInventoryTranslator;
 import org.geysermc.connector.network.translators.inventory.InventoryTranslator;
 import org.geysermc.connector.network.translators.item.ItemEntry;

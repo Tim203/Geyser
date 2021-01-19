@@ -52,17 +52,17 @@ import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.geyser.connector.entity.ItemFrameEntity;
 import org.geysermc.geyser.connector.entity.player.SkullPlayerEntity;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.world.block.BlockStateValues;
-import org.geysermc.connector.network.translators.world.block.BlockTranslator;
-import org.geysermc.connector.network.translators.world.block.entity.BedrockOnlyBlockEntity;
-import org.geysermc.connector.network.translators.world.block.entity.BlockEntityTranslator;
-import org.geysermc.connector.network.translators.world.block.entity.RequiresBlockState;
-import org.geysermc.connector.network.translators.world.block.entity.SkullBlockEntityTranslator;
-import org.geysermc.connector.network.translators.world.chunk.BlockStorage;
-import org.geysermc.connector.network.translators.world.chunk.ChunkSection;
-import org.geysermc.connector.network.translators.world.chunk.bitarray.BitArray;
-import org.geysermc.connector.network.translators.world.chunk.bitarray.BitArrayVersion;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.world.block.BlockStateValues;
+import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
+import org.geysermc.geyser.connector.network.translators.world.block.entity.BedrockOnlyBlockEntity;
+import org.geysermc.geyser.connector.network.translators.world.block.entity.BlockEntityTranslator;
+import org.geysermc.geyser.connector.network.translators.world.block.entity.RequiresBlockState;
+import org.geysermc.geyser.connector.network.translators.world.block.entity.SkullBlockEntityTranslator;
+import org.geysermc.geyser.connector.network.translators.world.chunk.BlockStorage;
+import org.geysermc.geyser.connector.network.translators.world.chunk.ChunkSection;
+import org.geysermc.geyser.connector.network.translators.world.chunk.bitarray.BitArray;
+import org.geysermc.geyser.connector.network.translators.world.chunk.bitarray.BitArrayVersion;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -70,7 +70,7 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
-import static org.geysermc.connector.network.translators.world.block.BlockTranslator.*;
+import static org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator.*;
 
 @UtilityClass
 public class ChunkUtils {

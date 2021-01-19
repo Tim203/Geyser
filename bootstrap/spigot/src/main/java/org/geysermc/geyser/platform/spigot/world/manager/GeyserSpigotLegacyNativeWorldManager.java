@@ -29,7 +29,7 @@ import com.github.steveice10.mc.protocol.MinecraftConstants;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntList;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.platform.spigot.GeyserSpigotPlugin;
 import us.myles.ViaVersion.api.Pair;
 import us.myles.ViaVersion.api.data.MappingData;

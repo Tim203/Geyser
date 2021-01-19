@@ -35,8 +35,8 @@ import com.nukkitx.protocol.bedrock.packet.MoveEntityAbsolutePacket;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 import org.geysermc.geyser.connector.entity.type.EntityType;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.world.block.BlockTranslator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

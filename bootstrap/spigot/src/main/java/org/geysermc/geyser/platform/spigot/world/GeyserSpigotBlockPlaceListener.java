@@ -34,8 +34,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.geysermc.geyser.connector.GeyserConnector;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.world.block.BlockTranslator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
 import org.geysermc.geyser.platform.spigot.world.manager.GeyserSpigotWorldManager;
 
 @AllArgsConstructor

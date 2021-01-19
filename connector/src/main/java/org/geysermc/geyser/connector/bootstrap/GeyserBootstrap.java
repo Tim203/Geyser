@@ -30,8 +30,8 @@ import org.geysermc.geyser.connector.ping.IGeyserPingPassthrough;
 import org.geysermc.geyser.connector.configuration.GeyserConfiguration;
 import org.geysermc.geyser.connector.GeyserLogger;
 import org.geysermc.geyser.connector.command.CommandManager;
-import org.geysermc.connector.network.translators.world.GeyserWorldManager;
-import org.geysermc.connector.network.translators.world.WorldManager;
+import org.geysermc.geyser.connector.network.translators.world.GeyserWorldManager;
+import org.geysermc.geyser.connector.network.translators.world.WorldManager;
 
 import java.nio.file.Path;
 

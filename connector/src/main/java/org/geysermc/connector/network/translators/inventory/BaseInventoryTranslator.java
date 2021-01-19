@@ -28,7 +28,7 @@ package org.geysermc.connector.network.translators.inventory;
 import com.nukkitx.protocol.bedrock.data.inventory.ContainerId;
 import com.nukkitx.protocol.bedrock.data.inventory.InventoryActionData;
 import org.geysermc.geyser.connector.inventory.Inventory;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.inventory.action.InventoryActionDataTranslator;
 
 import java.util.List;

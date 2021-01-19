@@ -28,7 +28,7 @@ package org.geysermc.geyser.connector.utils;
 import com.github.steveice10.mc.protocol.data.game.entity.player.GameMode;
 import com.github.steveice10.mc.protocol.data.game.setting.Difficulty;
 import org.geysermc.geyser.connector.GeyserConnector;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.common.window.CustomFormBuilder;
 import org.geysermc.geyser.common.window.CustomFormWindow;
 import org.geysermc.geyser.common.window.button.FormImage;

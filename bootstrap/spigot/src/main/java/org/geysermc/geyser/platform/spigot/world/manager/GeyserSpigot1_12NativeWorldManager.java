@@ -29,8 +29,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.geysermc.adapters.spigot.SpigotAdapters;
 import org.geysermc.adapters.spigot.SpigotWorldAdapter;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.world.block.BlockTranslator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
 import us.myles.ViaVersion.api.Via;
 import us.myles.ViaVersion.protocols.protocol1_13to1_12_2.storage.BlockStorage;
 

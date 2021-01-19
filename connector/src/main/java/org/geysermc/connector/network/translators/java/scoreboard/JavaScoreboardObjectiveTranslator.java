@@ -25,14 +25,14 @@
 
 package org.geysermc.connector.network.translators.java.scoreboard;
 
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.session.cache.WorldCache;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.cache.WorldCache;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
 import org.geysermc.geyser.connector.scoreboard.Objective;
 import org.geysermc.geyser.connector.scoreboard.Scoreboard;
 import org.geysermc.geyser.connector.scoreboard.ScoreboardUpdater;
-import org.geysermc.connector.network.translators.chat.MessageTranslator;
+import org.geysermc.geyser.connector.network.translators.chat.MessageTranslator;
 
 import com.github.steveice10.mc.protocol.data.game.scoreboard.ObjectiveAction;
 import com.github.steveice10.mc.protocol.packet.ingame.server.scoreboard.ServerScoreboardObjectivePacket;

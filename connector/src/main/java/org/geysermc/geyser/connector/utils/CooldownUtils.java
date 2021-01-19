@@ -27,7 +27,7 @@ package org.geysermc.geyser.connector.utils;
 
 import com.nukkitx.protocol.bedrock.packet.SetTitlePacket;
 import org.geysermc.geyser.connector.GeyserConnector;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 
 import java.util.concurrent.TimeUnit;
 

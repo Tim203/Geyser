@@ -27,7 +27,7 @@ package org.geysermc.geyser.platform.standalone.gui;
 
 import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.GeyserCommand;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 import org.geysermc.geyser.platform.standalone.GeyserStandaloneLogger;
 import org.geysermc.geyser.platform.standalone.command.GeyserCommandManager;

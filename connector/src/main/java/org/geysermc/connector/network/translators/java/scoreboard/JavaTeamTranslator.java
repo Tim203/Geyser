@@ -29,15 +29,15 @@ import com.github.steveice10.mc.protocol.packet.ingame.server.scoreboard.ServerT
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.GeyserLogger;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
 import org.geysermc.geyser.connector.scoreboard.Scoreboard;
 import org.geysermc.geyser.connector.scoreboard.ScoreboardUpdater;
 import org.geysermc.geyser.connector.scoreboard.Team;
 import org.geysermc.geyser.connector.scoreboard.UpdateType;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
-import org.geysermc.connector.network.translators.chat.MessageTranslator;
+import org.geysermc.geyser.connector.network.translators.chat.MessageTranslator;
 
 import java.util.Arrays;
 import java.util.Set;

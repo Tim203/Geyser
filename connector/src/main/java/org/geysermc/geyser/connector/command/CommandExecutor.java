@@ -27,7 +27,7 @@ package org.geysermc.geyser.connector.command;
 
 import lombok.AllArgsConstructor;
 import org.geysermc.geyser.connector.GeyserConnector;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 
 /**
  * Represents helper functions for listening to {@code /geyser} commands.

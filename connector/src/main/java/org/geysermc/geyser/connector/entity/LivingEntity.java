@@ -41,7 +41,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.geysermc.geyser.connector.entity.attribute.AttributeType;
 import org.geysermc.geyser.connector.entity.type.EntityType;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.item.ItemRegistry;
 import org.geysermc.geyser.connector.utils.AttributeUtils;
 import org.geysermc.geyser.connector.utils.ChunkUtils;

@@ -32,7 +32,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.geysermc.geyser.connector.entity.living.AbstractFishEntity;
 import org.geysermc.geyser.connector.entity.type.EntityType;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 
 public class TropicalFishEntity extends AbstractFishEntity {
 

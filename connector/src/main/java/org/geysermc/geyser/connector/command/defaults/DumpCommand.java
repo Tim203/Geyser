@@ -33,7 +33,7 @@ import org.geysermc.geyser.connector.command.GeyserCommand;
 import org.geysermc.geyser.connector.common.ChatColor;
 import org.geysermc.geyser.connector.common.serializer.AsteriskSerializer;
 import org.geysermc.geyser.connector.dump.DumpInfo;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 import org.geysermc.geyser.connector.utils.WebUtils;
 

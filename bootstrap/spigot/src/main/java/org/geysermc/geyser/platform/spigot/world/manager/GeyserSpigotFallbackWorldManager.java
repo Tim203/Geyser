@@ -26,8 +26,8 @@
 package org.geysermc.geyser.platform.spigot.world.manager;
 
 import com.github.steveice10.mc.protocol.data.game.chunk.Chunk;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.world.block.BlockTranslator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.world.block.BlockTranslator;
 
 /**
  * Should only be used when we know {@link GeyserSpigotWorldManager#getBlockAt(GeyserSession, int, int, int)}

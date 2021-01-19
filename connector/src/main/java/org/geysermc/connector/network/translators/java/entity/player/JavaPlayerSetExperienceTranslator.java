@@ -27,9 +27,9 @@ package org.geysermc.connector.network.translators.java.entity.player;
 
 import org.geysermc.geyser.connector.entity.Entity;
 import org.geysermc.geyser.connector.entity.attribute.AttributeType;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.translators.PacketTranslator;
-import org.geysermc.connector.network.translators.Translator;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.translators.PacketTranslator;
+import org.geysermc.geyser.connector.network.translators.Translator;
 
 import com.github.steveice10.mc.protocol.packet.ingame.server.entity.player.ServerPlayerSetExperiencePacket;
 

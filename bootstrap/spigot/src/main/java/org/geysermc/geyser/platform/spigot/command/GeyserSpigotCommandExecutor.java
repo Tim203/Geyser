@@ -32,7 +32,7 @@ import org.bukkit.command.TabExecutor;
 import org.geysermc.geyser.connector.GeyserConnector;
 import org.geysermc.geyser.connector.command.CommandExecutor;
 import org.geysermc.geyser.connector.command.GeyserCommand;
-import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
 import org.geysermc.geyser.connector.utils.LanguageUtils;
 
 import java.util.ArrayList;

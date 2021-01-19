@@ -26,8 +26,8 @@
 package org.geysermc.geyser.connector.command.defaults;
 
 import org.geysermc.geyser.connector.GeyserConnector;
-import org.geysermc.connector.network.session.GeyserSession;
-import org.geysermc.connector.network.session.cache.AdvancementsCache;
+import org.geysermc.geyser.connector.network.session.GeyserSession;
+import org.geysermc.geyser.connector.network.session.cache.AdvancementsCache;
 import org.geysermc.geyser.common.window.SimpleFormWindow;
 import org.geysermc.geyser.connector.command.CommandSender;
 import org.geysermc.geyser.connector.command.GeyserCommand;
