@@ -25,11 +25,11 @@
 
 package org.geysermc.connector.command.defaults;
 
-import org.geysermc.common.PlatformType;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.command.CommandSender;
 import org.geysermc.connector.command.GeyserCommand;
 import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.common.PlatformType;
 
 import java.util.Collections;
 

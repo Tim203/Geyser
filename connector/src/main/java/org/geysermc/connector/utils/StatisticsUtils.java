@@ -28,12 +28,12 @@ package org.geysermc.connector.utils;
 import com.github.steveice10.mc.protocol.data.MagicValues;
 import com.github.steveice10.mc.protocol.data.game.entity.type.EntityType;
 import com.github.steveice10.mc.protocol.data.game.statistic.*;
-import org.geysermc.common.window.SimpleFormWindow;
-import org.geysermc.common.window.button.FormButton;
-import org.geysermc.common.window.response.SimpleFormResponse;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.item.ItemRegistry;
 import org.geysermc.connector.network.translators.world.block.BlockTranslator;
+import org.geysermc.geyser.common.window.SimpleFormWindow;
+import org.geysermc.geyser.common.window.button.FormButton;
+import org.geysermc.geyser.common.window.response.SimpleFormResponse;
 
 import java.util.Map;
 

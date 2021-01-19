@@ -25,12 +25,12 @@
 
 package org.geysermc.connector.command.defaults;
 
-import org.geysermc.common.window.SimpleFormWindow;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.command.CommandSender;
 import org.geysermc.connector.command.GeyserCommand;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.session.cache.AdvancementsCache;
+import org.geysermc.geyser.common.window.SimpleFormWindow;
 
 public class AdvancementsCommand extends GeyserCommand {
 

@@ -29,14 +29,14 @@ import com.github.steveice10.mc.protocol.data.game.advancement.Advancement;
 import com.github.steveice10.mc.protocol.packet.ingame.client.window.ClientAdvancementTabPacket;
 import lombok.Getter;
 import lombok.Setter;
-import org.geysermc.common.window.SimpleFormWindow;
-import org.geysermc.common.window.button.FormButton;
-import org.geysermc.common.window.response.SimpleFormResponse;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.connector.network.translators.chat.MessageTranslator;
 import org.geysermc.connector.utils.GeyserAdvancement;
 import org.geysermc.connector.utils.LanguageUtils;
 import org.geysermc.connector.utils.LocaleUtils;
+import org.geysermc.geyser.common.window.SimpleFormWindow;
+import org.geysermc.geyser.common.window.button.FormButton;
+import org.geysermc.geyser.common.window.response.SimpleFormResponse;
 
 import java.util.HashMap;
 import java.util.List;

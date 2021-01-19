@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.geysermc</groupId>
+        <groupId>org.geysermc.geyser</groupId>
         <artifactId>bootstrap-parent</artifactId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.3.0-SNAPSHOT</version>
     </parent>
     <artifactId>bootstrap-bungeecord</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.geysermc</groupId>
+            <groupId>org.geysermc.geyser</groupId>
             <artifactId>connector</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>1.3.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -40,7 +40,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Main-Class>org.geysermc.platform.bungeecord.GeyserBungeeMain</Main-Class>
+                            <Main-Class>org.geysermc.geyser.platform.bungeecord.GeyserBungeeMain</Main-Class>
                         </manifestEntries>
                     </archive>
                 </configuration>
@@ -59,35 +59,35 @@
                             <relocations>
                                 <relocation>
                                     <pattern>net.md_5.bungee.jni</pattern>
-                                    <shadedPattern>org.geysermc.platform.bungeecord.shaded.jni</shadedPattern>
+                                    <shadedPattern>org.geysermc.geyser.platform.bungeecord.shaded.jni</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.fasterxml.jackson</pattern>
-                                    <shadedPattern>org.geysermc.platform.bungeecord.shaded.jackson</shadedPattern>
+                                    <shadedPattern>org.geysermc.geyser.platform.bungeecord.shaded.jackson</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>io.netty</pattern>
-                                    <shadedPattern>org.geysermc.platform.bungeecord.shaded.netty</shadedPattern>
+                                    <shadedPattern>org.geysermc.geyser.platform.bungeecord.shaded.netty</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.reflections</pattern>
-                                    <shadedPattern>org.geysermc.platform.bungeecord.shaded.reflections</shadedPattern>
+                                    <shadedPattern>org.geysermc.geyser.platform.bungeecord.shaded.reflections</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.google.common</pattern>
-                                    <shadedPattern>org.geysermc.platform.bungeecord.shaded.google.common</shadedPattern>
+                                    <shadedPattern>org.geysermc.geyser.platform.bungeecord.shaded.google.common</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.google.guava</pattern>
-                                    <shadedPattern>org.geysermc.platform.bungeecord.shaded.google.guava</shadedPattern>
+                                    <shadedPattern>org.geysermc.geyser.platform.bungeecord.shaded.google.guava</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.dom4j</pattern>
-                                    <shadedPattern>org.geysermc.platform.bungeecord.shaded.dom4j</shadedPattern>
+                                    <shadedPattern>org.geysermc.geyser.platform.bungeecord.shaded.dom4j</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>net.kyori</pattern>
-                                    <shadedPattern>org.geysermc.platform.bungeecord.shaded.kyori</shadedPattern>
+                                    <shadedPattern>org.geysermc.geyser.platform.bungeecord.shaded.kyori</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>

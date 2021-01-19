@@ -4,17 +4,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.geysermc</groupId>
+        <groupId>org.geysermc.geyser</groupId>
         <artifactId>geyser-parent</artifactId>
-        <version>1.2.0-SNAPSHOT</version>
+        <version>1.3.0-SNAPSHOT</version>
     </parent>
     <artifactId>connector</artifactId>
 
     <dependencies>
         <dependency>
-            <groupId>org.geysermc</groupId>
+            <groupId>org.geysermc.geyser</groupId>
             <artifactId>common</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <version>1.3.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -259,7 +259,7 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>${project.basedir}/src/main/java/org/geysermc/connector/GeyserConnector.java</include>
+                                <include>${project.basedir}/src/main/java/org/geysermc/geyser/connector/GeyserConnector.java</include>
                             </includes>
                             <replacements>
                                 <replacement>
@@ -282,7 +282,7 @@
                         </goals>
                         <configuration>
                             <includes>
-                                <include>${project.basedir}/src/main/java/org/geysermc/connector/GeyserConnector.java</include>
+                                <include>${project.basedir}/src/main/java/org/geysermc/geyser/connector/GeyserConnector.java</include>
                             </includes>
                             <replacements>
                                 <replacement>
@@ -311,16 +311,16 @@
                         <configuration>
                             <scripts>
                                 <script><![CDATA[
-                                    new org.reflections.Reflections("org.geysermc.connector.network.translators")
-                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.connector.network.translators-reflections.xml")
-                                    new org.reflections.Reflections("org.geysermc.connector.network.translators.collision.translators")
-                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.connector.network.translators.collision.translators-reflections.xml")
-                                    new org.reflections.Reflections("org.geysermc.connector.network.translators.item")
-                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.connector.network.translators.item-reflections.xml")
-                                    new org.reflections.Reflections("org.geysermc.connector.network.translators.sound")
-                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.connector.network.translators.sound-reflections.xml")
-                                    new org.reflections.Reflections("org.geysermc.connector.network.translators.world.block.entity")
-                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.connector.network.translators.world.block.entity-reflections.xml")
+                                    new org.reflections.Reflections("org.geysermc.geyser.connector.network.translators")
+                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.geyser.connector.network.translators-reflections.xml")
+                                    new org.reflections.Reflections("org.geysermc.geyser.connector.network.translators.collision.translators")
+                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.geyser.connector.network.translators.collision.translators-reflections.xml")
+                                    new org.reflections.Reflections("org.geysermc.geyser.connector.network.translators.item")
+                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.geyser.connector.network.translators.item-reflections.xml")
+                                    new org.reflections.Reflections("org.geysermc.geyser.connector.network.translators.sound")
+                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.geyser.connector.network.translators.sound-reflections.xml")
+                                    new org.reflections.Reflections("org.geysermc.geyser.connector.network.translators.world.block.entity")
+                                        .save("${project.artifactId}/target/classes/META-INF/reflections/org.geysermc.geyser.connector.network.translators.world.block.entity-reflections.xml")
                                 ]]></script>
                             </scripts>
                         </configuration>

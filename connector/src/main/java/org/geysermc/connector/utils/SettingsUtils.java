@@ -27,16 +27,16 @@ package org.geysermc.connector.utils;
 
 import com.github.steveice10.mc.protocol.data.game.entity.player.GameMode;
 import com.github.steveice10.mc.protocol.data.game.setting.Difficulty;
-import org.geysermc.common.window.CustomFormBuilder;
-import org.geysermc.common.window.CustomFormWindow;
-import org.geysermc.common.window.button.FormImage;
-import org.geysermc.common.window.component.DropdownComponent;
-import org.geysermc.common.window.component.InputComponent;
-import org.geysermc.common.window.component.LabelComponent;
-import org.geysermc.common.window.component.ToggleComponent;
-import org.geysermc.common.window.response.CustomFormResponse;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.network.session.GeyserSession;
+import org.geysermc.geyser.common.window.CustomFormBuilder;
+import org.geysermc.geyser.common.window.CustomFormWindow;
+import org.geysermc.geyser.common.window.button.FormImage;
+import org.geysermc.geyser.common.window.component.DropdownComponent;
+import org.geysermc.geyser.common.window.component.InputComponent;
+import org.geysermc.geyser.common.window.component.LabelComponent;
+import org.geysermc.geyser.common.window.component.ToggleComponent;
+import org.geysermc.geyser.common.window.response.CustomFormResponse;
 
 import java.util.ArrayList;
 

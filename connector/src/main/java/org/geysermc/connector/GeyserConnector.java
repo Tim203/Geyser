@@ -32,7 +32,6 @@ import com.nukkitx.network.raknet.RakNetConstants;
 import com.nukkitx.protocol.bedrock.BedrockServer;
 import lombok.Getter;
 import lombok.Setter;
-import org.geysermc.common.PlatformType;
 import org.geysermc.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.connector.command.CommandManager;
 import org.geysermc.connector.common.AuthType;
@@ -60,6 +59,7 @@ import org.geysermc.connector.utils.DimensionUtils;
 import org.geysermc.connector.utils.LanguageUtils;
 import org.geysermc.connector.utils.LocaleUtils;
 import org.geysermc.connector.utils.ResourcePack;
+import org.geysermc.geyser.common.PlatformType;
 
 import javax.naming.directory.Attribute;
 import javax.naming.directory.InitialDirContext;
