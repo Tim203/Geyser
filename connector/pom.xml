@@ -213,7 +213,7 @@
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
-            <version>0.9.11</version> <!-- This isn't the latest version to get round https://github.com/ronmamo/reflections/issues/273 -->
+            <version>0.9.12</version> <!-- This isn't the latest version to get round https://github.com/ronmamo/reflections/issues/273 -->
         </dependency>
         <dependency>
             <groupId>org.dom4j</groupId>
@@ -378,7 +378,7 @@
                     <dependency>
                         <groupId>org.reflections</groupId>
                         <artifactId>reflections</artifactId>
-                        <version>0.9.11</version>
+                        <version>0.9.12</version>
                     </dependency>
                     <dependency>
                         <groupId>org.dom4j</groupId>
