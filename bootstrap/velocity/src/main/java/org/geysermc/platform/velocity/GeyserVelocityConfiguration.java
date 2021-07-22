@@ -25,22 +25,18 @@
 
 package org.geysermc.platform.velocity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import org.geysermc.connector.FloodgateKeyLoader;
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
+import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Getter
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class GeyserVelocityConfiguration extends GeyserJacksonConfiguration {
-    @JsonIgnore
+public final class GeyserVelocityConfiguration extends GeyserCommonConfiguration {
     private Path floodgateKeyPath;
 
     public void loadFloodgate(GeyserVelocityPlugin plugin, ProxyServer proxyServer, File dataFolder) {

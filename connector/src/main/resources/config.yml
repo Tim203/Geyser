@@ -71,7 +71,7 @@ floodgate-key-file: key.pem
 # This allows automatic configuration/login to the remote Java server.
 # If you are brave enough to put your Mojang account info into a config file.
 # Uncomment the lines below to enable this feature.
-#userAuths:
+user-auths:
 #  BedrockAccountUsername: # Your Minecraft: Bedrock Edition username
 #    email: javaccountemail@example.com # Your Minecraft: Java Edition email
 #    password: javaccountpassword123 # Your Minecraft: Java Edition password
@@ -175,7 +175,7 @@ metrics:
   # If metrics should be enabled
   enabled: true
   # UUID of server, don't change!
-  uuid: generateduuid
+  uuid: ${metrics.uuid}
 
 # ADVANCED OPTIONS - DO NOT TOUCH UNLESS YOU KNOW WHAT YOU ARE DOING!
 
@@ -197,4 +197,4 @@ enable-proxy-connections: false
 # Turning this off for Spigot will stop NMS from being used but will have a performance impact.
 use-adapters: true
 
-config-version: 4
+config-version: 5

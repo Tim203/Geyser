@@ -30,13 +30,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.geysermc.connector.FloodgateKeyLoader;
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
+import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 
 import java.nio.file.Path;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class GeyserBungeeConfiguration extends GeyserJacksonConfiguration {
+public final class GeyserBungeeConfiguration extends GeyserCommonConfiguration {
     @JsonIgnore
     private Path floodgateKeyPath;
 

@@ -38,20 +38,22 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.geysermc.common.PlatformType;
+import org.geysermc.configutils.ConfigUtilities;
+import org.geysermc.configutils.file.codec.PathFileCodec;
+import org.geysermc.configutils.file.template.ResourceTemplateReader;
+import org.geysermc.configutils.updater.renames.Renames;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.connector.command.CommandManager;
+import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 import org.geysermc.connector.configuration.GeyserConfiguration;
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
 import org.geysermc.connector.dump.BootstrapDumpInfo;
 import org.geysermc.connector.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.connector.ping.IGeyserPingPassthrough;
-import org.geysermc.connector.utils.FileUtils;
 import org.geysermc.connector.utils.LanguageUtils;
 import org.geysermc.platform.standalone.command.GeyserCommandManager;
 import org.geysermc.platform.standalone.gui.GeyserStandaloneGUI;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -85,7 +87,7 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
         boolean useGuiOpts = bootstrap.useGui;
         String configFilenameOpt = bootstrap.configFilename;
 
-        List<BeanPropertyDefinition> availableProperties = getPOJOForClass(GeyserJacksonConfiguration.class);
+        List<BeanPropertyDefinition> availableProperties = getPOJOForClass(GeyserCommonConfiguration.class);
 
         for (int i = 0; i < args.length; i++) {
             // By default, standalone Geyser will check if it should open the GUI based on if the GUI is null
@@ -187,14 +189,29 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
         geyserLogger = new GeyserStandaloneLogger();
 
         LoopbackUtil.checkLoopback(geyserLogger);
-        
+
         try {
-            File configFile = FileUtils.fileOrCopiedFromResource(new File(configFilename), "config.yml", (x) -> x.replaceAll("generateduuid", UUID.randomUUID().toString()));
-            geyserConfig = FileUtils.loadConfig(configFile, GeyserStandaloneConfiguration.class);
+            ConfigUtilities utilities =
+                    ConfigUtilities.builder()
+                            .fileCodec(PathFileCodec.instance())
+                            .configFile("config.yml")
+                            .templateReader(ResourceTemplateReader.of(getClass()))
+                            .template("config.yml")
+                            .renames(Renames.builder()
+                                    .version(
+                                            5,
+                                            Renames.versionBuilder()
+                                                    .rename("userAuths", "user-auths"))
+                                    .build())
+                            .copyDirectly("user-auths")
+                            .definePlaceholder("metrics.uuid", UUID::randomUUID)
+                            .build();
+
+            geyserConfig = utilities.executeOn(GeyserStandaloneConfiguration.class);
 
             handleArgsConfigOptions();
 
-            if (this.geyserConfig.getRemote().getAddress().equalsIgnoreCase("auto")) {
+            if (geyserConfig.getRemote().getAddress().equalsIgnoreCase("auto")) {
                 geyserConfig.setAutoconfiguredRemote(true); // Doesn't really need to be set but /shrug
                 geyserConfig.getRemote().setAddress("127.0.0.1");
             }
@@ -207,7 +224,6 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
                 return;
             }
         }
-        GeyserConfiguration.checkGeyserConfiguration(geyserConfig, geyserLogger);
 
         // Allow libraries like Protocol to have their debug information passthrough
         logger.get().setLevel(geyserConfig.isDebugMode() ? Level.DEBUG : Level.INFO);
@@ -331,7 +347,7 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
      */
     private void handleArgsConfigOptions() {
         // Get the available properties from the class
-        List<BeanPropertyDefinition> availableProperties = getPOJOForClass(GeyserJacksonConfiguration.class);
+        List<BeanPropertyDefinition> availableProperties = getPOJOForClass(GeyserCommonConfiguration.class);
 
         for (Map.Entry<String, String> configKey : argsConfigKeys.entrySet()) {
             String[] configKeyParts = configKey.getKey().split("\\.");

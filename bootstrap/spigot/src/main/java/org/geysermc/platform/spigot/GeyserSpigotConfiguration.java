@@ -31,13 +31,13 @@ import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.geysermc.connector.FloodgateKeyLoader;
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
+import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 
 import java.nio.file.Path;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class GeyserSpigotConfiguration extends GeyserJacksonConfiguration {
+public final class GeyserSpigotConfiguration extends GeyserCommonConfiguration {
     @JsonIgnore
     private Path floodgateKeyPath;
 

@@ -25,11 +25,11 @@
 
 package org.geysermc.platform.sponge;
 
-import org.geysermc.connector.configuration.GeyserJacksonConfiguration;
+import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 
 import java.nio.file.Path;
 
-public final class GeyserSpongeConfiguration extends GeyserJacksonConfiguration {
+public final class GeyserSpongeConfiguration extends GeyserCommonConfiguration {
     @Override
     public Path getFloodgateKeyPath() {
         return null; //floodgate isn't available for Sponge
