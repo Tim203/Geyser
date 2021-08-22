@@ -25,7 +25,6 @@
 
 package org.geysermc.connector.utils;
 
-import com.github.steveice10.mc.protocol.data.game.entity.Effect;
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.Position;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.nukkitx.math.vector.Vector3i;
@@ -171,8 +170,8 @@ public class BlockUtils {
                     false, false);
         }
 
-        hasteLevel = Math.max(session.getEffectCache().getEffectLevel(Effect.FASTER_DIG), session.getEffectCache().getEffectLevel(Effect.CONDUIT_POWER));
-        miningFatigueLevel = session.getEffectCache().getEffectLevel(Effect.SLOWER_DIG);
+        hasteLevel = Math.max(session.getEffectCache().getHaste(), session.getEffectCache().getConduitPower());
+        miningFatigueLevel = session.getEffectCache().getMiningFatigue();
 
         boolean isInWater = session.getCollisionManager().isPlayerInWater();
 
@@ -244,16 +243,15 @@ public class BlockUtils {
         return fullJavaIdentifier.substring(0, stateIndex);
     }
 
-    // Note: these reuse classes, so don't try to store more than once instance or coordinates will get overwritten
-    public static BlockCollision getCollision(int blockId, int x, int y, int z) {
+    public static BlockCollision getCollision(int blockId, Vector3i blockPos) {
         BlockCollision collision = Registries.COLLISIONS.get(blockId);
         if (collision != null) {
-            collision.setPosition(x, y, z);
+            collision.setPosition(blockPos);
         }
         return collision;
     }
 
-    public static BlockCollision getCollisionAt(GeyserSession session, int x, int y, int z) {
-        return getCollision(session.getConnector().getWorldManager().getBlockAt(session, x, y, z), x, y, z);
+    public static BlockCollision getCollisionAt(GeyserSession session, Vector3i blockPos) {
+        return getCollision(session.getConnector().getWorldManager().getBlockAt(session, blockPos), blockPos);
     }
 }

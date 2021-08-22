@@ -32,12 +32,15 @@ import org.geysermc.connector.utils.FileUtils;
 
 import java.io.InputStream;
 
+/**
+ * Loads NBT data from the given resource path.
+ */
 public class NbtRegistryLoader implements RegistryLoader<String, NbtMap> {
 
     @Override
     public NbtMap load(String input) {
         InputStream stream = FileUtils.getResource(input);
-        try (NBTInputStream nbtInputStream = NbtUtils.createNetworkReader(stream)) {
+        try (NBTInputStream nbtInputStream = NbtUtils.createNetworkReader(stream, true, true)) {
             return (NbtMap) nbtInputStream.readTag();
         } catch (Exception e) {
             throw new AssertionError("Failed to load registrations for " + input, e);

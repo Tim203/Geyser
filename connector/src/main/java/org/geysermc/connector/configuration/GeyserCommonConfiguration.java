@@ -25,12 +25,19 @@
 
 package org.geysermc.connector.configuration;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
 import org.geysermc.connector.GeyserConnector;
+import org.geysermc.connector.common.AuthType;
 import org.geysermc.connector.common.serializer.AsteriskSerializer;
 import org.geysermc.connector.network.CIDRMatcher;
+import org.geysermc.connector.utils.LanguageUtils;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +46,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
+@SuppressWarnings("FieldMayBeFinal")
 public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
 
     /**
@@ -52,7 +60,7 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
 
     private boolean extendedWorldHeight = false;
 
-    private String floodgateKeyFile = "public-key.pem";
+    private String floodgateKeyFile = "key.pem";
 
     public abstract Path getFloodgateKeyPath();
 
@@ -151,11 +159,12 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
         @AsteriskSerializer.Asterisk(isIp = true)
         private String address = "auto";
 
+        @JsonDeserialize(using = PortDeserializer.class) //todo remove
         @Setter
         private int port = 25565;
 
         @Setter
-        private String authType = "online";
+        private AuthType authType = AuthType.ONLINE;
 
         private boolean allowPasswordAuthentication = true;
 
@@ -188,7 +197,23 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
 
     private int mtu = 1400;
 
-    private boolean useAdapters = true;
+    private boolean useDirectConnection = true;
 
     private int configVersion = 0;
+
+    /**
+     * Ensure that the port deserializes in the config as a number no matter what.
+     */
+    protected static class PortDeserializer extends JsonDeserializer<Integer> {
+        @Override
+        public Integer deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            String value = p.getValueAsString();
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                System.err.println(LanguageUtils.getLocaleStringLog("geyser.bootstrap.config.invalid_port"));
+                return 25565;
+            }
+        }
+    }
 }

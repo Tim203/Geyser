@@ -38,7 +38,6 @@ import com.github.steveice10.mc.protocol.packet.ingame.client.player.ClientPlaye
 import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.math.vector.Vector3i;
 import com.nukkitx.protocol.bedrock.data.LevelEventType;
-import com.nukkitx.protocol.bedrock.data.entity.EntityFlags;
 import com.nukkitx.protocol.bedrock.data.inventory.*;
 import com.nukkitx.protocol.bedrock.packet.*;
 import org.geysermc.connector.entity.CommandBlockMinecartEntity;
@@ -84,26 +83,24 @@ public class BedrockInventoryTransactionTranslator extends PacketTranslator<Inve
                     InventoryActionData containerAction = packet.getActions().get(1);
                     if (worldAction.getSource().getType() == InventorySource.Type.WORLD_INTERACTION
                             && worldAction.getSource().getFlag() == InventorySource.Flag.DROP_ITEM) {
-                        session.addInventoryTask(() -> {
-                            if (session.getPlayerInventory().getHeldItemSlot() != containerAction.getSlot() ||
-                                    session.getPlayerInventory().getItemInHand().isEmpty()) {
-                                return;
-                            }
+                        if (session.getPlayerInventory().getHeldItemSlot() != containerAction.getSlot() ||
+                                session.getPlayerInventory().getItemInHand().isEmpty()) {
+                            return;
+                        }
 
-                            boolean dropAll = worldAction.getToItem().getCount() > 1;
-                            ClientPlayerActionPacket dropAllPacket = new ClientPlayerActionPacket(
-                                    dropAll ? PlayerAction.DROP_ITEM_STACK : PlayerAction.DROP_ITEM,
-                                    BlockUtils.POSITION_ZERO,
-                                    BlockFace.DOWN
-                            );
-                            session.sendDownstreamPacket(dropAllPacket);
+                        boolean dropAll = worldAction.getToItem().getCount() > 1;
+                        ClientPlayerActionPacket dropAllPacket = new ClientPlayerActionPacket(
+                                dropAll ? PlayerAction.DROP_ITEM_STACK : PlayerAction.DROP_ITEM,
+                                BlockUtils.POSITION_ZERO,
+                                BlockFace.DOWN
+                        );
+                        session.sendDownstreamPacket(dropAllPacket);
 
-                            if (dropAll) {
-                                session.getPlayerInventory().setItemInHand(GeyserItemStack.EMPTY);
-                            } else {
-                                session.getPlayerInventory().getItemInHand().sub(1);
-                            }
-                        });
+                        if (dropAll) {
+                            session.getPlayerInventory().setItemInHand(GeyserItemStack.EMPTY);
+                        } else {
+                            session.getPlayerInventory().getItemInHand().sub(1);
+                        }
                     }
                 }
                 break;
@@ -149,7 +146,6 @@ public class BedrockInventoryTransactionTranslator extends PacketTranslator<Inve
                          */
                         // CraftBukkit+ check - see https://github.com/PaperMC/Paper/blob/458db6206daae76327a64f4e2a17b67a7e38b426/Spigot-Server-Patches/0532-Move-range-check-for-block-placing-up.patch
                         Vector3f playerPosition = session.getPlayerEntity().getPosition();
-                        EntityFlags flags = session.getPlayerEntity().getMetadata().getFlags();
 
                         // Adjust position for current eye height
                         switch (session.getPose()) {
@@ -210,21 +206,26 @@ public class BedrockInventoryTransactionTranslator extends PacketTranslator<Inve
                             if (session.getItemMappings().getBoatIds().contains(packet.getItemInHand().getId())) {
                                 ClientPlayerUseItemPacket itemPacket = new ClientPlayerUseItemPacket(Hand.MAIN_HAND);
                                 session.sendDownstreamPacket(itemPacket);
-                            }
-                            // Check actions, otherwise buckets may be activated when block inventories are accessed
-                            else if (session.getItemMappings().getBucketIds().contains(packet.getItemInHand().getId())) {
+                            } else if (session.getItemMappings().getBucketIds().contains(packet.getItemInHand().getId())) {
                                 // Let the server decide if the bucket item should change, not the client, and revert the changes the client made
                                 InventorySlotPacket slotPacket = new InventorySlotPacket();
                                 slotPacket.setContainerId(ContainerId.INVENTORY);
                                 slotPacket.setSlot(packet.getHotbarSlot());
                                 slotPacket.setItem(packet.getItemInHand());
                                 session.sendUpstreamPacket(slotPacket);
-                                // Delay the interaction in case the client doesn't intend to actually use the bucket
-                                // See BedrockActionTranslator.java
-                                session.setBucketScheduledFuture(session.getConnector().getGeneralThreadPool().schedule(() -> {
-                                    ClientPlayerUseItemPacket itemPacket = new ClientPlayerUseItemPacket(Hand.MAIN_HAND);
-                                    session.sendDownstreamPacket(itemPacket);
-                                }, 5, TimeUnit.MILLISECONDS));
+                                // Don't send ClientPlayerUseItemPacket for powder snow buckets
+                                if (packet.getItemInHand().getId() != session.getItemMappings().getStoredItems().powderSnowBucket().getBedrockId()) {
+                                    // Special check for crafting tables since clients don't send BLOCK_INTERACT when interacting
+                                    int blockState = session.getConnector().getWorldManager().getBlockAt(session, packet.getBlockPosition());
+                                    if (session.isSneaking() || blockState != BlockRegistries.JAVA_IDENTIFIERS.get("minecraft:crafting_table")) {
+                                        // Delay the interaction in case the client doesn't intend to actually use the bucket
+                                        // See BedrockActionTranslator.java
+                                        session.setBucketScheduledFuture(session.scheduleInEventLoop(() -> {
+                                            ClientPlayerUseItemPacket itemPacket = new ClientPlayerUseItemPacket(Hand.MAIN_HAND);
+                                            session.sendDownstreamPacket(itemPacket);
+                                        }, 5, TimeUnit.MILLISECONDS));
+                                    }
+                                }
                             }
                         }
 
@@ -232,7 +233,7 @@ public class BedrockInventoryTransactionTranslator extends PacketTranslator<Inve
                             if (session.getOpPermissionLevel() >= 2 && session.getGameMode() == GameMode.CREATIVE) {
                                 // Otherwise insufficient permissions
                                 int blockState = session.getBlockMappings().getJavaBlockState(packet.getBlockRuntimeId());
-                                String blockName = BlockRegistries.JAVA_IDENTIFIERS.get().inverse().getOrDefault(blockState, "");
+                                String blockName = BlockRegistries.JAVA_IDENTIFIERS.get().getOrDefault(blockState, "");
                                 // In the future this can be used for structure blocks too, however not all elements
                                 // are available in each GUI
                                 if (blockName.contains("jigsaw")) {
