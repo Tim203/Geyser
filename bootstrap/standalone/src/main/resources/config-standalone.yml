@@ -1,0 +1,8 @@
+>> config.yml
+>>| 31
+  # The IP address of the remote (Java Edition) server
+  address: 127.0.0.1
+  # The port of the remote (Java Edition) server
+  port: 25565
+>>|
+>>*

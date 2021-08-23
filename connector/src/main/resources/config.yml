@@ -13,14 +13,10 @@ bedrock:
   address: 0.0.0.0
   # The port that will listen for connections
   port: 19132
-  # Some hosting services change your Java port everytime you start the server and require the same port to be used for Bedrock.
-  # This option makes the Bedrock port the same as the Java port every time you start the server.
-  # This option is for the plugin version only.
-  clone-remote-port: false
   # The MOTD that will be broadcasted to Minecraft: Bedrock Edition clients. This is irrelevant if "passthrough-motd" is set to true
   # If either of these are empty, the respective string will default to "Geyser"
   motd1: "Geyser"
-  motd2: "Another Geyser server."
+  motd2: "Another Geyser server"
   # The Server Name that will be sent to Minecraft: Bedrock Edition clients. This is visible in both the pause menu and the settings menu.
   server-name: "Geyser"
   # How much to compress network traffic to the Bedrock client. The higher the number, the more CPU usage used, but
@@ -35,15 +31,7 @@ bedrock:
   # Both IP addresses and subnets are supported.
   #proxy-protocol-whitelisted-ips: [ "127.0.0.1", "172.18.0.0/16" ]
 remote:
-  # The IP address of the remote (Java Edition) server
-  # If it is "auto", for standalone version the remote address will be set to 127.0.0.1,
-  # for plugin versions, it is recommended to keep this as "auto" so Geyser will automatically configure address, port, and auth-type.
-  address: auto
-  # The port of the remote (Java Edition) server
-  # For plugin versions, if address has been set to "auto", the port will also follow the server's listening port.
-  port: 25565
   # Authentication type. Can be offline, online, or floodgate (see https://github.com/GeyserMC/Geyser/wiki/Floodgate).
-  # For plugin versions, it's recommended to keep the `address` field to "auto" so Floodgate support is automatically configured.
   auth-type: online
   # Allow for password-based authentication methods through Geyser. Only useful in online mode.
   # If this is false, users must authenticate to Microsoft using a code provided by Geyser on their desktop.
@@ -193,7 +181,7 @@ enable-proxy-connections: false
 
 # The internet supports a maximum MTU of 1492 but could cause issues with packet fragmentation.
 # 1400 is the default.
-# mtu: 1400
+mtu: 1400
 
 # Whether to connect directly into the Java server without creating a TCP connection.
 # This should only be disabled if a plugin that interfaces with packets or the network does not work correctly with Geyser.

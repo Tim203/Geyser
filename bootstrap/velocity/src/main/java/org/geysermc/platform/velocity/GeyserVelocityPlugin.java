@@ -93,20 +93,8 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
             ex.printStackTrace();
         }
 
-        InetSocketAddress javaAddr = proxyServer.getBoundAddress();
-
-        // By default this should be localhost but may need to be changed in some circumstances
-        if (this.geyserConfig.getRemote().getAddress().equalsIgnoreCase("auto")) {
-            this.geyserConfig.setAutoconfiguredRemote(true);
-            // Don't use localhost if not listening on all interfaces
-            if (!javaAddr.getHostString().equals("0.0.0.0") && !javaAddr.getHostString().equals("")) {
-                this.geyserConfig.getRemote().setAddress(javaAddr.getHostString());
-            }
-            geyserConfig.getRemote().setPort(javaAddr.getPort());
-        }
-
         if (geyserConfig.getBedrock().isCloneRemotePort()) {
-            geyserConfig.getBedrock().setPort(javaAddr.getPort());
+            geyserConfig.getBedrock().setPort(proxyServer.getBoundAddress().getPort());
         }
 
         this.geyserLogger = new GeyserVelocityLogger(logger, geyserConfig.isDebugMode());
@@ -124,7 +112,7 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
         if (geyserConfig.getRemote().getAuthType() == AuthType.FLOODGATE && !proxyServer.getPluginManager().getPlugin("floodgate").isPresent()) {
             geyserLogger.severe(LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.not_installed") + " " + LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.disabling"));
             return;
-        } else if (geyserConfig.isAutoconfiguredRemote() && proxyServer.getPluginManager().getPlugin("floodgate").isPresent()) {
+        } else if (proxyServer.getPluginManager().getPlugin("floodgate").isPresent()) {
             // Floodgate installed means that the user wants Floodgate authentication
             geyserLogger.debug("Auto-setting to Floodgate authentication.");
             geyserConfig.getRemote().setAuthType(AuthType.FLOODGATE);

@@ -39,13 +39,10 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.geysermc.common.PlatformType;
-import org.geysermc.configutils.ConfigUtilities;
-import org.geysermc.configutils.file.codec.PathFileCodec;
-import org.geysermc.configutils.file.template.ResourceTemplateReader;
-import org.geysermc.configutils.updater.renames.Renames;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.connector.command.CommandManager;
+import org.geysermc.connector.configuration.ConfigLoader;
 import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 import org.geysermc.connector.configuration.GeyserConfiguration;
 import org.geysermc.connector.dump.BootstrapDumpInfo;
@@ -55,7 +52,6 @@ import org.geysermc.connector.utils.LanguageUtils;
 import org.geysermc.platform.standalone.command.GeyserCommandManager;
 import org.geysermc.platform.standalone.gui.GeyserStandaloneGUI;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -196,31 +192,9 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
         LoopbackUtil.checkLoopback(geyserLogger);
 
         try {
-            ConfigUtilities utilities =
-                    ConfigUtilities.builder()
-                            .fileCodec(PathFileCodec.instance())
-                            .configFile("config.yml")
-                            .templateReader(ResourceTemplateReader.of(getClass()))
-                            .template("config.yml")
-                            .renames(Renames.builder()
-                                    .version(
-                                            5,
-                                            Renames.versionBuilder()
-                                                    .rename("userAuths", "user-auths"))
-                                    .build())
-                            .copyDirectly("user-auths")
-                            .definePlaceholder("metrics.uuid", UUID::randomUUID)
-                            .build();
-
-            geyserConfig = utilities.executeOn(GeyserStandaloneConfiguration.class);
-
+            geyserConfig = new ConfigLoader<>("config-standalone.yml", GeyserStandaloneConfiguration.class).load();
             handleArgsConfigOptions();
-
-            if (geyserConfig.getRemote().getAddress().equalsIgnoreCase("auto")) {
-                geyserConfig.setAutoconfiguredRemote(true); // Doesn't really need to be set but /shrug
-                geyserConfig.getRemote().setAddress("127.0.0.1");
-            }
-        } catch (IOException ex) {
+        } catch (Throwable ex) {
             geyserLogger.severe(LanguageUtils.getLocaleStringLog("geyser.config.failed"), ex);
             if (gui == null) {
                 System.exit(1);

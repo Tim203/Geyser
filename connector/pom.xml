@@ -30,6 +30,11 @@
             <version>1.4.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.geysermc.configutils</groupId>
+            <artifactId>configutils</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <!-- Jackson JSON and YAML serialization -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

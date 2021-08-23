@@ -1,0 +1,5 @@
+>> config.yml
+>>| 32
+  # Floodgate will be detected automatically if Floodgate is also installed on this server
+>>|
+>>*

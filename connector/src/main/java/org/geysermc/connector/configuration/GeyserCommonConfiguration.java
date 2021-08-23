@@ -49,12 +49,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
 
-    /**
-     * If the config was originally 'auto' before the values changed
-     */
-    @Setter
-    private boolean autoconfiguredRemote = false;
-
     private BedrockConfiguration bedrock = new BedrockConfiguration();
     private RemoteConfiguration remote = new RemoteConfiguration();
 
@@ -157,7 +151,7 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
     public static class RemoteConfiguration implements IRemoteConfiguration {
         @Setter
         @AsteriskSerializer.Asterisk(isIp = true)
-        private String address = "auto";
+        private String address = "127.0.0.1";
 
         @JsonDeserialize(using = PortDeserializer.class) //todo remove
         @Setter
