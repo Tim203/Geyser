@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -156,6 +157,11 @@ public class GeyserBungeePlugin extends Plugin implements GeyserBootstrap {
     @Override
     public BootstrapDumpInfo getDumpInfo() {
         return new GeyserBungeeDumpInfo(getProxy());
+    }
+
+    @Override
+    public Path getLogsPath() {
+        return Paths.get(getProxy().getName().equals("BungeeCord") ? "proxy.log.0" : "logs/latest.log");
     }
 
     @Nullable
