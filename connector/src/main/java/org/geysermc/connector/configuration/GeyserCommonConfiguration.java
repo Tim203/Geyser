@@ -25,19 +25,15 @@
 
 package org.geysermc.connector.configuration;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
+import org.geysermc.configutils.loader.validate.ValidationResult;
+import org.geysermc.configutils.loader.validate.Validator;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.common.AuthType;
 import org.geysermc.connector.common.serializer.AsteriskSerializer;
 import org.geysermc.connector.network.CIDRMatcher;
-import org.geysermc.connector.utils.LanguageUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -129,7 +125,7 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
 
         private boolean enableProxyProtocol = false;
 
-        private List<String> proxyProtocolWhitelistedIps = Collections.emptyList();
+        private List<String> proxyProtocolWhitelistedIps = Collections.emptyList(); //todo support
 
         private List<CIDRMatcher> whitelistedIpsMatchers = null;
 
@@ -153,7 +149,6 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
         @AsteriskSerializer.Asterisk(isIp = true)
         private String address = "127.0.0.1";
 
-        @JsonDeserialize(using = PortDeserializer.class) //todo remove
         @Setter
         private int port = 25565;
 
@@ -198,16 +193,19 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
     /**
      * Ensure that the port deserializes in the config as a number no matter what.
      */
-    protected static class PortDeserializer extends JsonDeserializer<Integer> {
+    protected static class PortValidator implements Validator {
         @Override
-        public Integer deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            String value = p.getValueAsString();
-            try {
-                return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
-                System.err.println(LanguageUtils.getLocaleStringLog("geyser.bootstrap.config.invalid_port"));
-                return 25565;
+        public ValidationResult validate(String ignored, Object value) throws IllegalArgumentException {
+            if (!(value instanceof Integer)) {
+                return ValidationResult.failed("Port number should be an integer");
             }
+            int port = (int) value;
+            if (port <= 0) {
+                return ValidationResult.failed("Port number should be greater than " + 0);
+            } else if (port > 65535) {
+                return ValidationResult.failed("Port number cannot be greater than " + 65535);
+            }
+            return ValidationResult.ok(port);
         }
     }
 }

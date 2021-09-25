@@ -29,6 +29,7 @@ import org.checkerframework.checker.nullness.qual.NonNull;
 import org.geysermc.configutils.ConfigUtilities;
 import org.geysermc.configutils.file.codec.PathFileCodec;
 import org.geysermc.configutils.file.template.ResourceTemplateReader;
+import org.geysermc.configutils.loader.validate.Validations;
 import org.geysermc.configutils.updater.change.Changes;
 
 import java.util.Objects;
@@ -58,6 +59,9 @@ public class ConfigLoader<T extends GeyserCommonConfiguration> {
                                 .build())
                         .copyDirectly("user-auths")
                         .definePlaceholder("metrics.uuid", UUID::randomUUID)
+                        .validations(Validations.builder()
+                                .validation("remote.port", new GeyserCommonConfiguration.PortValidator())
+                                .build())
                         .build();
 
         return utilities.executeOn(mapTo);
