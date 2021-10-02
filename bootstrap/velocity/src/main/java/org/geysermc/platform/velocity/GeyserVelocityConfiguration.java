@@ -34,13 +34,15 @@ import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 @Getter
 public final class GeyserVelocityConfiguration extends GeyserCommonConfiguration {
     private Path floodgateKeyPath;
 
     public void loadFloodgate(GeyserVelocityPlugin plugin, ProxyServer proxyServer, File dataFolder) {
-        PluginContainer floodgate = proxyServer.getPluginManager().getPlugin("floodgate").orElse(null);
-        floodgateKeyPath = FloodgateKeyLoader.getKeyPath(this, floodgate, Paths.get("plugins/floodgate/"), dataFolder.toPath(), plugin.getGeyserLogger());
+        Optional<PluginContainer> floodgate = proxyServer.getPluginManager().getPlugin("floodgate");
+        Path floodgateDataPath = floodgate.isPresent() ? Paths.get("plugins/floodgate/") : null;
+        floodgateKeyPath = FloodgateKeyLoader.getKeyPath(this, floodgateDataPath, dataFolder.toPath(), plugin.getGeyserLogger());
     }
 }
