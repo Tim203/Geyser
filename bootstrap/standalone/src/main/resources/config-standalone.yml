@@ -1,8 +1,14 @@
 >> config-base.yml
+>># The following section is only needed for Standalone, Sponge and Fabric.
 >>| 34
   # The IP address of the remote (Java Edition) server
   address: 127.0.0.1
   # The port of the remote (Java Edition) server
   port: 25565
+>>|
+>>| 47
+  # Forward the hostname that the Bedrock client used to connect over to the Java server
+  # This is designed to be used for forced hosts on proxies
+  forward-hostname: false
 >>|
 >>*

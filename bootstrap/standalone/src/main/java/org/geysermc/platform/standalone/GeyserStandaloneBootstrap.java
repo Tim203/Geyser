@@ -188,8 +188,8 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
         try {
             geyserConfig = new ConfigLoader<>("config-standalone.yml", GeyserStandaloneConfiguration.class).load();
             handleArgsConfigOptions();
-        } catch (Throwable ex) {
-            geyserLogger.severe(LanguageUtils.getLocaleStringLog("geyser.config.failed"), ex);
+        } catch (Throwable throwable) {
+            geyserLogger.severe(LanguageUtils.getLocaleStringLog("geyser.config.failed"), throwable);
             if (gui == null) {
                 System.exit(1);
             } else {

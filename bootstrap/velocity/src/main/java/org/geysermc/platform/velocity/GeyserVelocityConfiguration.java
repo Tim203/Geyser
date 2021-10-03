@@ -26,23 +26,29 @@
 package org.geysermc.platform.velocity;
 
 import com.velocitypowered.api.plugin.PluginContainer;
-import com.velocitypowered.api.proxy.ProxyServer;
-import lombok.Getter;
+import org.geysermc.configutils.loader.callback.CallbackResult;
 import org.geysermc.connector.FloodgateKeyLoader;
 import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-@Getter
-public final class GeyserVelocityConfiguration extends GeyserCommonConfiguration {
-    private Path floodgateKeyPath;
-
-    public void loadFloodgate(GeyserVelocityPlugin plugin, ProxyServer proxyServer, File dataFolder) {
-        Optional<PluginContainer> floodgate = proxyServer.getPluginManager().getPlugin("floodgate");
+public final class GeyserVelocityConfiguration extends GeyserCommonConfiguration<GeyserVelocityPlugin> {
+    @Override
+    public Path retrieveFloodgateKeyPath(GeyserVelocityPlugin plugin) {
+        Optional<PluginContainer> floodgate = plugin.getProxyServer().getPluginManager().getPlugin("floodgate");
         Path floodgateDataPath = floodgate.isPresent() ? Paths.get("plugins/floodgate/") : null;
-        floodgateKeyPath = FloodgateKeyLoader.getKeyPath(this, floodgateDataPath, dataFolder.toPath(), plugin.getGeyserLogger());
+        return FloodgateKeyLoader.getKeyPath(this, floodgateDataPath, plugin.getConfigFolder(), plugin.getGeyserLogger());
+    }
+
+    @Override
+    public CallbackResult postInitialize(GeyserVelocityPlugin plugin) {
+        boolean hasFloodgate = plugin.getProxyServer().getPluginManager().getPlugin("floodgate").isPresent();
+
+        return checkForFloodgate(hasFloodgate).ifSucceeded(() -> {
+            getRemote().setPort(plugin.getProxyServer().getBoundAddress().getPort());
+            return super.postInitialize(plugin);
+        });
     }
 }

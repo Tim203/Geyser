@@ -27,12 +27,15 @@ package org.geysermc.connector.configuration;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.geysermc.configutils.loader.callback.CallbackResult;
+import org.geysermc.configutils.loader.callback.GenericPostInitializeCallback;
 import org.geysermc.configutils.loader.validate.ValidationResult;
 import org.geysermc.configutils.loader.validate.Validator;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.common.AuthType;
 import org.geysermc.connector.common.serializer.AsteriskSerializer;
 import org.geysermc.connector.network.CIDRMatcher;
+import org.geysermc.connector.utils.LanguageUtils;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -43,7 +46,8 @@ import java.util.stream.Collectors;
 
 @Getter
 @SuppressWarnings("FieldMayBeFinal")
-public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
+public abstract class GeyserCommonConfiguration<T>
+        implements GeyserConfiguration, GenericPostInitializeCallback<T> {
 
     private BedrockConfiguration bedrock = new BedrockConfiguration();
     private RemoteConfiguration remote = new RemoteConfiguration();
@@ -52,7 +56,7 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
 
     private String floodgateKeyFile = "key.pem";
 
-    public abstract Path getFloodgateKeyPath();
+    private Path floodgateKeyPath;
 
     private Map<String, UserAuthenticationInfo> userAuths;
 
@@ -101,6 +105,60 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
     private boolean xboxAchievementsEnabled = false;
 
     private MetricsInfo metrics = new MetricsInfo();
+
+    private int scoreboardPacketThreshold = 10;
+
+    private boolean enableProxyConnections = false;
+
+    private int mtu = 1400;
+
+    private boolean useDirectConnection = true;
+
+    private int configVersion = 0;
+
+    @Override
+    public CallbackResult postInitialize(T callbackArgument) {
+        return postInitialize().ifSucceeded(() -> {
+            // other platforms had their chance to change stuff by overriding postInitialize/0
+            if (getBedrock().isCloneRemotePort()) {
+                getBedrock().setPort(getRemote().getPort());
+            }
+
+            floodgateKeyPath = retrieveFloodgateKeyPath(callbackArgument);
+            return CallbackResult.ok();
+        });
+    }
+
+    protected CallbackResult postInitialize() {
+        return CallbackResult.ok();
+    }
+
+    protected CallbackResult checkForFloodgate(boolean hasFloodgate) {
+        // Remove this in like a year
+        try {
+            // Should only exist on 1.0
+            Class.forName("org.geysermc.floodgate.FloodgateAPI");
+
+            return CallbackResult.failed(LanguageUtils.getLocaleStringLog(
+                    "geyser.bootstrap.floodgate.outdated",
+                    "https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/"
+            ));
+        } catch (ClassNotFoundException ignored) {}
+
+        if (getRemote().getAuthType() == AuthType.FLOODGATE && !hasFloodgate) {
+            return CallbackResult.failed(
+                    LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.not_installed") + " " +
+                            LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.disabling")
+            );
+        } else if (hasFloodgate) {
+            // Auto-setting to Floodgate auth when Floodgate is installed
+            getRemote().setAuthType(AuthType.FLOODGATE);
+        }
+
+        return CallbackResult.ok();
+    }
+
+    abstract protected Path retrieveFloodgateKeyPath(T callbackArgument);
 
     @Getter
     public static class BedrockConfiguration implements IBedrockConfiguration {
@@ -159,7 +217,7 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
 
         private boolean useProxyProtocol = false;
 
-        private boolean forwardHostname = false;
+        private boolean forwardHostname = true; // only true by default for plugin versions
     }
 
     @Getter
@@ -180,22 +238,12 @@ public abstract class GeyserCommonConfiguration implements GeyserConfiguration {
         private String uuid = UUID.randomUUID().toString();
     }
 
-    private int scoreboardPacketThreshold = 10;
-
-    private boolean enableProxyConnections = false;
-
-    private int mtu = 1400;
-
-    private boolean useDirectConnection = true;
-
-    private int configVersion = 0;
-
     /**
      * Ensure that the port deserializes in the config as a number no matter what.
      */
     protected static class PortValidator implements Validator {
         @Override
-        public ValidationResult validate(String ignored, Object value) throws IllegalArgumentException {
+        public ValidationResult validate(String ignored, Object value) {
             if (!(value instanceof Integer)) {
                 return ValidationResult.failed("Port number should be an integer");
             }

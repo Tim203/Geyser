@@ -30,11 +30,10 @@ import org.geysermc.common.PlatformType;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.connector.command.CommandManager;
-import org.geysermc.connector.configuration.GeyserConfiguration;
+import org.geysermc.connector.configuration.ConfigLoader;
 import org.geysermc.connector.dump.BootstrapDumpInfo;
 import org.geysermc.connector.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.connector.ping.IGeyserPingPassthrough;
-import org.geysermc.connector.utils.FileUtils;
 import org.geysermc.connector.utils.LanguageUtils;
 import org.geysermc.platform.sponge.command.GeyserSpongeCommandExecutor;
 import org.geysermc.platform.sponge.command.GeyserSpongeCommandManager;
@@ -47,10 +46,7 @@ import org.spongepowered.api.event.game.state.GameStoppedEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.file.Path;
-import java.util.UUID;
 
 @Plugin(id = "geyser", name = GeyserConnector.NAME + "-Sponge", version = GeyserConnector.VERSION, url = "https://geysermc.org", authors = "GeyserMC")
 public class GeyserSpongePlugin implements GeyserBootstrap {
@@ -71,31 +67,14 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
 
     @Override
     public void onEnable() {
-        if (!configDir.exists())
-            configDir.mkdirs();
-
-        File configFile = null;
         try {
-            configFile = FileUtils.fileOrCopiedFromResource(new File(configDir, "config.yml"), "config.yml", (file) -> file.replaceAll("generateduuid", UUID.randomUUID().toString()));
-        } catch (IOException ex) {
-            logger.warn(LanguageUtils.getLocaleStringLog("geyser.config.failed"));
-            ex.printStackTrace();
-        }
-
-        try {
-            this.geyserConfig = FileUtils.loadConfig(configFile, GeyserSpongeConfiguration.class);
-        } catch (IOException ex) {
-            logger.warn(LanguageUtils.getLocaleStringLog("geyser.config.failed"));
-            ex.printStackTrace();
+            geyserConfig = new ConfigLoader<>("config-sponge.yml", GeyserSpongeConfiguration.class).load();
+        } catch (Throwable throwable) {
+            logger.warn(LanguageUtils.getLocaleStringLog("geyser.config.failed"), throwable);
             return;
         }
 
-        if (geyserConfig.getBedrock().isCloneRemotePort()) {
-            geyserConfig.getBedrock().setPort(geyserConfig.getRemote().getPort());
-        }
-
         this.geyserLogger = new GeyserSpongeLogger(logger, geyserConfig.isDebugMode());
-        GeyserConfiguration.checkGeyserConfiguration(geyserConfig, geyserLogger);
         this.connector = GeyserConnector.start(PlatformType.SPONGE, this);
 
         if (geyserConfig.isLegacyPingPassthrough()) {

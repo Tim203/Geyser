@@ -26,6 +26,7 @@
 package org.geysermc.connector.configuration;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.geysermc.configutils.ConfigUtilities;
 import org.geysermc.configutils.file.codec.PathFileCodec;
 import org.geysermc.configutils.file.template.ResourceTemplateReader;
@@ -35,13 +36,23 @@ import org.geysermc.configutils.updater.change.Changes;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ConfigLoader<T extends GeyserCommonConfiguration> {
+public class ConfigLoader<T extends GeyserCommonConfiguration<X>, X> {
     private final String templateFile;
     private final Class<T> mapTo;
+    private final X configCallbackArgument;
 
-    public ConfigLoader(@NonNull String templateFile, @NonNull Class<T> mapTo) {
+    public ConfigLoader(
+            @NonNull String templateFile,
+            @NonNull Class<T> mapTo,
+            @Nullable X configCallbackArgument) {
+
         this.templateFile = Objects.requireNonNull(templateFile);
         this.mapTo = Objects.requireNonNull(mapTo);
+        this.configCallbackArgument = configCallbackArgument;
+    }
+
+    public ConfigLoader(@NonNull String templateFile, @NonNull Class<T> mapTo) {
+        this(templateFile, mapTo, null);
     }
 
     public T load() throws Throwable {
@@ -62,6 +73,7 @@ public class ConfigLoader<T extends GeyserCommonConfiguration> {
                         .validations(Validations.builder()
                                 .validation("remote.port", new GeyserCommonConfiguration.PortValidator())
                                 .build())
+                        .postInitializeCallbackArgument(configCallbackArgument)
                         .build();
 
         return utilities.executeOn(mapTo);

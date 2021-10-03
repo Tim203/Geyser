@@ -1,0 +1,12 @@
+>> config-plugin.yml
+>># The following section is only needed for Standalone, Sponge and Fabric.
+>># 34 + 4 for clone remote port
+>>| 38
+  # The IP address of the remote (Java Edition) server.
+  # It is recommended to keep this as "auto" so Geyser will automatically configure address and port.
+  address: auto
+  # The port of the remote (Java Edition) server.
+  # If address has been set to "auto", the port will also follow the server's listening port.
+  port: 25565
+>>|
+>>*

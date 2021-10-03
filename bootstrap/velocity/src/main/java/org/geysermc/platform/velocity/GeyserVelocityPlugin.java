@@ -39,24 +39,19 @@ import org.geysermc.common.PlatformType;
 import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.bootstrap.GeyserBootstrap;
 import org.geysermc.connector.common.AuthType;
-import org.geysermc.connector.configuration.GeyserConfiguration;
+import org.geysermc.connector.configuration.ConfigLoader;
 import org.geysermc.connector.dump.BootstrapDumpInfo;
 import org.geysermc.connector.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.connector.ping.IGeyserPingPassthrough;
-import org.geysermc.connector.utils.FileUtils;
 import org.geysermc.connector.utils.LanguageUtils;
 import org.geysermc.platform.velocity.command.GeyserVelocityCommandExecutor;
 import org.geysermc.platform.velocity.command.GeyserVelocityCommandManager;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 @Plugin(id = "geyser", name = GeyserConnector.NAME + "-Velocity", version = GeyserConnector.VERSION, url = "https://geysermc.org", authors = "GeyserMC")
 public class GeyserVelocityPlugin implements GeyserBootstrap {
@@ -64,6 +59,7 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
     @Inject
     private Logger logger;
 
+    @Getter
     @Inject
     private ProxyServer proxyServer;
 
@@ -84,45 +80,12 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
     @Override
     public void onEnable() {
         try {
-            if (!configFolder.toFile().exists())
-                //noinspection ResultOfMethodCallIgnored
-                configFolder.toFile().mkdirs();
-            File configFile = FileUtils.fileOrCopiedFromResource(configFolder.resolve("config.yml").toFile(),
-                    "config.yml", (x) -> x.replaceAll("generateduuid", UUID.randomUUID().toString()));
-            this.geyserConfig = FileUtils.loadConfig(configFile, GeyserVelocityConfiguration.class);
-        } catch (IOException ex) {
-            logger.warn(LanguageUtils.getLocaleStringLog("geyser.config.failed"), ex);
-            ex.printStackTrace();
-        }
-
-        if (geyserConfig.getBedrock().isCloneRemotePort()) {
-            geyserConfig.getBedrock().setPort(proxyServer.getBoundAddress().getPort());
+            geyserConfig = new ConfigLoader<>("config-plugin.yml", GeyserVelocityConfiguration.class, this).load();
+        } catch (Throwable throwable) {
+            logger.warn(LanguageUtils.getLocaleStringLog("geyser.config.failed"), throwable);
         }
 
         this.geyserLogger = new GeyserVelocityLogger(logger, geyserConfig.isDebugMode());
-        GeyserConfiguration.checkGeyserConfiguration(geyserConfig, geyserLogger);
-
-        // Remove this in like a year
-        try {
-            // Should only exist on 1.0
-            Class.forName("org.geysermc.floodgate.FloodgateAPI");
-            geyserLogger.severe(LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.outdated",
-                    "https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/"));
-            return;
-        } catch (ClassNotFoundException ignored) {
-        }
-
-        if (geyserConfig.getRemote().getAuthType() == AuthType.FLOODGATE && proxyServer.getPluginManager().getPlugin("floodgate").isEmpty()) {
-            geyserLogger.severe(LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.not_installed") + " "
-                    + LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.disabling"));
-            return;
-        } else if (proxyServer.getPluginManager().getPlugin("floodgate").isPresent()) {
-            // Floodgate installed means that the user wants Floodgate authentication
-            geyserLogger.debug("Auto-setting to Floodgate authentication.");
-            geyserConfig.getRemote().setAuthType(AuthType.FLOODGATE);
-        }
-
-        geyserConfig.loadFloodgate(this, proxyServer, configFolder.toFile());
 
         this.connector = GeyserConnector.start(PlatformType.VELOCITY, this);
 

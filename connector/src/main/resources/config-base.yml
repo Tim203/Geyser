@@ -42,9 +42,6 @@ remote:
   # 2) You run Velocity or BungeeCord with the option enabled in the proxy's main config.
   # IF YOU DON'T KNOW WHAT THIS IS, DON'T TOUCH IT!
   use-proxy-protocol: false
-  # Forward the hostname that the Bedrock client used to connect over to the Java server
-  # This is designed to be used for forced hosts on proxies
-  forward-hostname: false
 
 # Allows the overworld world height to be extended from 0 - 255 to -64 - 319. This option cannot be changed during a reload.
 # Performance issues and/or additional bugs may occur for Bedrock clients as this is an experimental toggle on their end.
@@ -65,11 +62,6 @@ user-auths:
 #    email: javaccountemail@example.com # Your Minecraft: Java Edition email
 #    password: javaccountpassword123 # Your Minecraft: Java Edition password
 #    microsoft-account: true # Whether the account is a Mojang or Microsoft account.
-#
-#  bluerkelp2: 
-#    email: not_really_my_email_address_mr_minecrafter53267@gmail.com 
-#    password: "this isn't really my password"
-#    microsoft-account: false
 
 # Bedrock clients can freeze when opening up the command prompt for the first time if given a lot of commands.
 # Disabling this will prevent command suggestions from being sent and solve freezing for Bedrock clients.
@@ -83,9 +75,6 @@ passthrough-motd: false
 passthrough-protocol-name: false
 # Relay the player count and max players from the remote server to Bedrock players.
 passthrough-player-counts: false
-# Enable LEGACY ping passthrough. There is no need to enable this unless your MOTD or player count does not appear properly.
-# This option does nothing on standalone.
-legacy-ping-passthrough: false
 # How often to ping the remote server, in seconds. Only relevant for standalone or legacy ping passthrough.
 # Increase if you are getting BrokenPipe errors.
 ping-passthrough-interval: 3
@@ -181,11 +170,5 @@ enable-proxy-connections: false
 # The internet supports a maximum MTU of 1492 but could cause issues with packet fragmentation.
 # 1400 is the default.
 mtu: 1400
-
-# Whether to connect directly into the Java server without creating a TCP connection.
-# This should only be disabled if a plugin that interfaces with packets or the network does not work correctly with Geyser.
-# If enabled on plugin versions, the remote address and port sections are ignored
-# If disabled on plugin versions, expect performance decrease and latency increase
-use-direct-connection: true
 
 config-version: 5

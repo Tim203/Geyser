@@ -25,26 +25,43 @@
 
 package org.geysermc.platform.bungeecord;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Getter;
+import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
+import org.geysermc.configutils.loader.callback.CallbackResult;
 import org.geysermc.connector.FloodgateKeyLoader;
 import org.geysermc.connector.configuration.GeyserCommonConfiguration;
 
 import java.nio.file.Path;
+import java.util.Collection;
 
-@Getter
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class GeyserBungeeConfiguration extends GeyserCommonConfiguration {
-    @JsonIgnore
-    private Path floodgateKeyPath;
-
-    public void loadFloodgate(GeyserBungeePlugin plugin) {
+public final class GeyserBungeeConfiguration extends GeyserCommonConfiguration<GeyserBungeePlugin> {
+    @Override
+    public Path retrieveFloodgateKeyPath(GeyserBungeePlugin plugin) {
         Plugin floodgate = plugin.getProxy().getPluginManager().getPlugin("floodgate");
         Path geyserDataFolder = plugin.getDataFolder().toPath();
         Path floodgateDataFolder = floodgate != null ? floodgate.getDataFolder().toPath() : null;
 
-        floodgateKeyPath = FloodgateKeyLoader.getKeyPath(this, floodgateDataFolder, geyserDataFolder, plugin.getGeyserLogger());
+        return FloodgateKeyLoader.getKeyPath(this, floodgateDataFolder, geyserDataFolder, plugin.getGeyserLogger());
+    }
+
+    @Override
+    public CallbackResult postInitialize(GeyserBungeePlugin plugin) {
+        boolean hasFloodgate = plugin.getProxy().getPluginManager().getPlugin("floodgate") != null;
+
+        return checkForFloodgate(hasFloodgate).ifSucceeded(() -> {
+            Collection<ListenerInfo> listeners = plugin.getProxy().getConfig().getListeners();
+
+            if (listeners.size() > 1) {
+                plugin.getLogger()
+                        .fine("There are multiple listeners defined, we'll use the first listener");
+            }
+
+            if (!listeners.isEmpty()) {
+                ListenerInfo listener = plugin.getProxy().getConfig().getListeners().toArray(new ListenerInfo[0])[0];
+                getRemote().setPort(listener.getHost().getPort());
+            }
+
+            return super.postInitialize(plugin);
+        });
     }
 }
