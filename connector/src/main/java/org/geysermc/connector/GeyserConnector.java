@@ -162,18 +162,6 @@ public class GeyserConnector {
 
         ResourcePack.loadPacks();
 
-        if (platformType != PlatformType.STANDALONE && config.getRemote().getAddress().equals("auto")) {
-            // Set the remote address to localhost since that is where we are always connecting
-            try {
-                config.getRemote().setAddress(InetAddress.getLocalHost().getHostAddress());
-            } catch (UnknownHostException ex) {
-                logger.debug("Unknown host when trying to find localhost.");
-                if (config.isDebugMode()) {
-                    ex.printStackTrace();
-                }
-                config.getRemote().setAddress(InetAddress.getLoopbackAddress().getHostAddress());
-            }
-        }
         String remoteAddress = config.getRemote().getAddress();
         // Filters whether it is not an IP address or localhost, because otherwise it is not possible to find out an SRV entry.
         if (!remoteAddress.matches(IP_REGEX) && !remoteAddress.equalsIgnoreCase("localhost")) {
@@ -281,7 +269,7 @@ public class GeyserConnector {
         }
 
         if (config.getMetrics().isEnabled()) {
-            metrics = new Metrics(this, "GeyserMC", config.getMetrics().getUniqueId(), false, java.util.logging.Logger.getLogger(""));
+            metrics = new Metrics(this, "GeyserMC", config.getMetrics().getUuid(), false, java.util.logging.Logger.getLogger(""));
             metrics.addCustomChart(new Metrics.SingleLineChart("players", sessionManager::size));
             // Prevent unwanted words best we can
             metrics.addCustomChart(new Metrics.SimplePie("authMode", () -> config.getRemote().getAuthType().toString().toLowerCase()));

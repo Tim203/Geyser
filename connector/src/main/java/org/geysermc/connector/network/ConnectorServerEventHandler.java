@@ -67,10 +67,10 @@ public class ConnectorServerEventHandler implements BedrockServerEventHandler {
 
     @Override
     public boolean onConnectionRequest(InetSocketAddress inetSocketAddress) {
-        List<String> allowedProxyIPs = connector.getConfig().getBedrock().getProxyProtocolWhitelistedIPs();
+        List<String> allowedProxyIPs = connector.getConfig().getBedrock().getProxyProtocolWhitelistedIps();
         if (connector.getConfig().getBedrock().isEnableProxyProtocol() && !allowedProxyIPs.isEmpty()) {
             boolean isWhitelistedIP = false;
-            for (CIDRMatcher matcher : connector.getConfig().getBedrock().getWhitelistedIPsMatchers()) {
+            for (CIDRMatcher matcher : connector.getConfig().getBedrock().getWhitelistedIpsMatchers()) {
                 if (matcher.matches(inetSocketAddress.getAddress())) {
                     isWhitelistedIP = true;
                     break;
