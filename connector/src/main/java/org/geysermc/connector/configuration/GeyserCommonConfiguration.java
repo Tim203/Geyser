@@ -35,6 +35,7 @@ import org.geysermc.connector.GeyserConnector;
 import org.geysermc.connector.common.AuthType;
 import org.geysermc.connector.common.serializer.AsteriskSerializer;
 import org.geysermc.connector.network.CIDRMatcher;
+import org.geysermc.connector.utils.Constants;
 import org.geysermc.connector.utils.LanguageUtils;
 
 import java.nio.file.Path;
@@ -137,7 +138,7 @@ public abstract class GeyserCommonConfiguration<T>
 
             return CallbackResult.failed(LanguageUtils.getLocaleStringLog(
                     "geyser.bootstrap.floodgate.outdated",
-                    "https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/"
+                    Constants.FLOODGATE_DOWNLOAD_LOCATION
             ));
         } catch (ClassNotFoundException ignored) {}
 
