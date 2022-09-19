@@ -23,7 +23,7 @@
  * @link https://github.com/GeyserMC/Geyser
  */
 
-package org.geysermc.connector.configuration;
+package org.geysermc.geyser.configuration;
 
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;

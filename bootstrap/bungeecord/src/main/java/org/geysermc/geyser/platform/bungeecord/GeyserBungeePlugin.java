@@ -30,7 +30,6 @@ import org.geysermc.common.PlatformType;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.GeyserBootstrap;
 import org.geysermc.geyser.command.CommandManager;
-import org.geysermc.geyser.session.auth.AuthType;
 import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
 import org.geysermc.geyser.ping.GeyserLegacyPingPassthrough;
