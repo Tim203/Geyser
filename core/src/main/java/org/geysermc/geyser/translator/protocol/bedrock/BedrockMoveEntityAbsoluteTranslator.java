@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,9 @@ package org.geysermc.geyser.translator.protocol.bedrock;
 import com.github.steveice10.mc.protocol.packet.ingame.serverbound.level.ServerboundMoveVehiclePacket;
 import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.protocol.bedrock.packet.MoveEntityAbsolutePacket;
+import org.geysermc.geyser.entity.EntityDefinitions;
 import org.geysermc.geyser.entity.type.BoatEntity;
 import org.geysermc.geyser.entity.type.Entity;
-import org.geysermc.geyser.entity.EntityDefinitions;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
@@ -45,7 +45,7 @@ public class BedrockMoveEntityAbsoluteTranslator extends PacketTranslator<MoveEn
     public void translate(GeyserSession session, MoveEntityAbsolutePacket packet) {
         session.setLastVehicleMoveTimestamp(System.currentTimeMillis());
 
-        Entity ridingEntity = session.getRidingVehicleEntity();
+        Entity ridingEntity = session.getPlayerEntity().getVehicle();
         if (ridingEntity != null && session.getWorldBorder().isPassingIntoBorderBoundaries(packet.getPosition(), false)) {
             Vector3f position = Vector3f.from(ridingEntity.getPosition().getX(), packet.getPosition().getY(),
                     ridingEntity.getPosition().getZ());

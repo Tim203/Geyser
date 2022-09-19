@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -62,9 +62,25 @@ public class BlockRegistries {
     public static final MappedRegistry<String, Integer, Object2IntBiMap<String>> JAVA_IDENTIFIERS = MappedRegistry.create(RegistryLoaders.empty(Object2IntBiMap::new));
 
     /**
+     * A registry which stores unique Java IDs to its clean identifier
+     * This is used in the statistics form.
+     */
+    public static final ArrayRegistry<String> CLEAN_JAVA_IDENTIFIERS = ArrayRegistry.create(RegistryLoaders.empty(() -> new String[] {}));
+
+    /**
      * A registry containing all the waterlogged blockstates.
      */
     public static final SimpleRegistry<IntSet> WATERLOGGED = SimpleRegistry.create(RegistryLoaders.empty(IntOpenHashSet::new));
+
+    /**
+     * A registry containing all blockstates which are always interactive.
+     */
+    public static final SimpleRegistry<IntSet> INTERACTIVE = SimpleRegistry.create(RegistryLoaders.empty(IntOpenHashSet::new));
+
+    /**
+     * A registry containing all blockstates which are interactive if the player has the may build permission.
+     */
+    public static final SimpleRegistry<IntSet> INTERACTIVE_MAY_BUILD = SimpleRegistry.create(RegistryLoaders.empty(IntOpenHashSet::new));
 
     static {
         BlockRegistryPopulator.populate();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,10 @@
 package org.geysermc.geyser.translator.protocol.java;
 
 import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundChangeDifficultyPacket;
+import com.nukkitx.protocol.bedrock.packet.SetDifficultyPacket;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
-import com.nukkitx.protocol.bedrock.packet.SetDifficultyPacket;
 
 @Translator(packet = ClientboundChangeDifficultyPacket.class)
 public class JavaChangeDifficultyTranslator extends PacketTranslator<ClientboundChangeDifficultyPacket> {

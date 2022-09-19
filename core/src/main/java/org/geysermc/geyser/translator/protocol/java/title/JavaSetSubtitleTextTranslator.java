@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ public class JavaSetSubtitleTextTranslator extends PacketTranslator<ClientboundS
         if (packet.getText() == null) { //TODO 1.17 can this happen?
             text = " ";
         } else {
-            text = MessageTranslator.convertMessage(packet.getText(), session.getLocale());
+            text = MessageTranslator.convertMessage(packet.getText(), session.locale());
         }
 
         SetTitlePacket titlePacket = new SetTitlePacket();

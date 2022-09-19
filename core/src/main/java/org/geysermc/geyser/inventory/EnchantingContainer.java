@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ public class EnchantingContainer extends Container {
         for (int i = 0; i < geyserEnchantOptions.length; i++) {
             geyserEnchantOptions[i] = new GeyserEnchantOption(i);
             // Options cannot be null, so we build initial options
-            // GeyserSession can be safely null here because it's only needed for net IDs
+            // GeyserConnection can be safely null here because it's only needed for net IDs
             enchantOptions[i] = geyserEnchantOptions[i].build(null);
         }
     }

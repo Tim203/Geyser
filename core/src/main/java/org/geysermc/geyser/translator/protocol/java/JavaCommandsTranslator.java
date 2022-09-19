@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,8 @@ package org.geysermc.geyser.translator.protocol.java;
 
 import com.github.steveice10.mc.protocol.data.game.command.CommandNode;
 import com.github.steveice10.mc.protocol.data.game.command.CommandParser;
+import com.github.steveice10.mc.protocol.data.game.command.properties.ResourceProperties;
+import com.github.steveice10.mc.protocol.data.game.entity.attribute.AttributeType;
 import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundCommandsPacket;
 import com.nukkitx.protocol.bedrock.data.command.CommandData;
 import com.nukkitx.protocol.bedrock.data.command.CommandEnumData;
@@ -43,12 +45,14 @@ import lombok.Getter;
 import lombok.ToString;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.session.GeyserSession;
-import org.geysermc.geyser.translator.protocol.PacketTranslator;
-import org.geysermc.geyser.translator.protocol.Translator;
+import org.geysermc.geyser.api.event.downstream.ServerDefineCommandsEvent;
+import org.geysermc.geyser.command.GeyserCommandManager;
 import org.geysermc.geyser.inventory.item.Enchantment;
 import org.geysermc.geyser.registry.BlockRegistries;
 import org.geysermc.geyser.registry.Registries;
+import org.geysermc.geyser.session.GeyserSession;
+import org.geysermc.geyser.translator.protocol.PacketTranslator;
+import org.geysermc.geyser.translator.protocol.Translator;
 import org.geysermc.geyser.util.EntityUtils;
 
 import java.util.*;
@@ -57,24 +61,27 @@ import java.util.*;
 public class JavaCommandsTranslator extends PacketTranslator<ClientboundCommandsPacket> {
 
     private static final String[] ALL_EFFECT_IDENTIFIERS = EntityUtils.getAllEffectIdentifiers();
+    private static final String[] ATTRIBUTES = AttributeType.Builtin.BUILTIN.keySet().toArray(new String[0]);
     private static final String[] ENUM_BOOLEAN = {"true", "false"};
     private static final String[] VALID_COLORS;
     private static final String[] VALID_SCOREBOARD_SLOTS;
 
-    private static final Hash.Strategy<CommandParamData[][]> PARAM_STRATEGY = new Hash.Strategy<>() {
+    private static final Hash.Strategy<BedrockCommandInfo> PARAM_STRATEGY = new Hash.Strategy<>() {
         @Override
-        public int hashCode(CommandParamData[][] o) {
-            return Arrays.deepHashCode(o);
+        public int hashCode(BedrockCommandInfo o) {
+            int paramHash = Arrays.deepHashCode(o.paramData());
+            return 31 * paramHash + o.description().hashCode();
         }
 
         @Override
-        public boolean equals(CommandParamData[][] a, CommandParamData[][] b) {
+        public boolean equals(BedrockCommandInfo a, BedrockCommandInfo b) {
             if (a == b) return true;
             if (a == null || b == null) return false;
-            if (a.length != b.length) return false;
-            for (int i = 0; i < a.length; i++) {
-                CommandParamData[] a1 = a[i];
-                CommandParamData[] b1 = b[i];
+            if (!a.description().equals(b.description())) return false;
+            if (a.paramData().length != b.paramData().length) return false;
+            for (int i = 0; i < a.paramData().length; i++) {
+                CommandParamData[] a1 = a.paramData()[i];
+                CommandParamData[] b1 = b.paramData()[i];
                 if (a1.length != b1.length) return false;
 
                 for (int j = 0; j < a1.length; j++) {
@@ -109,11 +116,12 @@ public class JavaCommandsTranslator extends PacketTranslator<ClientboundCommands
             return;
         }
 
+        GeyserCommandManager manager = session.getGeyser().commandManager();
         CommandNode[] nodes = packet.getNodes();
         List<CommandData> commandData = new ArrayList<>();
         IntSet commandNodes = new IntOpenHashSet();
         Set<String> knownAliases = new HashSet<>();
-        Map<CommandParamData[][], Set<String>> commands = new Object2ObjectOpenCustomHashMap<>(PARAM_STRATEGY);
+        Map<BedrockCommandInfo, Set<String>> commands = new Object2ObjectOpenCustomHashMap<>(PARAM_STRATEGY);
         Int2ObjectMap<List<CommandNode>> commandArgs = new Int2ObjectOpenHashMap<>();
 
         // Get the first node, it should be a root node
@@ -124,7 +132,7 @@ public class JavaCommandsTranslator extends PacketTranslator<ClientboundCommands
             CommandNode node = nodes[nodeIndex];
 
             // Make sure we don't have duplicated commands (happens if there is more than 1 root node)
-            if (!commandNodes.add(nodeIndex) || !knownAliases.add(node.getName().toLowerCase())) continue;
+            if (!commandNodes.add(nodeIndex) || !knownAliases.add(node.getName().toLowerCase(Locale.ROOT))) continue;
 
             // Get and update the commandArgs list with the found arguments
             if (node.getChildIndices().length >= 1) {
@@ -137,22 +145,28 @@ public class JavaCommandsTranslator extends PacketTranslator<ClientboundCommands
             CommandParamData[][] params = getParams(session, nodes[nodeIndex], nodes);
 
             // Insert the alias name into the command list
-            commands.computeIfAbsent(params, index -> new HashSet<>()).add(node.getName().toLowerCase());
+            commands.computeIfAbsent(new BedrockCommandInfo(node.getName().toLowerCase(Locale.ROOT), manager.description(node.getName().toLowerCase(Locale.ROOT)), params),
+                    index -> new HashSet<>()).add(node.getName().toLowerCase());
+        }
+
+        ServerDefineCommandsEvent event = new ServerDefineCommandsEvent(session, commands.keySet());
+        session.getGeyser().eventBus().fire(event);
+        if (event.isCancelled()) {
+            return;
         }
 
         // The command flags, not sure what these do apart from break things
         List<CommandData.Flag> flags = Collections.emptyList();
 
         // Loop through all the found commands
-
-        for (Map.Entry<CommandParamData[][], Set<String>> entry : commands.entrySet()) {
+        for (Map.Entry<BedrockCommandInfo, Set<String>> entry : commands.entrySet()) {
             String commandName = entry.getValue().iterator().next(); // We know this has a value
 
             // Create a basic alias
             CommandEnumData aliases = new CommandEnumData(commandName + "Aliases", entry.getValue().toArray(new String[0]), false);
 
             // Build the completed command and add it to the final list
-            CommandData data = new CommandData(commandName, session.getGeyser().getCommandManager().getDescription(commandName), flags, (byte) 0, aliases, entry.getKey());
+            CommandData data = new CommandData(commandName, entry.getKey().description(), flags, (byte) 0, aliases, entry.getKey().paramData());
             commandData.add(data);
         }
 
@@ -198,10 +212,11 @@ public class JavaCommandsTranslator extends PacketTranslator<ClientboundCommands
      * Convert Java edition command types to Bedrock edition
      *
      * @param session the session
-     * @param parser Command type to convert
+     * @param node Command type to convert
      * @return Bedrock parameter data type
      */
-    private static Object mapCommandType(GeyserSession session, CommandParser parser) {
+    private static Object mapCommandType(GeyserSession session, CommandNode node) {
+        CommandParser parser = node.getParser();
         if (parser == null) {
             return CommandParam.STRING;
         }
@@ -213,7 +228,7 @@ public class JavaCommandsTranslator extends PacketTranslator<ClientboundCommands
             case BLOCK_POS -> CommandParam.BLOCK_POSITION;
             case COLUMN_POS, VEC3 -> CommandParam.POSITION;
             case MESSAGE -> CommandParam.MESSAGE;
-            case NBT, NBT_COMPOUND_TAG, NBT_TAG, NBT_PATH -> CommandParam.JSON;
+            case NBT_COMPOUND_TAG, NBT_TAG, NBT_PATH -> CommandParam.JSON; //TODO NBT was removed
             case RESOURCE_LOCATION, FUNCTION -> CommandParam.FILE_PATH;
             case BOOL -> ENUM_BOOLEAN;
             case OPERATION -> CommandParam.OPERATOR; // ">=", "==", etc
@@ -224,8 +239,22 @@ public class JavaCommandsTranslator extends PacketTranslator<ClientboundCommands
             case COLOR -> VALID_COLORS;
             case SCOREBOARD_SLOT -> VALID_SCOREBOARD_SLOTS;
             case MOB_EFFECT -> ALL_EFFECT_IDENTIFIERS;
+            case RESOURCE, RESOURCE_OR_TAG -> {
+                String resource = ((ResourceProperties) node.getProperties()).getRegistryKey();
+                if (resource.equals("minecraft:attribute")) {
+                    yield ATTRIBUTES;
+                } else {
+                    yield CommandParam.STRING;
+                }
+            }
             default -> CommandParam.STRING;
         };
+    }
+
+    /**
+     * Stores the command description and parameter data for best optimizing the Bedrock commands packet.
+     */
+    private static record BedrockCommandInfo(String name, String description, CommandParamData[][] paramData) implements ServerDefineCommandsEvent.CommandInfo {
     }
 
     @Getter
@@ -291,18 +320,24 @@ public class JavaCommandsTranslator extends PacketTranslator<ClientboundCommands
                     }
                 } else {
                     // Put the non-enum param into the list
-                    Object mappedType = mapCommandType(session, paramNode.getParser());
+                    Object mappedType = mapCommandType(session, paramNode);
                     CommandEnumData enumData = null;
                     CommandParam type = null;
+                    boolean optional = this.paramNode.isExecutable();
                     if (mappedType instanceof String[]) {
-                        enumData = new CommandEnumData(paramNode.getParser().name().toLowerCase(), (String[]) mappedType, false);
+                        enumData = new CommandEnumData(paramNode.getParser().name().toLowerCase(Locale.ROOT), (String[]) mappedType, false);
                     } else {
                         type = (CommandParam) mappedType;
+                        // Bedrock throws a fit if an optional message comes after a string or target
+                        // Example vanilla commands: ban-ip, ban, and kick
+                        if (optional && type == CommandParam.MESSAGE && (paramData.getType() == CommandParam.STRING || paramData.getType() == CommandParam.TARGET)) {
+                            optional = false;
+                        }
                     }
                     // IF enumData != null:
                     // In game, this will show up like <paramNode.getName(): enumData.getName()>
                     // So if paramNode.getName() == "value" and enumData.getName() == "bool": <value: bool>
-                    children.add(new ParamInfo(paramNode, new CommandParamData(paramNode.getName(), this.paramNode.isExecutable(), enumData, type, null, Collections.emptyList())));
+                    children.add(new ParamInfo(paramNode, new CommandParamData(paramNode.getName(), optional, enumData, type, null, Collections.emptyList())));
                 }
             }
 

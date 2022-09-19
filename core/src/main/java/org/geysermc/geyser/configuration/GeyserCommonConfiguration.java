@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,9 +32,9 @@ import org.geysermc.configutils.loader.callback.GenericPostInitializeCallback;
 import org.geysermc.configutils.loader.validate.ValidationResult;
 import org.geysermc.configutils.loader.validate.Validator;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.session.auth.AuthType;
-import org.geysermc.geyser.text.AsteriskSerializer;
+import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.network.CIDRMatcher;
+import org.geysermc.geyser.text.AsteriskSerializer;
 import org.geysermc.geyser.text.GeyserLocale;
 import org.geysermc.geyser.utils.Constants;
 
@@ -52,6 +52,8 @@ public abstract class GeyserCommonConfiguration<T>
 
     private BedrockConfiguration bedrock = new BedrockConfiguration();
     private RemoteConfiguration remote = new RemoteConfiguration();
+
+    private List<String> savedUserLogins = Collections.emptyList();
 
     private String floodgateKeyFile = "key.pem";
 
@@ -83,6 +85,10 @@ public abstract class GeyserCommonConfiguration<T>
 
     private boolean showCoordinates = true;
 
+    private boolean disableBedrockScaffolding = false;
+
+    private boolean alwaysQuickChangeArmor = false;
+
     private EmoteOffhandWorkaroundOption emoteOffhandWorkaround = EmoteOffhandWorkaroundOption.DISABLED;
 
     private boolean allowThirdPartyEars = false;
@@ -93,6 +99,10 @@ public abstract class GeyserCommonConfiguration<T>
 
     private boolean allowCustomSkulls = true;
 
+    private int maxVisibleCustomSkulls = 128;
+
+    private int customSkullRenderDistance = 32;
+
     private boolean addNonBedrockItems = true;
 
     private boolean aboveBedrockNetherBuilding = false;
@@ -101,7 +111,13 @@ public abstract class GeyserCommonConfiguration<T>
 
     private boolean xboxAchievementsEnabled = false;
 
+    private boolean logPlayerIpAddresses = true;
+
+    private boolean notifyOnNewBedrockUpdate = true;
+
     private MetricsInfo metrics = new MetricsInfo();
+
+    private int pendingAuthenticationTimeout = 120;
 
     private int scoreboardPacketThreshold = 10;
 
@@ -162,15 +178,42 @@ public abstract class GeyserCommonConfiguration<T>
         @AsteriskSerializer.Asterisk(isIp = true)
         private String address = "0.0.0.0";
 
+        @Override
+        public String address() {
+            return address;
+        }
+
         @Setter
         private int port = 19132;
 
+        @Override
+        public int port() {
+            return port;
+        }
+
+        @Getter
         private boolean cloneRemotePort = false;
 
         private String motd1 = "GeyserMC";
+
+        @Override
+        public String primaryMotd() {
+            return motd1;
+        }
+
         private String motd2 = "Geyser";
 
+        @Override
+        public String secondaryMotd() {
+            return motd2;
+        }
+
         private String serverName = GeyserImpl.NAME;
+
+        @Override
+        public String serverName() {
+            return serverName;
+        }
 
         private int compressionLevel = 6;
 
@@ -178,8 +221,10 @@ public abstract class GeyserCommonConfiguration<T>
             return Math.max(-1, Math.min(compressionLevel, 9));
         }
 
+        @Getter
         private boolean enableProxyProtocol = false;
 
+        @Getter
         private List<String> proxyProtocolWhitelistedIps = Collections.emptyList(); //todo support
 
         private List<CIDRMatcher> whitelistedIpsMatchers = null;
@@ -204,16 +249,34 @@ public abstract class GeyserCommonConfiguration<T>
         @AsteriskSerializer.Asterisk(isIp = true)
         private String address = "127.0.0.1";
 
+        @Override
+        public String address() {
+            return address;
+        }
+
         @Setter
         private int port = 25565;
+
+        @Override
+        public int port() {
+            return port;
+        }
 
         @Setter
         private AuthType authType = AuthType.ONLINE;
 
+        @Override
+        public AuthType authType() {
+            return authType;
+        }
+
+        @Getter
         private boolean allowPasswordAuthentication = true;
 
+        @Getter
         private boolean useProxyProtocol = false;
 
+        @Getter
         private boolean forwardHostname = true; // only true by default for plugin versions
     }
 

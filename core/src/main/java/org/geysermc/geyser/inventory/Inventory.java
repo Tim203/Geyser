@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,25 +31,34 @@ import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.nukkitx.math.vector.Vector3i;
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
+import lombok.ToString;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.session.GeyserSession;
+import org.geysermc.geyser.translator.inventory.item.ItemTranslator;
+import org.jetbrains.annotations.Range;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 
-public class Inventory {
-
+@ToString
+public abstract class Inventory {
     @Getter
-    protected final int id;
+    protected final int javaId;
 
     /**
-     * If this is out of sync with the server, the server will resync items.
-     * Since Java Edition 1.17.1.
+     * The Java inventory state ID from the server. As of Java Edition 1.18.1 this value has one instance per player.
+     * If this is out of sync with the server when a packet containing it is handled, the server will resync items.
+     * This field has existed since Java Edition 1.17.1.
      */
     @Getter
     @Setter
     private int stateId;
+    /**
+     * See {@link org.geysermc.geyser.inventory.click.ClickPlan#execute(boolean)}; used as a hack
+     */
+    @Getter
+    private int nextStateId = -1;
 
     @Getter
     protected final int size;
@@ -61,8 +70,7 @@ public class Inventory {
     protected final ContainerType containerType;
 
     @Getter
-    @Setter
-    protected String title;
+    protected final String title;
 
     protected final GeyserItemStack[] items;
 
@@ -85,13 +93,21 @@ public class Inventory {
         this("Inventory", id, size, containerType);
     }
 
-    protected Inventory(String title, int id, int size, ContainerType containerType) {
+    protected Inventory(String title, int javaId, int size, ContainerType containerType) {
         this.title = title;
-        this.id = id;
+        this.javaId = javaId;
         this.size = size;
         this.containerType = containerType;
         this.items = new GeyserItemStack[size];
         Arrays.fill(items, GeyserItemStack.EMPTY);
+    }
+
+    // This is to prevent conflicts with special bedrock inventory IDs.
+    // The vanilla java server only sends an ID between 1 and 100 when opening an inventory,
+    // so this is rarely needed. (certain plugins)
+    // Example: https://github.com/GeyserMC/Geyser/issues/3254
+    public int getBedrockId() {
+        return javaId <= 100 ? javaId : (javaId % 100) + 1;
     }
 
     public GeyserItemStack getItem(int slot) {
@@ -102,7 +118,9 @@ public class Inventory {
         return items[slot];
     }
 
-    public void setItem(int slot, @NonNull GeyserItemStack newItem, GeyserSession session) {
+    public abstract int getOffsetForHotbar(@Range(from = 0, to = 8) int slot);
+
+    public void setItem(int slot, @Nonnull GeyserItemStack newItem, GeyserSession session) {
         if (slot > this.size) {
             session.getGeyser().getLogger().debug("Tried to set an item out of bounds! " + this);
             return;
@@ -123,9 +141,11 @@ public class Inventory {
         }
     }
 
-    protected static void updateItemNetId(GeyserItemStack oldItem, GeyserItemStack newItem, GeyserSession session) {
+    protected void updateItemNetId(GeyserItemStack oldItem, GeyserItemStack newItem, GeyserSession session) {
         if (!newItem.isEmpty()) {
-            if (newItem.getItemData(session).equals(oldItem.getItemData(session), false, false, false)) {
+            int oldMapping = ItemTranslator.getBedrockItemId(session, oldItem);
+            int newMapping = ItemTranslator.getBedrockItemId(session, newItem);
+            if (oldMapping == newMapping) {
                 newItem.setNetId(oldItem.getNetId());
             } else {
                 newItem.setNetId(session.getNextItemNetId());
@@ -133,15 +153,15 @@ public class Inventory {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Inventory{" +
-                "id=" + id +
-                ", size=" + size +
-                ", title='" + title + '\'' +
-                ", items=" + Arrays.toString(items) +
-                ", holderPosition=" + holderPosition +
-                ", holderId=" + holderId +
-                '}';
+    /**
+     * See {@link org.geysermc.geyser.inventory.click.ClickPlan#execute(boolean)} for more details.
+     */
+    public void incrementStateId(int count) {
+        // nextStateId == -1 means that it was not needed until now
+        nextStateId = (nextStateId == -1 ? stateId : nextStateId) + count & Short.MAX_VALUE;
+    }
+
+    public void resetNextStateId() {
+        nextStateId = -1;
     }
 }

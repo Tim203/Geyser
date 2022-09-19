@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@
 
 package org.geysermc.geyser.translator.protocol.bedrock;
 
-import com.github.steveice10.mc.protocol.data.game.entity.metadata.Position;
 import com.github.steveice10.mc.protocol.data.game.entity.object.Direction;
 import com.github.steveice10.mc.protocol.data.game.entity.player.Hand;
 import com.github.steveice10.mc.protocol.packet.ingame.serverbound.inventory.ServerboundContainerButtonClickPacket;
@@ -53,11 +52,12 @@ public class BedrockLecternUpdateTranslator extends PacketTranslator<LecternUpda
 
             // Emulate an interact packet
             ServerboundUseItemOnPacket blockPacket = new ServerboundUseItemOnPacket(
-                    new Position(packet.getBlockPosition().getX(), packet.getBlockPosition().getY(), packet.getBlockPosition().getZ()),
+                    packet.getBlockPosition(),
                     Direction.DOWN,
                     Hand.MAIN_HAND,
                     0, 0, 0, // Java doesn't care about these when dealing with a lectern
-                    false);
+                    false,
+                    session.getWorldCache().nextPredictionSequence());
             session.sendDownstreamPacket(blockPacket);
         } else {
             // Bedrock wants to either move a page or exit
@@ -68,9 +68,9 @@ public class BedrockLecternUpdateTranslator extends PacketTranslator<LecternUpda
 
             if (lecternContainer.getCurrentBedrockPage() == packet.getPage()) {
                 // The same page means Bedrock is closing the window
-                ServerboundContainerClosePacket closeWindowPacket = new ServerboundContainerClosePacket(lecternContainer.getId());
+                ServerboundContainerClosePacket closeWindowPacket = new ServerboundContainerClosePacket(lecternContainer.getJavaId());
                 session.sendDownstreamPacket(closeWindowPacket);
-                InventoryUtils.closeInventory(session, lecternContainer.getId(), false);
+                InventoryUtils.closeInventory(session, lecternContainer.getJavaId(), false);
             } else {
                 // Each "page" Bedrock gives to us actually represents two pages (think opening a book and seeing two pages)
                 // Each "page" on Java is just one page (think a spiral notebook folded back to only show one page)
@@ -82,12 +82,12 @@ public class BedrockLecternUpdateTranslator extends PacketTranslator<LecternUpda
                 // is a byte when transmitted over the network and therefore this stops us at 128
                 if (newJavaPage > currentJavaPage) {
                     for (int i = currentJavaPage; i < newJavaPage; i++) {
-                        ServerboundContainerButtonClickPacket clickButtonPacket = new ServerboundContainerButtonClickPacket(session.getOpenInventory().getId(), 2);
+                        ServerboundContainerButtonClickPacket clickButtonPacket = new ServerboundContainerButtonClickPacket(session.getOpenInventory().getJavaId(), 2);
                         session.sendDownstreamPacket(clickButtonPacket);
                     }
                 } else {
                     for (int i = currentJavaPage; i > newJavaPage; i--) {
-                        ServerboundContainerButtonClickPacket clickButtonPacket = new ServerboundContainerButtonClickPacket(session.getOpenInventory().getId(), 1);
+                        ServerboundContainerButtonClickPacket clickButtonPacket = new ServerboundContainerButtonClickPacket(session.getOpenInventory().getJavaId(), 1);
                         session.sendDownstreamPacket(clickButtonPacket);
                     }
                 }

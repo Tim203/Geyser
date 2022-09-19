@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.util.CachedServerIcon;
+import org.geysermc.geyser.network.GameProtocol;
 import org.geysermc.geyser.ping.GeyserPingInfo;
-import org.geysermc.geyser.network.MinecraftProtocol;
 import org.geysermc.geyser.ping.IGeyserPingPassthrough;
 
 import javax.annotation.Nonnull;
@@ -52,13 +52,13 @@ public class GeyserSpigotPingPassthrough implements IGeyserPingPassthrough {
             Bukkit.getPluginManager().callEvent(event);
             GeyserPingInfo geyserPingInfo = new GeyserPingInfo(event.getMotd(),
                     new GeyserPingInfo.Players(event.getMaxPlayers(), event.getNumPlayers()),
-                    new GeyserPingInfo.Version(Bukkit.getVersion(), MinecraftProtocol.getJavaProtocolVersion()) // thanks Spigot for not exposing this, just default to latest
+                    new GeyserPingInfo.Version(Bukkit.getVersion(), GameProtocol.getJavaProtocolVersion()) // thanks Spigot for not exposing this, just default to latest
             );
             Bukkit.getOnlinePlayers().stream().map(Player::getName).forEach(geyserPingInfo.getPlayerList()::add);
             return geyserPingInfo;
-        } catch (Exception e) {
-            logger.debug("Error while getting Bukkit ping passthrough: " + e.toString());
-            return new GeyserPingInfo(null, null, null);
+        } catch (Exception | LinkageError e) { // LinkageError in the event that method/constructor signatures change
+            logger.debug("Error while getting Bukkit ping passthrough: " + e);
+            return null;
         }
     }
 
@@ -66,7 +66,7 @@ public class GeyserSpigotPingPassthrough implements IGeyserPingPassthrough {
     private static class GeyserPingEvent extends ServerListPingEvent {
 
         public GeyserPingEvent(InetAddress address, String motd, int numPlayers, int maxPlayers) {
-            super(address, motd, numPlayers, maxPlayers);
+            super(address, motd, Bukkit.shouldSendChatPreviews(), numPlayers, maxPlayers);
         }
 
         @Override
@@ -79,5 +79,4 @@ public class GeyserSpigotPingPassthrough implements IGeyserPingPassthrough {
             return Collections.emptyIterator();
         }
     }
-
 }

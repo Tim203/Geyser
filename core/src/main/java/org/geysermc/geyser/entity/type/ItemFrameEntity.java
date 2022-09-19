@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import com.github.steveice10.mc.protocol.data.game.entity.metadata.EntityMetadat
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.type.IntEntityMetadata;
 import com.github.steveice10.mc.protocol.data.game.entity.object.Direction;
+import com.github.steveice10.mc.protocol.data.game.entity.player.Hand;
 import com.github.steveice10.mc.protocol.data.game.entity.type.EntityType;
 import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.math.vector.Vector3i;
@@ -37,12 +38,12 @@ import com.nukkitx.nbt.NbtMapBuilder;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
 import com.nukkitx.protocol.bedrock.packet.BlockEntityDataPacket;
 import com.nukkitx.protocol.bedrock.packet.UpdateBlockPacket;
-import com.nukkitx.protocol.bedrock.v465.Bedrock_v465;
 import lombok.Getter;
 import org.geysermc.geyser.entity.EntityDefinition;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.inventory.item.ItemTranslator;
-import org.geysermc.geyser.registry.type.ItemMapping;
+import org.geysermc.geyser.util.InteractionResult;
+import org.geysermc.geyser.util.InventoryUtils;
 
 import java.util.UUID;
 
@@ -77,18 +78,16 @@ public class ItemFrameEntity extends Entity {
      */
     private boolean changed = true;
 
-    public ItemFrameEntity(GeyserSession session, long entityId, long geyserId, UUID uuid, EntityDefinition<?> definition, Vector3f position, Vector3f motion, float yaw, float pitch, Direction direction) {
-        super(session, entityId, geyserId, uuid, definition, position, motion, yaw, pitch, 0f);
+    public ItemFrameEntity(GeyserSession session, int entityId, long geyserId, UUID uuid, EntityDefinition<?> definition, Vector3f position, Vector3f motion, float yaw, float pitch, float headYaw, Direction direction) {
+        super(session, entityId, geyserId, uuid, definition, position, motion, yaw, pitch, headYaw);
 
         NbtMapBuilder blockBuilder = NbtMap.builder()
                 .putString("name", this.definition.entityType() == EntityType.GLOW_ITEM_FRAME ? "minecraft:glow_frame" : "minecraft:frame")
                 .putInt("version", session.getBlockMappings().getBlockStateVersion());
         NbtMapBuilder statesBuilder = NbtMap.builder()
                 .putInt("facing_direction", direction.ordinal())
-                .putByte("item_frame_map_bit", (byte) 0);
-        if (session.getUpstream().getProtocolVersion() >= Bedrock_v465.V465_CODEC.getProtocolVersion()) {
-            statesBuilder.putByte("item_frame_photo_bit", (byte) 0);
-        }
+                .putByte("item_frame_map_bit", (byte) 0)
+                .putByte("item_frame_photo_bit", (byte) 0);
         blockBuilder.put("states", statesBuilder.build());
 
         bedrockRuntimeId = session.getBlockMappings().getItemFrame(blockBuilder.build());
@@ -114,7 +113,9 @@ public class ItemFrameEntity extends Entity {
         if (entityMetadata.getValue() != null) {
             this.heldItem = entityMetadata.getValue();
             ItemData itemData = ItemTranslator.translateToBedrock(session, heldItem);
-            ItemMapping mapping = session.getItemMappings().getMapping(entityMetadata.getValue());
+
+            String customIdentifier = session.getItemMappings().getCustomIdMappings().get(itemData.getId());
+
             NbtMapBuilder builder = NbtMap.builder();
 
             builder.putByte("Count", (byte) itemData.getCount());
@@ -122,7 +123,7 @@ public class ItemFrameEntity extends Entity {
                 builder.put("tag", itemData.getTag());
             }
             builder.putShort("Damage", (short) itemData.getDamage());
-            builder.putString("Name", mapping.getBedrockIdentifier());
+            builder.putString("Name", customIdentifier != null ? customIdentifier : session.getItemMappings().getMapping(entityMetadata.getValue()).getBedrockIdentifier());
             NbtMapBuilder tag = getDefaultTag().toBuilder();
             tag.put("Item", builder.build());
             tag.putFloat("ItemDropChance", 1.0f);
@@ -208,10 +209,15 @@ public class ItemFrameEntity extends Entity {
         changed = false;
     }
 
+    @Override
+    public InteractionResult interact(Hand hand) {
+        return InventoryUtils.isEmpty(heldItem) && session.getPlayerInventory().getItemInHand(hand).isEmpty() ? InteractionResult.PASS : InteractionResult.SUCCESS;
+    }
+
     /**
      * Finds the Java entity ID of an item frame from its Bedrock position.
      * @param position position of item frame in Bedrock.
-     * @param session GeyserSession.
+     * @param session GeyserConnection.
      * @return Java entity ID or -1 if not found.
      */
     public static ItemFrameEntity getItemFrameEntity(GeyserSession session, Vector3i position) {

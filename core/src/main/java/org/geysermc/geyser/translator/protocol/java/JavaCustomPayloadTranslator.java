@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2020 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,19 +25,23 @@
 
 package org.geysermc.geyser.translator.protocol.java;
 
-import com.github.steveice10.mc.protocol.packet.ingame.serverbound.ServerboundCustomPayloadPacket;
 import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundCustomPayloadPacket;
+import com.github.steveice10.mc.protocol.packet.ingame.serverbound.ServerboundCustomPayloadPacket;
 import com.google.common.base.Charsets;
 import com.nukkitx.protocol.bedrock.packet.TransferPacket;
+import com.nukkitx.protocol.bedrock.packet.UnknownPacket;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.geysermc.cumulus.Forms;
+import org.geysermc.cumulus.form.Form;
+import org.geysermc.cumulus.form.util.FormType;
+import org.geysermc.floodgate.pluginmessage.PluginMessageChannels;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.api.logger.GeyserLogger;
-import org.geysermc.geyser.session.auth.AuthType;
+import org.geysermc.geyser.GeyserLogger;
+import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
-import org.geysermc.cumulus.Form;
-import org.geysermc.cumulus.Forms;
-import org.geysermc.cumulus.util.FormType;
 
 import java.nio.charset.StandardCharsets;
 
@@ -48,44 +52,48 @@ public class JavaCustomPayloadTranslator extends PacketTranslator<ClientboundCus
     @Override
     public void translate(GeyserSession session, ClientboundCustomPayloadPacket packet) {
         // The only plugin messages it has to listen for are Floodgate plugin messages
-        if (session.getRemoteAuthType() != AuthType.FLOODGATE) {
+        if (session.remoteServer().authType() != AuthType.FLOODGATE) {
             return;
         }
 
         String channel = packet.getChannel();
 
-        if (channel.equals("floodgate:form")) {
+        if (channel.equals(PluginMessageChannels.FORM)) {
             byte[] data = packet.getData();
 
             // receive: first byte is form type, second and third are the id, remaining is the form data
             // respond: first and second byte id, remaining is form response data
 
-            FormType type = FormType.getByOrdinal(data[0]);
+            FormType type = FormType.fromOrdinal(data[0]);
             if (type == null) {
-                throw new NullPointerException(
-                        "Got type " + data[0] + " which isn't a valid form type!");
+                throw new NullPointerException("Got type " + data[0] + " which isn't a valid form type!");
             }
 
             String dataString = new String(data, 3, data.length - 3, Charsets.UTF_8);
 
-            Form form = Forms.fromJson(dataString, type);
-            form.setResponseHandler(response -> {
-                byte[] raw = response.getBytes(StandardCharsets.UTF_8);
-                byte[] finalData = new byte[raw.length + 2];
+            Form form = Forms.fromJson(dataString, type, (ignored, response) -> {
+                byte[] finalData;
+                if (response == null) {
+                    // Response data can be null as of 1.19.20 (same behaviour as empty response data)
+                    // Only need to send the form id
+                    finalData = new byte[]{data[1], data[2]};
+                } else {
+                    byte[] raw = response.getBytes(StandardCharsets.UTF_8);
+                    finalData = new byte[raw.length + 2];
 
-                finalData[0] = data[1];
-                finalData[1] = data[2];
-                System.arraycopy(raw, 0, finalData, 2, raw.length);
+                    finalData[0] = data[1];
+                    finalData[1] = data[2];
+                    System.arraycopy(raw, 0, finalData, 2, raw.length);
+                }
 
                 session.sendDownstreamPacket(new ServerboundCustomPayloadPacket(channel, finalData));
             });
             session.sendForm(form);
 
-        } else if (channel.equals("floodgate:transfer")) {
+        } else if (channel.equals(PluginMessageChannels.TRANSFER)) {
             byte[] data = packet.getData();
 
-            // port, 4 bytes. remaining data, address.
-
+            // port (4 bytes), address (remaining data)
             if (data.length < 5) {
                 throw new NullPointerException("Transfer data should be at least 5 bytes long");
             }
@@ -101,6 +109,24 @@ public class JavaCustomPayloadTranslator extends PacketTranslator<ClientboundCus
             transferPacket.setAddress(address);
             transferPacket.setPort(port);
             session.sendUpstreamPacket(transferPacket);
+
+        } else if (channel.equals(PluginMessageChannels.PACKET)) {
+            logger.debug("A packet has been sent using the Floodgate api");
+            byte[] data = packet.getData();
+
+            // packet id, packet data
+            if (data.length < 2) {
+                throw new IllegalStateException("Packet data should be at least 2 bytes long");
+            }
+
+            int packetId = data[0] & 0xFF;
+            ByteBuf packetData = Unpooled.wrappedBuffer(data, 1, data.length - 1);
+
+            var toSend = new UnknownPacket();
+            toSend.setPacketId(packetId);
+            toSend.setPayload(packetData);
+
+            session.sendUpstreamPacket(toSend);
         }
     }
 }

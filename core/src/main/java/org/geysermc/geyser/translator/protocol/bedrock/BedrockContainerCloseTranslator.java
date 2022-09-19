@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ import org.geysermc.geyser.inventory.MerchantContainer;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
+import org.geysermc.geyser.translator.protocol.java.inventory.JavaMerchantOffersTranslator;
 import org.geysermc.geyser.util.InventoryUtils;
 
 @Translator(packet = ContainerClosePacket.class)
@@ -39,26 +40,30 @@ public class BedrockContainerCloseTranslator extends PacketTranslator<ContainerC
 
     @Override
     public void translate(GeyserSession session, ContainerClosePacket packet) {
-        byte windowId = packet.getId();
+        byte bedrockId = packet.getId();
 
         //Client wants close confirmation
         session.sendUpstreamPacket(packet);
         session.setClosingInventory(false);
 
-        if (windowId == -1 && session.getOpenInventory() instanceof MerchantContainer) {
+        if (bedrockId == -1 && session.getOpenInventory() instanceof MerchantContainer) {
             // 1.16.200 - window ID is always -1 sent from Bedrock
-            windowId = (byte) session.getOpenInventory().getId();
+            bedrockId = (byte) session.getOpenInventory().getBedrockId();
         }
 
         Inventory openInventory = session.getOpenInventory();
         if (openInventory != null) {
-            if (windowId == openInventory.getId()) {
-                ServerboundContainerClosePacket closeWindowPacket = new ServerboundContainerClosePacket(windowId);
+            if (bedrockId == openInventory.getBedrockId()) {
+                ServerboundContainerClosePacket closeWindowPacket = new ServerboundContainerClosePacket(openInventory.getJavaId());
                 session.sendDownstreamPacket(closeWindowPacket);
-                InventoryUtils.closeInventory(session, windowId, false);
+                InventoryUtils.closeInventory(session, openInventory.getJavaId(), false);
             } else if (openInventory.isPending()) {
                 InventoryUtils.displayInventory(session, openInventory);
                 openInventory.setPending(false);
+
+                if (openInventory instanceof MerchantContainer merchantContainer && merchantContainer.getPendingOffersPacket() != null) {
+                    JavaMerchantOffersTranslator.openMerchant(session, merchantContainer.getPendingOffersPacket(), merchantContainer);
+                }
             }
         }
     }

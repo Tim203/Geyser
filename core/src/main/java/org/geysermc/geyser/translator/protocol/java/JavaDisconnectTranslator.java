@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ public class JavaDisconnectTranslator extends PacketTranslator<ClientboundDiscon
 
     @Override
     public void translate(GeyserSession session, ClientboundDisconnectPacket packet) {
-        session.disconnect(MessageTranslator.convertMessage(packet.getReason(), session.getLocale()));
+        session.disconnect(MessageTranslator.convertMessage(packet.getReason(), session.locale()));
     }
 
     @Override

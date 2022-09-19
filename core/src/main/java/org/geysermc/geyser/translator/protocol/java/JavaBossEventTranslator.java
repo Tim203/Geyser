@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,11 @@
 
 package org.geysermc.geyser.translator.protocol.java;
 
+import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundBossEventPacket;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.session.cache.BossBar;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
-
-import com.github.steveice10.mc.protocol.packet.ingame.clientbound.ClientboundBossEventPacket;
 
 @Translator(packet = ClientboundBossEventPacket.class)
 public class JavaBossEventTranslator extends PacketTranslator<ClientboundBossEventPacket> {
@@ -41,7 +40,7 @@ public class JavaBossEventTranslator extends PacketTranslator<ClientboundBossEve
         switch (packet.getAction()) {
             case ADD:
                 long entityId = session.getEntityCache().getNextEntityId().incrementAndGet();
-                bossBar = new BossBar(session, entityId, packet.getTitle(), packet.getHealth(), 0, 1, 0);
+                bossBar = new BossBar(session, entityId, packet.getTitle(), packet.getHealth(), packet.getColor().ordinal(), 1, 0);
                 session.getEntityCache().addBossBar(packet.getUuid(), bossBar);
                 break;
             case UPDATE_TITLE:
@@ -54,6 +53,8 @@ public class JavaBossEventTranslator extends PacketTranslator<ClientboundBossEve
                 session.getEntityCache().removeBossBar(packet.getUuid());
                 break;
             case UPDATE_STYLE:
+                if (bossBar != null) bossBar.updateColor(packet.getColor().ordinal());
+                break;
             case UPDATE_FLAGS:
                 //todo
         }

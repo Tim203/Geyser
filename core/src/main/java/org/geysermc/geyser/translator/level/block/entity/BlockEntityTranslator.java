@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,6 @@ package org.geysermc.geyser.translator.level.block.entity;
 
 import com.github.steveice10.mc.protocol.data.game.level.block.BlockEntityType;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
-import com.github.steveice10.opennbt.tag.builtin.IntTag;
-import com.github.steveice10.opennbt.tag.builtin.StringTag;
 import com.github.steveice10.opennbt.tag.builtin.Tag;
 import com.nukkitx.nbt.NbtMap;
 import com.nukkitx.nbt.NbtMapBuilder;
@@ -47,15 +45,6 @@ public abstract class BlockEntityTranslator {
         NbtMapBuilder tagBuilder = getConstantBedrockTag(BlockEntityUtils.getBedrockBlockEntityId(type), x, y, z);
         translateTag(tagBuilder, tag, blockState);
         return tagBuilder.build();
-    }
-
-    protected CompoundTag getConstantJavaTag(String javaId, int x, int y, int z) {
-        CompoundTag tag = new CompoundTag("");
-        tag.put(new IntTag("x", x));
-        tag.put(new IntTag("y", y));
-        tag.put(new IntTag("z", z));
-        tag.put(new StringTag("id", javaId));
-        return tag;
     }
 
     protected NbtMapBuilder getConstantBedrockTag(String bedrockId, int x, int y, int z) {

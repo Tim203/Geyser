@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,16 +25,16 @@
 
 package org.geysermc.geyser;
 
-import org.geysermc.geyser.GeyserImpl;
+import org.geysermc.geyser.command.GeyserCommandManager;
 import org.geysermc.geyser.configuration.GeyserConfiguration;
-import org.geysermc.geyser.api.logger.GeyserLogger;
-import org.geysermc.geyser.command.CommandManager;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
 import org.geysermc.geyser.level.GeyserWorldManager;
 import org.geysermc.geyser.level.WorldManager;
 import org.geysermc.geyser.ping.IGeyserPingPassthrough;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.InputStream;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -72,7 +72,7 @@ public interface GeyserBootstrap {
      *
      * @return The current CommandManager
      */
-    CommandManager getGeyserCommandManager();
+    GeyserCommandManager getGeyserCommandManager();
 
     /**
      * Returns the current PingPassthrough manager
@@ -96,6 +96,13 @@ public interface GeyserBootstrap {
      * @return Path location of data folder
      */
     Path getConfigFolder();
+
+    /**
+     * @return the folder where user tokens are saved. This should always point to the location of the config.
+     */
+    default Path getSavedUserLoginsFolder() {
+        return getConfigFolder();
+    }
 
     /**
      * Information used for the bootstrap section of the debug dump
@@ -125,5 +132,30 @@ public interface GeyserBootstrap {
 
     default Path getLogsPath() {
         return Paths.get("logs/latest.log");
+    }
+
+    /**
+     * Get an InputStream for the given resource path.
+     * Overridden on platforms that have different class loader properties.
+     *
+     * @param resource Resource to get
+     * @return InputStream of the given resource, or null if not found
+     */
+    default @Nullable InputStream getResourceOrNull(String resource) {
+        return GeyserBootstrap.class.getClassLoader().getResourceAsStream(resource);
+    }
+
+    /**
+     * Get an InputStream for the given resource path, throws AssertionError if resource is not found.
+     *
+     * @param resource Resource to get
+     * @return InputStream of the given resource
+     */
+    default @Nonnull InputStream getResource(String resource) {
+        InputStream stream = getResourceOrNull(resource);
+        if (stream == null) {
+            throw new AssertionError("Unable to find resource: " + resource);
+        }
+        return stream;
     }
 }

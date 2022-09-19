@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,13 +28,13 @@ package org.geysermc.geyser.entity.type.living.monster;
 import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.protocol.bedrock.data.entity.EntityData;
 import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
-import org.geysermc.geyser.entity.type.Entity;
 import org.geysermc.geyser.entity.EntityDefinitions;
+import org.geysermc.geyser.entity.type.Entity;
 import org.geysermc.geyser.session.GeyserSession;
 
 public class EnderDragonPartEntity extends Entity {
 
-    public EnderDragonPartEntity(GeyserSession session, long entityId, long geyserId, float width, float height) {
+    public EnderDragonPartEntity(GeyserSession session, int entityId, long geyserId, float width, float height) {
         super(session, entityId, geyserId, null, EntityDefinitions.ENDER_DRAGON_PART, Vector3f.ZERO, Vector3f.ZERO, 0, 0, 0);
 
         dirtyMetadata.put(EntityData.BOUNDING_BOX_WIDTH, width);

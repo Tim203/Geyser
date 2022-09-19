@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,17 +32,9 @@ import org.geysermc.geyser.session.GeyserSession;
 
 public class ExpOrbEntity extends Entity {
 
-    private final int amount;
-
-    public ExpOrbEntity(GeyserSession session, int amount, long entityId, long geyserId, Vector3f position) {
+    public ExpOrbEntity(GeyserSession session, int amount, int entityId, long geyserId, Vector3f position) {
         super(session, entityId, geyserId, null, EntityDefinitions.EXPERIENCE_ORB, position, Vector3f.ZERO, 0, 0, 0);
 
-        this.amount = amount;
-    }
-
-    @Override
-    protected void initializeMetadata() {
-        super.initializeMetadata();
         this.dirtyMetadata.put(EntityData.EXPERIENCE_VALUE, amount);
     }
 }

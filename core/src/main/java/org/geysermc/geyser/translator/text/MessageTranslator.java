@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,13 +34,10 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.session.GeyserSession;
-import org.geysermc.geyser.text.MinecraftTranslationRegistry;
-import org.geysermc.geyser.text.GsonComponentSerializerWrapper;
-import org.geysermc.geyser.text.GeyserLocale;
+import org.geysermc.geyser.text.*;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 public class MessageTranslator {
     // These are used for handling the translations of the messages
@@ -59,13 +56,8 @@ public class MessageTranslator {
     // Reset character
     private static final String RESET = BASE + "r";
 
-    /* Various regexes to fix formatting for Bedrock's specifications */
-    private static final Pattern STRIKETHROUGH_UNDERLINE = Pattern.compile("\u00a7[mn]");
-    private static final Pattern COLOR_CHARACTERS = Pattern.compile("\u00a7([0-9a-f])");
-    private static final Pattern DOUBLE_RESET = Pattern.compile("\u00a7r\u00a7r");
-
     static {
-        TEAM_COLORS.put(TeamColor.NONE, "");
+        TEAM_COLORS.put(TeamColor.RESET, RESET);
 
         TEAM_COLORS.put(TeamColor.BLACK, BASE + "0");
         TEAM_COLORS.put(TeamColor.DARK_BLUE, BASE + "1");
@@ -90,8 +82,13 @@ public class MessageTranslator {
         TEAM_COLORS.put(TeamColor.STRIKETHROUGH, BASE + "m");
         TEAM_COLORS.put(TeamColor.ITALIC, BASE + "o");
 
-        // Temporary fix for https://github.com/KyoriPowered/adventure/issues/447
-        GsonComponentSerializer source = DefaultComponentSerializer.get();
+        // Temporary fix for https://github.com/KyoriPowered/adventure/issues/447 - TODO resolve properly
+        GsonComponentSerializer source = DefaultComponentSerializer.get()
+                .toBuilder()
+                // Use a custom legacy hover event deserializer since we don't use any of this data anyway, and
+                // fixes issues where legacy hover events throw deserialization errors
+                .legacyHoverEventSerializer(new DummyLegacyHoverEventSerializer())
+                .build();
         GSON_SERIALIZER = new GsonComponentSerializerWrapper(source);
         // Tell MCProtocolLib to use this serializer, too.
         DefaultComponentSerializer.set(GSON_SERIALIZER);
@@ -111,15 +108,34 @@ public class MessageTranslator {
 
             String legacy = LegacyComponentSerializer.legacySection().serialize(message);
 
-            // Strip strikethrough and underline as they are not supported on bedrock
-            legacy = STRIKETHROUGH_UNDERLINE.matcher(legacy).replaceAll("");
+            StringBuilder finalLegacy = new StringBuilder();
+            char[] legacyChars = legacy.toCharArray();
+            boolean lastFormatReset = false;
+            for (int i = 0; i < legacyChars.length; i++) {
+                char legacyChar = legacyChars[i];
+                if (legacyChar != ChatColor.ESCAPE || i >= legacyChars.length - 1) {
+                    // No special formatting for Bedrock needed
+                    // Or, we're at the end of the string
+                    finalLegacy.append(legacyChar);
+                    lastFormatReset = false;
+                    continue;
+                }
 
-            // Make color codes reset formatting like Java
-            // See https://minecraft.gamepedia.com/Formatting_codes#Usage
-            legacy = COLOR_CHARACTERS.matcher(legacy).replaceAll("\u00a7r\u00a7$1");
-            legacy = DOUBLE_RESET.matcher(legacy).replaceAll("\u00a7r");
+                char next = legacyChars[++i];
+                if (next != 'm' && next != 'n') {
+                    // Strikethrough and underline do not exist on Bedrock
+                    if ((next >= '0' && next <= '9') || (next >= 'a' && next <= 'f')) {
+                        // Append this color code, as well as a necessary reset code
+                        if (!lastFormatReset) {
+                            finalLegacy.append(RESET);
+                        }
+                    }
+                    finalLegacy.append(BASE).append(next);
+                }
+                lastFormatReset = next == 'r';
+            }
 
-            return legacy;
+            return finalLegacy.toString();
         } catch (Exception e) {
             GeyserImpl.getInstance().getLogger().debug(GSON_SERIALIZER.serialize(message));
             GeyserImpl.getInstance().getLogger().error("Failed to parse message", e);
@@ -149,6 +165,9 @@ public class MessageTranslator {
      * @return Bedrock formatted message
      */
     public static String convertMessageLenient(String message, String locale) {
+        if (message == null) {
+            return "";
+        }
         if (message.isBlank()) {
             return message;
         }
@@ -228,7 +247,7 @@ public class MessageTranslator {
      */
     public static boolean isTooLong(String message, GeyserSession session) {
         if (message.length() > 256) {
-            session.sendMessage(GeyserLocale.getPlayerLocaleString("geyser.chat.too_long", session.getLocale(), message.length()));
+            session.sendMessage(GeyserLocale.getPlayerLocaleString("geyser.chat.too_long", session.locale(), message.length()));
             return true;
         }
 

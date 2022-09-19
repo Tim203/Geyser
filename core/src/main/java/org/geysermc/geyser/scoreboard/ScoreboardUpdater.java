@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -118,7 +118,7 @@ public final class ScoreboardUpdater extends Thread {
                                             FIRST_SCORE_PACKETS_PER_SECOND_THRESHOLD;
 
                                     geyser.getLogger().info(
-                                            GeyserLocale.getLocaleStringLog("geyser.scoreboard.updater.threshold_reached.log", session.getName(), threshold, pps) +
+                                            GeyserLocale.getLocaleStringLog("geyser.scoreboard.updater.threshold_reached.log", session.bedrockUsername(), threshold, pps) +
                                                     GeyserLocale.getLocaleStringLog("geyser.scoreboard.updater.threshold_reached", (millisBetweenUpdates / 1000.0))
                                     );
 

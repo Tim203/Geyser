@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,16 +27,18 @@ package org.geysermc.geyser.platform.sponge;
 
 import com.google.inject.Inject;
 import org.geysermc.common.PlatformType;
-import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.GeyserBootstrap;
-import org.geysermc.geyser.command.CommandManager;
+import org.geysermc.geyser.GeyserImpl;
+import org.geysermc.geyser.api.command.Command;
+import org.geysermc.geyser.api.extension.Extension;
+import org.geysermc.geyser.command.GeyserCommandManager;
 import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
 import org.geysermc.geyser.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.geyser.ping.IGeyserPingPassthrough;
-import org.geysermc.geyser.text.GeyserLocale;
 import org.geysermc.geyser.platform.sponge.command.GeyserSpongeCommandExecutor;
 import org.geysermc.geyser.platform.sponge.command.GeyserSpongeCommandManager;
+import org.geysermc.geyser.text.GeyserLocale;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
@@ -47,6 +49,7 @@ import org.spongepowered.api.plugin.Plugin;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Map;
 
 @Plugin(id = "geyser", name = GeyserImpl.NAME + "-Sponge", version = GeyserImpl.VERSION, url = "https://geysermc.org", authors = "GeyserMC")
 public class GeyserSpongePlugin implements GeyserBootstrap {
@@ -65,8 +68,9 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
 
     private GeyserImpl geyser;
 
-    @Override
-    public void onEnable() {
+    public void onLoad() {
+        GeyserLocale.init(this);
+
         try {
             geyserConfig = new ConfigLoader<>("config-sponge.yml", GeyserSpongeConfiguration.class).load();
         } catch (Throwable throwable) {
@@ -75,7 +79,12 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
         }
 
         this.geyserLogger = new GeyserSpongeLogger(logger, geyserConfig.isDebugMode());
-        this.geyser = GeyserImpl.start(PlatformType.SPONGE, this);
+        this.geyser = GeyserImpl.load(PlatformType.SPONGE, this);
+    }
+
+    @Override
+    public void onEnable() {
+        GeyserImpl.start();
 
         if (geyserConfig.isLegacyPingPassthrough()) {
             this.geyserSpongePingPassthrough = GeyserLegacyPingPassthrough.init(geyser);
@@ -84,7 +93,18 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
         }
 
         this.geyserCommandManager = new GeyserSpongeCommandManager(Sponge.getCommandManager(), geyser);
-        Sponge.getCommandManager().register(this, new GeyserSpongeCommandExecutor(geyser), "geyser");
+        this.geyserCommandManager.init();
+
+        Sponge.getCommandManager().register(this, new GeyserSpongeCommandExecutor(geyser, geyserCommandManager.getCommands()), "geyser");
+
+        for (Map.Entry<Extension, Map<String, Command>> entry : this.geyserCommandManager.extensionCommands().entrySet()) {
+            Map<String, Command> commands = entry.getValue();
+            if (commands.isEmpty()) {
+                continue;
+            }
+
+            Sponge.getCommandManager().register(this, new GeyserSpongeCommandExecutor(this.geyser, commands), entry.getKey().description().id());
+        }
     }
 
     @Override
@@ -103,7 +123,7 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
     }
 
     @Override
-    public CommandManager getGeyserCommandManager() {
+    public GeyserCommandManager getGeyserCommandManager() {
         return this.geyserCommandManager;
     }
 
@@ -115,6 +135,11 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
     @Override
     public Path getConfigFolder() {
         return configDir.toPath();
+    }
+
+    @Listener
+    public void onServerStarting() {
+        onLoad();
     }
 
     @Listener

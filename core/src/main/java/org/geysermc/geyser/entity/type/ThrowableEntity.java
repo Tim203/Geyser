@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +32,8 @@ import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
 import com.nukkitx.protocol.bedrock.packet.LevelEventPacket;
 import com.nukkitx.protocol.bedrock.packet.MoveEntityDeltaPacket;
 import org.geysermc.geyser.entity.EntityDefinition;
-import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.level.block.BlockStateValues;
+import org.geysermc.geyser.session.GeyserSession;
 
 import java.util.UUID;
 
@@ -44,7 +44,7 @@ public class ThrowableEntity extends Entity implements Tickable {
 
     protected Vector3f lastJavaPosition;
 
-    public ThrowableEntity(GeyserSession session, long entityId, long geyserId, UUID uuid, EntityDefinition<?> definition, Vector3f position, Vector3f motion, float yaw, float pitch, float headYaw) {
+    public ThrowableEntity(GeyserSession session, int entityId, long geyserId, UUID uuid, EntityDefinition<?> definition, Vector3f position, Vector3f motion, float yaw, float pitch, float headYaw) {
         super(session, entityId, geyserId, uuid, definition, position, motion, yaw, pitch, headYaw);
         this.lastJavaPosition = position;
     }
@@ -56,7 +56,7 @@ public class ThrowableEntity extends Entity implements Tickable {
      */
     @Override
     public void tick() {
-        moveAbsoluteImmediate(position.add(motion), yaw, pitch, headYaw, onGround, false);
+        moveAbsoluteImmediate(position.add(motion), getYaw(), getPitch(), getHeadYaw(), isOnGround(), false);
         float drag = getDrag();
         float gravity = getGravity();
         motion = motion.mul(drag).down(gravity);
@@ -89,20 +89,20 @@ public class ThrowableEntity extends Entity implements Tickable {
         }
         setPosition(position);
 
-        if (this.yaw != yaw) {
+        if (getYaw() != yaw) {
             moveEntityDeltaPacket.getFlags().add(MoveEntityDeltaPacket.Flag.HAS_YAW);
             moveEntityDeltaPacket.setYaw(yaw);
-            this.yaw = yaw;
+            setYaw(yaw);
         }
-        if (this.pitch != pitch) {
+        if (getPitch() != pitch) {
             moveEntityDeltaPacket.getFlags().add(MoveEntityDeltaPacket.Flag.HAS_PITCH);
             moveEntityDeltaPacket.setPitch(pitch);
-            this.pitch = pitch;
+            setPitch(pitch);
         }
-        if (this.headYaw != headYaw) {
+        if (getHeadYaw() != headYaw) {
             moveEntityDeltaPacket.getFlags().add(MoveEntityDeltaPacket.Flag.HAS_HEAD_YAW);
             moveEntityDeltaPacket.setHeadYaw(headYaw);
-            this.headYaw = headYaw;
+            setHeadYaw(headYaw);
         }
 
         if (!moveEntityDeltaPacket.getFlags().isEmpty()) {
@@ -118,16 +118,16 @@ public class ThrowableEntity extends Entity implements Tickable {
     protected float getGravity() {
         if (getFlag(EntityFlag.HAS_GRAVITY)) {
             switch (definition.entityType()) {
-                case THROWN_POTION:
+                case POTION:
                     return 0.05f;
-                case THROWN_EXP_BOTTLE:
+                case EXPERIENCE_BOTTLE:
                     return 0.07f;
                 case FIREBALL:
                 case SHULKER_BULLET:
                     return 0;
                 case SNOWBALL:
-                case THROWN_EGG:
-                case THROWN_ENDERPEARL:
+                case EGG:
+                case ENDER_PEARL:
                     return 0.03f;
                 case LLAMA_SPIT:
                     return 0.06f;
@@ -144,11 +144,11 @@ public class ThrowableEntity extends Entity implements Tickable {
             return 0.8f;
         } else {
             switch (definition.entityType()) {
-                case THROWN_POTION:
-                case THROWN_EXP_BOTTLE:
+                case POTION:
+                case EXPERIENCE_BOTTLE:
                 case SNOWBALL:
-                case THROWN_EGG:
-                case THROWN_ENDERPEARL:
+                case EGG:
+                case ENDER_PEARL:
                 case LLAMA_SPIT:
                     return 0.99f;
                 case FIREBALL:
@@ -172,7 +172,7 @@ public class ThrowableEntity extends Entity implements Tickable {
 
     @Override
     public boolean despawnEntity() {
-        if (definition.entityType() == EntityType.THROWN_ENDERPEARL) {
+        if (definition.entityType() == EntityType.ENDER_PEARL) {
             LevelEventPacket particlePacket = new LevelEventPacket();
             particlePacket.setType(LevelEventType.PARTICLE_TELEPORT);
             particlePacket.setPosition(position);

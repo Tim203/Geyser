@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -39,18 +39,19 @@ import org.apache.logging.log4j.core.Appender;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.appender.ConsoleAppender;
 import org.geysermc.common.PlatformType;
-import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.GeyserBootstrap;
-import org.geysermc.geyser.command.CommandManager;
+import org.geysermc.geyser.GeyserImpl;
+import org.geysermc.geyser.command.GeyserCommandManager;
 import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.configuration.GeyserCommonConfiguration;
 import org.geysermc.geyser.configuration.GeyserConfiguration;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
 import org.geysermc.geyser.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.geyser.ping.IGeyserPingPassthrough;
-import org.geysermc.geyser.text.GeyserLocale;
-import org.geysermc.geyser.platform.standalone.command.GeyserCommandManager;
+import org.geysermc.geyser.platform.standalone.command.GeyserStandaloneCommandManager;
 import org.geysermc.geyser.platform.standalone.gui.GeyserStandaloneGUI;
+import org.geysermc.geyser.text.GeyserLocale;
+import org.geysermc.geyser.util.LoopbackUtil;
 
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -61,7 +62,7 @@ import java.util.stream.Collectors;
 
 public class GeyserStandaloneBootstrap implements GeyserBootstrap {
 
-    private GeyserCommandManager geyserCommandManager;
+    private GeyserStandaloneCommandManager geyserCommandManager;
     private GeyserStandaloneConfiguration geyserConfig;
     private GeyserStandaloneLogger geyserLogger;
     private IGeyserPingPassthrough geyserPingPassthrough;
@@ -87,6 +88,8 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
         // Set defaults
         boolean useGuiOpts = bootstrap.useGui;
         String configFilenameOpt = bootstrap.configFilename;
+
+        GeyserLocale.init(bootstrap);
 
         List<BeanPropertyDefinition> availableProperties = getPOJOForClass(GeyserCommonConfiguration.class);
 
@@ -175,6 +178,7 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
                 logger.removeAppender(appender);
             }
         }
+
         if (useGui && gui == null) {
             gui = new GeyserStandaloneGUI();
             gui.redirectSystemStreams();
@@ -183,7 +187,7 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
 
         geyserLogger = new GeyserStandaloneLogger();
 
-        LoopbackUtil.checkLoopback(geyserLogger);
+        LoopbackUtil.checkAndApplyLoopback(geyserLogger);
 
         try {
             geyserConfig = new ConfigLoader<>("config-standalone.yml", GeyserStandaloneConfiguration.class).load();
@@ -197,12 +201,16 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
                 return;
             }
         }
+        geyserLogger.setDebug(geyserConfig.isDebugMode());
 
         // Allow libraries like Protocol to have their debug information passthrough
         logger.get().setLevel(geyserConfig.isDebugMode() ? Level.DEBUG : Level.INFO);
 
-        geyser = GeyserImpl.start(PlatformType.STANDALONE, this);
-        geyserCommandManager = new GeyserCommandManager(geyser);
+        geyser = GeyserImpl.load(PlatformType.STANDALONE, this);
+        GeyserImpl.start();
+
+        geyserCommandManager = new GeyserStandaloneCommandManager(geyser);
+        geyserCommandManager.init();
 
         if (gui != null) {
             gui.setupInterface(geyserLogger, geyserCommandManager);
@@ -247,7 +255,7 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
     }
 
     @Override
-    public CommandManager getGeyserCommandManager() {
+    public GeyserCommandManager getGeyserCommandManager() {
         return geyserCommandManager;
     }
 
@@ -260,6 +268,12 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
     public Path getConfigFolder() {
         // Return the current working directory
         return Paths.get(System.getProperty("user.dir"));
+    }
+
+    @Override
+    public Path getSavedUserLoginsFolder() {
+        // Return the location of the config
+        return new File(configFilename).getAbsoluteFile().getParentFile().toPath();
     }
 
     @Override

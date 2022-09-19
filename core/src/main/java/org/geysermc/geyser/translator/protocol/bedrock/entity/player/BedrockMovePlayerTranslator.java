@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,48 +31,33 @@ import com.github.steveice10.mc.protocol.packet.ingame.serverbound.player.Server
 import com.github.steveice10.packetlib.packet.Packet;
 import com.nukkitx.math.vector.Vector3d;
 import com.nukkitx.math.vector.Vector3f;
-import com.nukkitx.protocol.bedrock.packet.MoveEntityAbsolutePacket;
 import com.nukkitx.protocol.bedrock.packet.MovePlayerPacket;
-import org.geysermc.geyser.text.ChatColor;
 import org.geysermc.geyser.entity.EntityDefinitions;
 import org.geysermc.geyser.entity.type.player.SessionPlayerEntity;
+import org.geysermc.geyser.level.BedrockDimension;
 import org.geysermc.geyser.session.GeyserSession;
+import org.geysermc.geyser.text.ChatColor;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
 
 @Translator(packet = MovePlayerPacket.class)
 public class BedrockMovePlayerTranslator extends PacketTranslator<MovePlayerPacket> {
-    /* The upper and lower bounds to check for the void floor that only exists in Bedrock. These are the constants for the overworld. */
-    private static final int BEDROCK_OVERWORLD_VOID_FLOOR_UPPER_Y = -104;
-    private static final int BEDROCK_OVERWORLD_VOID_FLOOR_LOWER_Y = BEDROCK_OVERWORLD_VOID_FLOOR_UPPER_Y + 2;
 
     @Override
     public void translate(GeyserSession session, MovePlayerPacket packet) {
         SessionPlayerEntity entity = session.getPlayerEntity();
         if (!session.isSpawned()) return;
 
-        if (!session.getUpstream().isInitialized()) {
-            MoveEntityAbsolutePacket moveEntityBack = new MoveEntityAbsolutePacket();
-            moveEntityBack.setRuntimeEntityId(entity.getGeyserId());
-            moveEntityBack.setPosition(entity.getPosition());
-            moveEntityBack.setRotation(entity.getBedrockRotation());
-            moveEntityBack.setTeleported(true);
-            moveEntityBack.setOnGround(true);
-            session.sendUpstreamPacketImmediately(moveEntityBack);
-            return;
-        }
-
         session.setLastMovementTimestamp(System.currentTimeMillis());
 
         // Send book update before the player moves
         session.getBookEditCache().checkForSend();
 
-        if (!session.getTeleportMap().isEmpty()) {
+        // Ignore movement packets until Bedrock's position matches the teleported position
+        if (session.getUnconfirmedTeleport() != null) {
             session.confirmTeleport(packet.getPosition().toDouble().sub(0, EntityDefinitions.PLAYER.offset(), 0));
             return;
         }
-        // head yaw, pitch, head yaw
-        Vector3f rotation = Vector3f.from(packet.getRotation().getY(), packet.getRotation().getX(), packet.getRotation().getY());
         float yaw = packet.getRotation().getY();
         float pitch = packet.getRotation().getX();
         float headYaw = packet.getRotation().getY();
@@ -80,12 +65,18 @@ public class BedrockMovePlayerTranslator extends PacketTranslator<MovePlayerPack
         boolean positionChanged = !entity.getPosition().equals(packet.getPosition());
         boolean rotationChanged = entity.getYaw() != yaw || entity.getPitch() != pitch || entity.getHeadYaw() != headYaw;
 
+        if (session.getLookBackScheduledFuture() != null) {
+            // Resend the rotation if it was changed by Geyser
+            rotationChanged |= !session.getLookBackScheduledFuture().isDone();
+            session.getLookBackScheduledFuture().cancel(false);
+            session.setLookBackScheduledFuture(null);
+        }
+
         // If only the pitch and yaw changed
         // This isn't needed, but it makes the packets closer to vanilla
         // It also means you can't "lag back" while only looking, in theory
         if (!positionChanged && rotationChanged) {
-            ServerboundMovePlayerRotPacket playerRotationPacket = new ServerboundMovePlayerRotPacket(
-                    packet.isOnGround(), packet.getRotation().getY(), packet.getRotation().getX());
+            ServerboundMovePlayerRotPacket playerRotationPacket = new ServerboundMovePlayerRotPacket(packet.isOnGround(), yaw, pitch);
 
             entity.setYaw(yaw);
             entity.setPitch(pitch);
@@ -104,8 +95,11 @@ public class BedrockMovePlayerTranslator extends PacketTranslator<MovePlayerPack
                     Packet movePacket;
                     if (rotationChanged) {
                         // Send rotation updates as well
-                        movePacket = new ServerboundMovePlayerPosRotPacket(packet.isOnGround(), position.getX(), position.getY(), position.getZ(),
-                                packet.getRotation().getY(), packet.getRotation().getX());
+                        movePacket = new ServerboundMovePlayerPosRotPacket(
+                                packet.isOnGround(),
+                                position.getX(), position.getY(), position.getZ(),
+                                yaw, pitch
+                        );
                         entity.setYaw(yaw);
                         entity.setPitch(pitch);
                         entity.setHeadYaw(headYaw);
@@ -125,11 +119,10 @@ public class BedrockMovePlayerTranslator extends PacketTranslator<MovePlayerPack
 
                     if (notMovingUp) {
                         int floorY = position.getFloorY();
-                        // If the client believes the world has extended height, then it also believes the void floor
-                        // still exists, just at a lower spot
-                        boolean extendedWorld = session.getChunkCache().isExtendedHeight();
-                        if (floorY <= (extendedWorld ? BEDROCK_OVERWORLD_VOID_FLOOR_LOWER_Y : -38)
-                                && floorY >= (extendedWorld ? BEDROCK_OVERWORLD_VOID_FLOOR_UPPER_Y : -40)) {
+                        // The void floor is offset about 40 blocks below the bottom of the world
+                        BedrockDimension bedrockDimension = session.getChunkCache().getBedrockDimension();
+                        int voidFloorLocation = bedrockDimension.minY() - 40;
+                        if (floorY <= (voidFloorLocation + 2) && floorY >= voidFloorLocation) {
                             // Work around there being a floor at the bottom of the world and teleport the player below it
                             // Moving from below to above the void floor works fine
                             entity.setPosition(entity.getPosition().sub(0, 4f, 0));
@@ -142,6 +135,8 @@ public class BedrockMovePlayerTranslator extends PacketTranslator<MovePlayerPack
                             session.sendUpstreamPacket(movePlayerPacket);
                         }
                     }
+
+                    session.getSkullCache().updateVisibleSkulls();
                 }
             } else {
                 // Not a valid move
@@ -168,7 +163,7 @@ public class BedrockMovePlayerTranslator extends PacketTranslator<MovePlayerPack
             return false;
         }
         if (currentPosition.distanceSquared(newPosition) > 300) {
-            session.getGeyser().getLogger().debug(ChatColor.RED + session.getName() + " moved too quickly." +
+            session.getGeyser().getLogger().debug(ChatColor.RED + session.bedrockUsername() + " moved too quickly." +
                     " current position: " + currentPosition + ", new position: " + newPosition);
 
             return false;

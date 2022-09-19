@@ -17,16 +17,16 @@ The ultimate goal of this project is to allow Minecraft: Bedrock Edition users t
 
 Special thanks to the DragonProxy project for being a trailblazer in protocol translation and for all the team members who have joined us here!
 
-### Currently supporting Minecraft Bedrock 1.17.10 - 1.17.41 and Minecraft Java 1.17.1.
+### Currently supporting Minecraft Bedrock 1.19.0/1.19.1x/1.19.20/1.19.21/1.19.22 and Minecraft Java 1.19.1/1.19.2.
 
 ## Setting Up
-Take a look [here](https://github.com/GeyserMC/Geyser/wiki/Setup) for how to set up Geyser.
+Take a look [here](https://wiki.geysermc.org/geyser/setup/) for how to set up Geyser.
 
 [![YouTube Video](https://img.youtube.com/vi/U7dZZ8w7Gi4/0.jpg)](https://www.youtube.com/watch?v=U7dZZ8w7Gi4)
 
 ## Links:
 - Website: https://geysermc.org
-- Docs: https://github.com/GeyserMC/Geyser/wiki
+- Docs: https://wiki.geysermc.org/geyser/
 - Download: https://ci.geysermc.org
 - Discord: https://discord.gg/geysermc
 - Donate: https://opencollective.com/geysermc
@@ -34,18 +34,16 @@ Take a look [here](https://github.com/GeyserMC/Geyser/wiki/Setup) for how to set
 
 ## What's Left to be Added/Fixed
 - Near-perfect movement (to the point where anticheat on large servers is unlikely to ban you)
-- Resource pack conversion/CustomModelData
 - Some Entity Flags
 - Structure block UI
 
 ## What can't be fixed
-There are a few things Geyser is unable to support due to various differences between Minecraft Bedrock and Java. For a list of these limitations, see the [Current Limitations](https://github.com/GeyserMC/Geyser/wiki/Current-Limitations) page.
+There are a few things Geyser is unable to support due to various differences between Minecraft Bedrock and Java. For a list of these limitations, see the [Current Limitations](https://wiki.geysermc.org/geyser/current-limitations/) page.
 
 ## Compiling
 1. Clone the repo to your computer
-2. [Install Maven](https://maven.apache.org/install.html)
-3. Navigate to the Geyser root directory and run `git submodule update --init --recursive`. This command downloads all the needed submodules for Geyser and is a crucial step in this process.
-4. Run `mvn clean install` and locate to the `target` folder.
+2. Navigate to the Geyser root directory and run `git submodule update --init --recursive`. This command downloads all the needed submodules for Geyser and is a crucial step in this process.
+3. Run `gradlew build` and locate to `bootstrap/build` folder.
 
 ## Contributing
 Any contributions are appreciated. Please feel free to reach out to us on [Discord](http://discord.geysermc.org/) if

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 
 package org.geysermc.geyser.util;
 
+import org.geysermc.geyser.GeyserBootstrap;
 import org.geysermc.geyser.GeyserImpl;
 
 import java.io.*;
@@ -47,30 +48,18 @@ public class FileUtils {
     /**
      * Open the specified file or copy if from resources
      *
-     * @param name File and resource name
-     * @param fallback Formatting callback
-     * @return File handle of the specified file
-     * @throws IOException if the file failed to copy from resource
-     */
-    public static File fileOrCopiedFromResource(String name, Function<String, String> fallback) throws IOException {
-        return fileOrCopiedFromResource(new File(name), name, fallback);
-    }
-
-    /**
-     * Open the specified file or copy if from resources
-     *
      * @param file File to open
      * @param name Name of the resource get if needed
      * @param format Formatting callback
      * @return File handle of the specified file
      * @throws IOException if the file failed to copy from resource
      */
-    public static File fileOrCopiedFromResource(File file, String name, Function<String, String> format) throws IOException {
+    public static File fileOrCopiedFromResource(File file, String name, Function<String, String> format, GeyserBootstrap bootstrap) throws IOException {
         if (!file.exists()) {
             //noinspection ResultOfMethodCallIgnored
             file.createNewFile();
             try (FileOutputStream fos = new FileOutputStream(file)) {
-                try (InputStream input = GeyserImpl.class.getResourceAsStream("/" + name)) { // resources need leading "/" prefix
+                try (InputStream input = bootstrap.getResource(name)) {
                     byte[] bytes = new byte[input.available()];
 
                     //noinspection ResultOfMethodCallIgnored
@@ -121,20 +110,6 @@ public class FileUtils {
     }
 
     /**
-     * Get an InputStream for the given resource path, throws AssertionError if resource is not found
-     *
-     * @param resource Resource to get
-     * @return InputStream of the given resource
-     */
-    public static InputStream getResource(String resource) {
-        InputStream stream = FileUtils.class.getClassLoader().getResourceAsStream(resource);
-        if (stream == null) {
-            throw new AssertionError("Unable to find resource: " + resource);
-        }
-        return stream;
-    }
-
-    /**
      * Calculate the SHA256 hash of a file
      *
      * @param file File to calculate the hash for
@@ -177,28 +152,22 @@ public class FileUtils {
      * @return The byte array of the file
      */
     public static byte[] readAllBytes(File file) {
-        try (InputStream inputStream = new FileInputStream(file)) {
-            return readAllBytes(inputStream);
+        try (InputStream stream = new FileInputStream(file)) {
+            return stream.readAllBytes();
         } catch (IOException e) {
             throw new RuntimeException("Cannot read " + file);
         }
     }
 
     /**
-     * @param stream the InputStream to read off of
+     * @param resource the internal resource to read off from
      * @return the byte array of an InputStream
      */
-    public static byte[] readAllBytes(InputStream stream) {
-        try {
-            int size = stream.available();
-            byte[] bytes = new byte[size];
-            try (BufferedInputStream buf = new BufferedInputStream(stream)) {
-                //noinspection ResultOfMethodCallIgnored
-                buf.read(bytes, 0, bytes.length);
-            }
-            return bytes;
+    public static byte[] readAllBytes(String resource) {
+        try (InputStream stream = GeyserImpl.getInstance().getBootstrap().getResource(resource)) {
+            return stream.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException("Error while trying to read input stream!", e);
+            throw new RuntimeException("Error while trying to read internal input stream!", e);
         }
     }
 
@@ -241,15 +210,18 @@ public class FileUtils {
      * @return a set of all the classes annotated by the given annotation
      */
     public static Set<Class<?>> getGeneratedClassesForAnnotation(String input) {
-        InputStream annotatedClass = FileUtils.getResource(input);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(annotatedClass));
-        return reader.lines().map(className -> {
-            try {
-                return Class.forName(className);
-            } catch (ClassNotFoundException ex) {
-                GeyserImpl.getInstance().getLogger().error("Failed to find class " + className, ex);
-                throw new RuntimeException(ex);
-            }
-        }).collect(Collectors.toSet());
+        try (InputStream annotatedClass = GeyserImpl.getInstance().getBootstrap().getResource(input);
+             BufferedReader reader = new BufferedReader(new InputStreamReader(annotatedClass))) {
+            return reader.lines().map(className -> {
+                try {
+                    return Class.forName(className);
+                } catch (ClassNotFoundException ex) {
+                    GeyserImpl.getInstance().getLogger().error("Failed to find class " + className, ex);
+                    throw new RuntimeException(ex);
+                }
+            }).collect(Collectors.toSet());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,11 @@
 package org.geysermc.geyser.translator.protocol.bedrock;
 
 import com.nukkitx.protocol.bedrock.packet.SetLocalPlayerAsInitializedPacket;
-import org.geysermc.geyser.session.auth.AuthType;
+import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
+import org.geysermc.geyser.util.InventoryUtils;
 import org.geysermc.geyser.util.LoginEncryptionUtils;
 
 @Translator(packet = SetLocalPlayerAsInitializedPacket.class)
@@ -40,11 +41,33 @@ public class BedrockSetLocalPlayerAsInitializedTranslator extends PacketTranslat
             if (!session.getUpstream().isInitialized()) {
                 session.getUpstream().setInitialized(true);
 
-                if (session.getRemoteAuthType() == AuthType.ONLINE) {
+                if (session.remoteServer().authType() == AuthType.ONLINE) {
                     if (!session.isLoggedIn()) {
-                        LoginEncryptionUtils.buildAndShowLoginWindow(session);
+                        if (session.getGeyser().getConfig().getSavedUserLogins().contains(session.bedrockUsername())) {
+                            if (session.getGeyser().refreshTokenFor(session.bedrockUsername()) == null) {
+                                LoginEncryptionUtils.buildAndShowConsentWindow(session);
+                            } else {
+                                // If the refresh token is not null and we're here, then the refresh token expired
+                                // and the expiration form has been cached
+                                session.getFormCache().resendAllForms();
+                            }
+                        } else {
+                            LoginEncryptionUtils.buildAndShowLoginWindow(session);
+                        }
                     }
                     // else we were able to log the user in
+                }
+                if (session.isLoggedIn()) {
+                    // Sigh - as of Bedrock 1.18
+                    session.getEntityCache().updateBossBars();
+
+                    // Double sigh - https://github.com/GeyserMC/Geyser/issues/2677 - as of Bedrock 1.18
+                    if (session.getOpenInventory() != null && session.getOpenInventory().isPending()) {
+                        InventoryUtils.openInventory(session, session.getOpenInventory());
+                    }
+
+                    // What am I to expect - as of Bedrock 1.18
+                    session.getFormCache().resendAllForms();
                 }
             }
         }

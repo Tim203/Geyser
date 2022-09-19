@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,9 @@ package org.geysermc.geyser.util;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.geysermc.geyser.GeyserImpl;
 
+import javax.annotation.Nullable;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.InitialDirContext;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -52,6 +55,8 @@ public class WebUtils {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Geyser-" + GeyserImpl.getInstance().getPlatformType().toString() + "/" + GeyserImpl.VERSION); // Otherwise Java 8 fails on checking updates
+            con.setConnectTimeout(10000);
+            con.setReadTimeout(10000);
 
             return connectionToString(con);
         } catch (Exception e) {
@@ -68,6 +73,8 @@ public class WebUtils {
     public static JsonNode getJson(String reqURL) throws IOException {
         HttpURLConnection con = (HttpURLConnection) new URL(reqURL).openConnection();
         con.setRequestProperty("User-Agent", "Geyser-" + GeyserImpl.getInstance().getPlatformType().toString() + "/" + GeyserImpl.VERSION);
+        con.setConnectTimeout(10000);
+        con.setReadTimeout(10000);
         return GeyserImpl.JSON_MAPPER.readTree(con.getInputStream());
     }
 
@@ -167,5 +174,24 @@ public class WebUtils {
         }
 
         return connectionToString(con);
+    }
+
+    @Nullable
+    public static String[] findSrvRecord(GeyserImpl geyser, String remoteAddress) {
+        try {
+            // Searches for a server address and a port from a SRV record of the specified host name
+            InitialDirContext ctx = new InitialDirContext();
+            Attribute attr = ctx.getAttributes("dns:///_minecraft._tcp." + remoteAddress, new String[]{"SRV"}).get("SRV");
+            // size > 0 = SRV entry found
+            if (attr != null && attr.size() > 0) {
+                return ((String) attr.get(0)).split(" ");
+            }
+        } catch (Exception | NoClassDefFoundError ex) { // Check for a NoClassDefFoundError to prevent Android crashes
+            if (geyser.getConfig().isDebugMode()) {
+                geyser.getLogger().debug("Exception while trying to find an SRV record for the remote host.");
+                ex.printStackTrace(); // Otherwise we can get a stack trace for any domain that doesn't have an SRV record
+            }
+        }
+        return null;
     }
 }

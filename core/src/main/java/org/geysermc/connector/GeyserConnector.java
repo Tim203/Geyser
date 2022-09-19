@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,10 +26,10 @@
 package org.geysermc.connector;
 
 import com.nukkitx.protocol.bedrock.BedrockServer;
+import org.geysermc.api.Geyser;
 import org.geysermc.common.PlatformType;
 import org.geysermc.connector.network.session.GeyserSession;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.api.Geyser;
 
 import java.util.UUID;
 
@@ -73,11 +73,21 @@ public class GeyserConnector {
     }
 
     public GeyserSession getPlayerByXuid(String xuid) {
-        return new GeyserSession(GeyserImpl.getInstance().getPlayerByXuid(xuid));
+        org.geysermc.geyser.session.GeyserSession session = GeyserImpl.getInstance().connectionByXuid(xuid);
+        if (session != null) {
+            return new GeyserSession(session);
+        } else {
+            return null;
+        }
     }
 
     public GeyserSession getPlayerByUuid(UUID uuid) {
-        return new GeyserSession(GeyserImpl.getInstance().getPlayerByUuid(uuid));
+        org.geysermc.geyser.session.GeyserSession session = GeyserImpl.getInstance().connectionByUuid(uuid);
+        if (session != null) {
+            return new GeyserSession(session);
+        } else {
+            return null;
+        }
     }
 
     public boolean isProductionEnvironment() {

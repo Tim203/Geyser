@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,16 +34,23 @@ import com.nukkitx.nbt.NbtType;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.session.GeyserSession;
-import org.geysermc.geyser.translator.text.MessageTranslator;
+import org.geysermc.geyser.api.item.custom.CustomItemOptions;
+import org.geysermc.geyser.api.util.TriState;
+import org.geysermc.geyser.inventory.GeyserItemStack;
 import org.geysermc.geyser.registry.BlockRegistries;
 import org.geysermc.geyser.registry.type.ItemMapping;
 import org.geysermc.geyser.registry.type.ItemMappings;
-import org.geysermc.geyser.util.FileUtils;
+import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.text.MinecraftLocale;
+import org.geysermc.geyser.translator.text.MessageTranslator;
+import org.geysermc.geyser.util.FileUtils;
 
 import javax.annotation.Nonnull;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,11 +75,11 @@ public abstract class ItemTranslator {
 
             try {
                 if (NbtItemStackTranslator.class.isAssignableFrom(clazz)) {
-                    NbtItemStackTranslator nbtItemTranslator = (NbtItemStackTranslator) clazz.newInstance();
+                    NbtItemStackTranslator nbtItemTranslator = (NbtItemStackTranslator) clazz.getDeclaredConstructor().newInstance();
                     loadedNbtItemTranslators.put(nbtItemTranslator, priority);
                     continue;
                 }
-                ItemTranslator itemStackTranslator = (ItemTranslator) clazz.newInstance();
+                ItemTranslator itemStackTranslator = (ItemTranslator) clazz.getDeclaredConstructor().newInstance();
                 List<ItemMapping> appliedItems = itemStackTranslator.getAppliedItems();
                 for (ItemMapping item : appliedItems) {
                     ItemTranslator registered = ITEM_STACK_TRANSLATORS.get(item.getJavaId());
@@ -84,7 +91,7 @@ public abstract class ItemTranslator {
                     }
                     ITEM_STACK_TRANSLATORS.put(item.getJavaId(), itemStackTranslator);
                 }
-            } catch (InstantiationException | IllegalAccessException e) {
+            } catch (InstantiationException | InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
                 GeyserImpl.getInstance().getLogger().error("Could not instantiate annotated item translator " + clazz.getCanonicalName());
             }
         }
@@ -118,7 +125,7 @@ public abstract class ItemTranslator {
                 }
             }
             if (itemStack.getNbt().isEmpty()) {
-                // Otherwise, seems to causes issues with villagers accepting books, and I don't see how this will break anything else. - Camotoy
+                // Otherwise, seems to cause issues with villagers accepting books, and I don't see how this will break anything else. - Camotoy
                 itemStack = new ItemStack(itemStack.getId(), itemStack.getAmount(), null);
             }
         }
@@ -154,19 +161,19 @@ public abstract class ItemTranslator {
         }
 
         nbt = translateDisplayProperties(session, nbt, bedrockItem);
+        if (session.isAdvancedTooltips()) {
+            nbt = addAdvancedTooltips(nbt, bedrockItem, session.locale());
+        }
 
         ItemStack itemStack = new ItemStack(stack.getId(), stack.getAmount(), nbt);
 
-        ItemData.Builder builder;
-        ItemTranslator itemStackTranslator = ITEM_STACK_TRANSLATORS.get(bedrockItem.getJavaId());
-        if (itemStackTranslator != null) {
-            builder = itemStackTranslator.translateToBedrock(itemStack, bedrockItem, session.getItemMappings());
-        } else {
-            builder = DEFAULT_TRANSLATOR.translateToBedrock(itemStack, bedrockItem, session.getItemMappings());
-        }
+        ItemTranslator itemStackTranslator = ITEM_STACK_TRANSLATORS.getOrDefault(bedrockItem.getJavaId(), DEFAULT_TRANSLATOR);
+        ItemData.Builder builder = itemStackTranslator.translateToBedrock(itemStack, bedrockItem, session.getItemMappings());
         if (bedrockItem.isBlock()) {
             builder.blockRuntimeId(bedrockItem.getBedrockBlockId());
         }
+
+        translateCustomItem(nbt, builder, bedrockItem);
 
         if (nbt != null) {
             // Translate the canDestroy and canPlaceOn Java NBT
@@ -181,6 +188,57 @@ public abstract class ItemTranslator {
         }
 
         return builder.build();
+    }
+
+    private static CompoundTag addAdvancedTooltips(CompoundTag nbt, ItemMapping mapping, String language) {
+        CompoundTag newNbt = nbt;
+        if (newNbt == null) {
+            newNbt = new CompoundTag("nbt");
+            CompoundTag display = new CompoundTag("display");
+            display.put(new ListTag("Lore"));
+            newNbt.put(display);
+        }
+        CompoundTag compoundTag = newNbt.get("display");
+        if (compoundTag == null) {
+            compoundTag = new CompoundTag("display");
+        }
+        ListTag listTag = compoundTag.get("Lore");
+
+        if (listTag == null) {
+            listTag = new ListTag("Lore");
+        }
+        int maxDurability = mapping.getMaxDamage();
+
+        if (maxDurability != 0) {
+            Tag durabilityTag = newNbt.get("Damage");
+            if (durabilityTag instanceof IntTag) {
+                int durability = maxDurability - ((IntTag) durabilityTag).getValue();
+                if (durability != maxDurability) {
+                    Component component = Component.text()
+                            .resetStyle()
+                            .color(NamedTextColor.WHITE)
+                            .append(Component.translatable("item.durability",
+                                    Component.text(durability),
+                                    Component.text(maxDurability)))
+                            .build();
+                    listTag.add(new StringTag("", MessageTranslator.convertMessage(component, language)));
+                }
+            }
+        }
+
+        listTag.add(new StringTag("", "§r§8" + mapping.getJavaIdentifier()));
+        if (nbt != null) {
+            Component component = Component.text()
+                    .resetStyle()
+                    .color(NamedTextColor.DARK_GRAY)
+                    .append(Component.translatable("item.nbt_tags",
+                            Component.text(nbt.size())))
+                    .build();
+            listTag.add(new StringTag("", MessageTranslator.convertMessage(component, language)));
+        }
+        compoundTag.put(listTag);
+        newNbt.put(compoundTag);
+        return newNbt;
     }
 
     /**
@@ -207,6 +265,26 @@ public abstract class ItemTranslator {
         return canModifyBedrock;
     }
 
+    /**
+     * Given an item stack, determine the Bedrock item ID that should be applied to Bedrock players.
+     */
+    public static int getBedrockItemId(GeyserSession session, @Nonnull GeyserItemStack itemStack) {
+        if (itemStack.isEmpty()) {
+            return ItemMapping.AIR.getJavaId();
+        }
+        int javaId = itemStack.getJavaId();
+        ItemMapping mapping = ITEM_STACK_TRANSLATORS.getOrDefault(javaId, DEFAULT_TRANSLATOR)
+                .getItemMapping(javaId, itemStack.getNbt(), session.getItemMappings());
+
+        int customItemId = getCustomItem(itemStack.getNbt(), mapping);
+        if (customItemId == -1) {
+            // No custom item
+            return mapping.getBedrockId();
+        } else {
+            return customItemId;
+        }
+    }
+
     private static final ItemTranslator DEFAULT_TRANSLATOR = new ItemTranslator() {
         @Override
         public List<ItemMapping> getAppliedItems() {
@@ -214,7 +292,7 @@ public abstract class ItemTranslator {
         }
     };
 
-    public ItemData.Builder translateToBedrock(ItemStack itemStack, ItemMapping mapping, ItemMappings mappings) {
+    protected ItemData.Builder translateToBedrock(ItemStack itemStack, ItemMapping mapping, ItemMappings mappings) {
         if (itemStack == null) {
             // Return, essentially, air
             return ItemData.builder();
@@ -226,6 +304,10 @@ public abstract class ItemTranslator {
         if (itemStack.getNbt() != null) {
             builder.tag(this.translateNbtToBedrock(itemStack.getNbt()));
         }
+
+        CompoundTag nbt = itemStack.getNbt();
+        translateCustomItem(nbt, builder, mapping);
+
         return builder;
     }
 
@@ -237,9 +319,16 @@ public abstract class ItemTranslator {
         return new ItemStack(mapping.getJavaId(), itemData.getCount(), this.translateToJavaNBT("", itemData.getTag()));
     }
 
+    /**
+     * Used for initialization only and only called once.
+     */
     public abstract List<ItemMapping> getAppliedItems();
 
-    public NbtMap translateNbtToBedrock(CompoundTag tag) {
+    protected ItemMapping getItemMapping(int javaId, CompoundTag nbt, ItemMappings mappings) {
+        return mappings.getMapping(javaId);
+    }
+
+    protected NbtMap translateNbtToBedrock(CompoundTag tag) {
         NbtMapBuilder builder = NbtMap.builder();
         if (tag.getValue() != null && !tag.getValue().isEmpty()) {
             for (String str : tag.getValue().keySet()) {
@@ -318,7 +407,7 @@ public abstract class ItemTranslator {
         return null;
     }
 
-    public CompoundTag translateToJavaNBT(String name, NbtMap tag) {
+    private CompoundTag translateToJavaNBT(String name, NbtMap tag) {
         CompoundTag javaTag = new CompoundTag(name);
         Map<String, Tag> javaValue = javaTag.getValue();
         if (tag != null && !tag.isEmpty()) {
@@ -343,7 +432,7 @@ public abstract class ItemTranslator {
         if (object instanceof byte[]) {
             return new ByteArrayTag(name, (byte[]) object);
         }
-        
+
         if (object instanceof Byte) {
             return new ByteTag(name, (byte) object);
         }
@@ -413,12 +502,11 @@ public abstract class ItemTranslator {
     public static CompoundTag translateDisplayProperties(GeyserSession session, CompoundTag tag, ItemMapping mapping, char translationColor) {
         boolean hasCustomName = false;
         if (tag != null) {
-            CompoundTag display = tag.get("display");
-            if (display != null && display.contains("Name")) {
-                String name = ((StringTag) display.get("Name")).getValue();
+            if (tag.get("display") instanceof CompoundTag display && display.get("Name") instanceof StringTag tagName) {
+                String name = tagName.getValue();
 
                 // Get the translated name and prefix it with a reset char
-                name = MessageTranslator.convertMessageLenient(name, session.getLocale());
+                name = MessageTranslator.convertMessageLenient(name, session.locale());
 
                 // Add the new name tag
                 display.put(new StringTag("Name", name));
@@ -435,8 +523,10 @@ public abstract class ItemTranslator {
             if (tag == null) {
                 tag = new CompoundTag("");
             }
-            CompoundTag display = tag.get("display");
-            if (display == null) {
+            CompoundTag display;
+            if (tag.get("display") instanceof CompoundTag oldDisplay) {
+                display = oldDisplay;
+            } else {
                 display = new CompoundTag("display");
                 // Add to the new root tag
                 tag.put(display);
@@ -444,10 +534,52 @@ public abstract class ItemTranslator {
 
             String translationKey = mapping.getTranslationString();
             // Reset formatting since Bedrock defaults to italics
-            display.put(new StringTag("Name", "§r§" + translationColor + MinecraftLocale.getLocaleString(translationKey, session.getLocale())));
+            display.put(new StringTag("Name", "§r§" + translationColor + MinecraftLocale.getLocaleString(translationKey, session.locale())));
         }
 
         return tag;
+    }
+
+    /**
+     * Translates the custom model data of an item
+     */
+    private static void translateCustomItem(CompoundTag nbt, ItemData.Builder builder, ItemMapping mapping) {
+        int bedrockId = getCustomItem(nbt, mapping);
+        if (bedrockId != -1) {
+            builder.id(bedrockId);
+        }
+    }
+
+    private static int getCustomItem(CompoundTag nbt, ItemMapping mapping) {
+        if (nbt == null) {
+            return -1;
+        }
+        Object2IntMap<CustomItemOptions> customMappings = mapping.getCustomItemOptions();
+        if (customMappings.isEmpty()) {
+            return -1;
+        }
+        int customModelData = nbt.get("CustomModelData") instanceof IntTag customModelDataTag ? customModelDataTag.getValue() : 0;
+        TriState unbreakable = TriState.fromBoolean(nbt.get("Unbreakable") instanceof ByteTag unbreakableTag && unbreakableTag.getValue() == 1);
+        int damage = nbt.get("Damage") instanceof IntTag damageTag ? damageTag.getValue() : 0;
+        for (Object2IntMap.Entry<CustomItemOptions> mappingTypes : customMappings.object2IntEntrySet()) {
+            CustomItemOptions options = mappingTypes.getKey();
+
+            TriState unbreakableOption = options.unbreakable();
+            if (unbreakableOption == unbreakable) { // Implementation note: if the option is NOT_SET then this comparison will always be false because of how the item unbreaking TriState is created
+                return mappingTypes.getIntValue();
+            }
+
+            OptionalInt customModelDataOption = options.customModelData();
+            if (customModelDataOption.isPresent() && customModelDataOption.getAsInt() == customModelData) {
+                return mappingTypes.getIntValue();
+            }
+
+            OptionalInt damagePredicate = options.damagePredicate();
+            if (damagePredicate.isPresent() && damagePredicate.getAsInt() == damage) {
+                return mappingTypes.getIntValue();
+            }
+        }
+        return -1;
     }
 
     /**

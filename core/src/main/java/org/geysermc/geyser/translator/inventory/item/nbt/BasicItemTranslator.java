@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,11 @@
 package org.geysermc.geyser.translator.inventory.item.nbt;
 
 import com.github.steveice10.opennbt.tag.builtin.*;
+import org.geysermc.geyser.registry.type.ItemMapping;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.inventory.item.ItemRemapper;
-import org.geysermc.geyser.translator.text.MessageTranslator;
 import org.geysermc.geyser.translator.inventory.item.NbtItemStackTranslator;
-import org.geysermc.geyser.registry.type.ItemMapping;
+import org.geysermc.geyser.translator.text.MessageTranslator;
 import org.geysermc.geyser.util.ItemUtils;
 
 import java.util.ArrayList;
@@ -51,17 +51,15 @@ public class BasicItemTranslator extends NbtItemStackTranslator {
             }
         }
 
-        CompoundTag displayTag = itemTag.get("display");
-        if (displayTag == null) {
+        if (!(itemTag.get("display") instanceof CompoundTag displayTag)) {
             return;
         }
 
-        Tag loreTag = displayTag.get("Lore");
-        if (loreTag instanceof ListTag listTag) {
+        if (displayTag.get("Lore") instanceof ListTag listTag) {
             List<Tag> lore = new ArrayList<>();
             for (Tag tag : listTag.getValue()) {
                 if (!(tag instanceof StringTag)) continue;
-                lore.add(new StringTag("", MessageTranslator.convertMessageLenient(((StringTag) tag).getValue(), session.getLocale())));
+                lore.add(new StringTag("", MessageTranslator.convertMessageLenient(((StringTag) tag).getValue(), session.locale())));
             }
             displayTag.put(new ListTag("Lore", lore));
         }

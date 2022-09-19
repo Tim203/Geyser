@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,11 @@
 package org.geysermc.geyser.configuration;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.geysermc.geyser.api.logger.GeyserLogger;
-import org.geysermc.geyser.session.auth.AuthType;
+import org.geysermc.geyser.GeyserLogger;
+import org.geysermc.geyser.api.network.BedrockListener;
+import org.geysermc.geyser.api.network.RemoteServer;
 import org.geysermc.geyser.network.CIDRMatcher;
+import org.geysermc.geyser.network.GameProtocol;
 import org.geysermc.geyser.text.GeyserLocale;
 
 import java.nio.file.Path;
@@ -41,6 +43,9 @@ public interface GeyserConfiguration {
 
     IRemoteConfiguration getRemote();
 
+    List<String> getSavedUserLogins();
+
+    @Deprecated
     Map<String, ? extends IUserAuthenticationInfo> getUserAuths();
 
     boolean isCommandSuggestions();
@@ -73,6 +78,10 @@ public interface GeyserConfiguration {
 
     boolean isShowCoordinates();
 
+    boolean isDisableBedrockScaffolding();
+
+    boolean isAlwaysQuickChangeArmor();
+
     EmoteOffhandWorkaroundOption getEmoteOffhandWorkaround();
 
     String getDefaultLocale();
@@ -91,21 +100,21 @@ public interface GeyserConfiguration {
 
     boolean isAllowCustomSkulls();
 
+    int getMaxVisibleCustomSkulls();
+
+    int getCustomSkullRenderDistance();
+
+    boolean isLogPlayerIpAddresses();
+
+    boolean isNotifyOnNewBedrockUpdate();
+
     IMetricsInfo getMetrics();
 
-    interface IBedrockConfiguration {
+    int getPendingAuthenticationTimeout();
 
-        String getAddress();
-
-        int getPort();
+    interface IBedrockConfiguration extends BedrockListener {
 
         boolean isCloneRemotePort();
-
-        String getMotd1();
-
-        String getMotd2();
-
-        String getServerName();
 
         int getCompressionLevel();
 
@@ -119,23 +128,25 @@ public interface GeyserConfiguration {
         List<CIDRMatcher> getWhitelistedIpsMatchers();
     }
 
-    interface IRemoteConfiguration {
-
-        String getAddress();
-
-        int getPort();
+    interface IRemoteConfiguration extends RemoteServer {
 
         void setAddress(String address);
 
         void setPort(int port);
-
-        AuthType getAuthType();
 
         boolean isAllowPasswordAuthentication();
 
         boolean isUseProxyProtocol();
 
         boolean isForwardHostname();
+
+        default String minecraftVersion() {
+            return GameProtocol.getJavaMinecraftVersion();
+        }
+
+        default int protocolVersion() {
+            return GameProtocol.getJavaProtocolVersion();
+        }
     }
 
     interface IUserAuthenticationInfo {

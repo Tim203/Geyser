@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,30 +27,27 @@ package org.geysermc.geyser.translator.protocol.java.inventory;
 
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
 import com.github.steveice10.mc.protocol.data.game.recipe.Ingredient;
-import com.github.steveice10.mc.protocol.data.game.recipe.Recipe;
-import com.github.steveice10.mc.protocol.data.game.recipe.RecipeType;
-import com.github.steveice10.mc.protocol.data.game.recipe.data.ShapedRecipeData;
-import com.github.steveice10.mc.protocol.data.game.recipe.data.ShapelessRecipeData;
 import com.github.steveice10.mc.protocol.packet.ingame.clientbound.inventory.ClientboundContainerSetSlotPacket;
 import com.nukkitx.protocol.bedrock.data.inventory.ContainerId;
 import com.nukkitx.protocol.bedrock.data.inventory.CraftingData;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
+import com.nukkitx.protocol.bedrock.data.inventory.descriptor.ItemDescriptorWithCount;
 import com.nukkitx.protocol.bedrock.packet.CraftingDataPacket;
 import com.nukkitx.protocol.bedrock.packet.InventorySlotPacket;
+import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.inventory.GeyserItemStack;
 import org.geysermc.geyser.inventory.Inventory;
+import org.geysermc.geyser.inventory.recipe.GeyserShapedRecipe;
 import org.geysermc.geyser.session.GeyserSession;
-import org.geysermc.geyser.translator.protocol.PacketTranslator;
-import org.geysermc.geyser.translator.protocol.Translator;
 import org.geysermc.geyser.translator.inventory.InventoryTranslator;
-import org.geysermc.geyser.translator.inventory.CraftingInventoryTranslator;
 import org.geysermc.geyser.translator.inventory.PlayerInventoryTranslator;
 import org.geysermc.geyser.translator.inventory.item.ItemTranslator;
+import org.geysermc.geyser.translator.protocol.PacketTranslator;
+import org.geysermc.geyser.translator.protocol.Translator;
 import org.geysermc.geyser.util.InventoryUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -71,42 +68,61 @@ public class JavaContainerSetSlotTranslator extends PacketTranslator<Clientbound
         if (inventory == null)
             return;
 
-        inventory.setStateId(packet.getStateId());
-
         InventoryTranslator translator = session.getInventoryTranslator();
         if (translator != null) {
             if (session.getCraftingGridFuture() != null) {
                 session.getCraftingGridFuture().cancel(false);
             }
-            session.setCraftingGridFuture(session.scheduleInEventLoop(() -> updateCraftingGrid(session, packet, inventory, translator), 150, TimeUnit.MILLISECONDS));
+
+            int slot = packet.getSlot();
+            if (slot >= inventory.getSize()) {
+                GeyserImpl geyser = session.getGeyser();
+                geyser.getLogger().warning("ClientboundContainerSetSlotPacket sent to " + session.bedrockUsername()
+                        + " that exceeds inventory size!");
+                if (geyser.getConfig().isDebugMode()) {
+                    geyser.getLogger().debug(packet);
+                    geyser.getLogger().debug(inventory);
+                }
+                // 1.19.0 behavior: the state ID will not be set due to exception
+                return;
+            }
+
+            updateCraftingGrid(session, slot, packet.getItem(), inventory, translator);
 
             GeyserItemStack newItem = GeyserItemStack.from(packet.getItem());
             if (packet.getContainerId() == 0 && !(translator instanceof PlayerInventoryTranslator)) {
                 // In rare cases, the window ID can still be 0 but Java treats it as valid
-                session.getPlayerInventory().setItem(packet.getSlot(), newItem, session);
-                InventoryTranslator.PLAYER_INVENTORY_TRANSLATOR.updateSlot(session, session.getPlayerInventory(), packet.getSlot());
+                session.getPlayerInventory().setItem(slot, newItem, session);
+                InventoryTranslator.PLAYER_INVENTORY_TRANSLATOR.updateSlot(session, session.getPlayerInventory(), slot);
             } else {
-                inventory.setItem(packet.getSlot(), newItem, session);
-                translator.updateSlot(session, inventory, packet.getSlot());
+                inventory.setItem(slot, newItem, session);
+                translator.updateSlot(session, inventory, slot);
             }
+
+            // Intentional behavior here below the cursor; Minecraft 1.18.1 also does this.
+            int stateId = packet.getStateId();
+            session.setEmulatePost1_16Logic(stateId > 0 || stateId != inventory.getStateId());
+            inventory.setStateId(stateId);
         }
     }
 
-    private static void updateCraftingGrid(GeyserSession session, ClientboundContainerSetSlotPacket packet, Inventory inventory, InventoryTranslator translator) {
-        if (packet.getSlot() == 0) {
-            int gridSize;
-            if (translator instanceof PlayerInventoryTranslator) {
-                gridSize = 4;
-            } else if (translator instanceof CraftingInventoryTranslator) {
-                gridSize = 9;
-            } else {
-                return;
-            }
+    /**
+     * Checks for a changed output slot in the crafting grid, and ensures Bedrock sees the recipe.
+     */
+    private static void updateCraftingGrid(GeyserSession session, int slot, ItemStack item, Inventory inventory, InventoryTranslator translator) {
+        if (slot != 0) {
+            return;
+        }
+        int gridSize = translator.getGridSize();
+        if (gridSize == -1) {
+            return;
+        }
 
-            if (packet.getItem() == null || packet.getItem().getId() == 0) {
-                return;
-            }
+        if (item == null || item.getId() == 0) {
+            return;
+        }
 
+        session.setCraftingGridFuture(session.scheduleInEventLoop(() -> {
             int offset = gridSize == 4 ? 28 : 32;
             int gridDimensions = gridSize == 4 ? 2 : 3;
             int firstRow = -1, height = -1;
@@ -134,62 +150,10 @@ public class JavaContainerSetSlotTranslator extends PacketTranslator<Clientbound
             height += -firstRow + 1;
             width += -firstCol + 1;
 
-            recipes:
-            for (Recipe recipe : session.getCraftingRecipes().values()) {
-                if (recipe.getType() == RecipeType.CRAFTING_SHAPED) {
-                    ShapedRecipeData data = (ShapedRecipeData) recipe.getData();
-                    if (!data.getResult().equals(packet.getItem())) {
-                        continue;
-                    }
-                    if (data.getWidth() != width || data.getHeight() != height || width * height != data.getIngredients().length) {
-                        continue;
-                    }
-
-                    Ingredient[] ingredients = data.getIngredients();
-                    if (!testShapedRecipe(ingredients, inventory, gridDimensions, firstRow, height, firstCol, width)) {
-                        Ingredient[] mirroredIngredients = new Ingredient[data.getIngredients().length];
-                        for (int row = 0; row < height; row++) {
-                            for (int col = 0; col < width; col++) {
-                                mirroredIngredients[col + (row * width)] = ingredients[(width - 1 - col) + (row * width)];
-                            }
-                        }
-
-                        if (Arrays.equals(ingredients, mirroredIngredients) ||
-                                !testShapedRecipe(mirroredIngredients, inventory, gridDimensions, firstRow, height, firstCol, width)) {
-                            continue;
-                        }
-                    }
-                    // Recipe is had, don't sent packet
-                    return;
-                } else if (recipe.getType() == RecipeType.CRAFTING_SHAPELESS) {
-                    ShapelessRecipeData data = (ShapelessRecipeData) recipe.getData();
-                    if (!data.getResult().equals(packet.getItem())) {
-                        continue;
-                    }
-                    for (int i = 0; i < data.getIngredients().length; i++) {
-                        Ingredient ingredient = data.getIngredients()[i];
-                        for (ItemStack itemStack : ingredient.getOptions()) {
-                            boolean inventoryHasItem = false;
-                            for (int j = 0; j < inventory.getSize(); j++) {
-                                GeyserItemStack geyserItemStack = inventory.getItem(j);
-                                if (geyserItemStack.isEmpty()) {
-                                    inventoryHasItem = itemStack == null || itemStack.getId() == 0;
-                                    if (inventoryHasItem) {
-                                        break;
-                                    }
-                                } else if (itemStack.equals(geyserItemStack.getItemStack(1))) {
-                                    inventoryHasItem = true;
-                                    break;
-                                }
-                            }
-                            if (!inventoryHasItem) {
-                                continue recipes;
-                            }
-                        }
-                    }
-                    // Recipe is had, don't sent packet
-                    return;
-                }
+            if (InventoryUtils.getValidRecipe(session, item, inventory::getItem, gridDimensions, firstRow,
+                    height, firstCol, width) != null) {
+                // Recipe is already present on the client; don't send packet
+                return;
             }
 
             UUID uuid = UUID.randomUUID();
@@ -215,17 +179,16 @@ public class JavaContainerSetSlotTranslator extends PacketTranslator<Clientbound
                 }
             }
 
-            ShapedRecipeData data = new ShapedRecipeData(width, height, "", javaIngredients, packet.getItem());
             // Cache this recipe so we know the client has received it
-            session.getCraftingRecipes().put(newRecipeId, new Recipe(RecipeType.CRAFTING_SHAPED, uuid.toString(), data));
+            session.getCraftingRecipes().put(newRecipeId, new GeyserShapedRecipe(width, height, javaIngredients, item));
 
             CraftingDataPacket craftPacket = new CraftingDataPacket();
             craftPacket.getCraftingData().add(CraftingData.fromShaped(
                     uuid.toString(),
                     width,
                     height,
-                    Arrays.asList(ingredients),
-                    Collections.singletonList(ItemTranslator.translateToBedrock(session, packet.getItem())),
+                    Arrays.stream(ingredients).map(ItemDescriptorWithCount::fromItem).toList(),
+                    Collections.singletonList(ItemTranslator.translateToBedrock(session, item)),
                     uuid,
                     "crafting_table",
                     0,
@@ -245,33 +208,6 @@ public class JavaContainerSetSlotTranslator extends PacketTranslator<Clientbound
                     index++;
                 }
             }
-        }
-    }
-
-    private static boolean testShapedRecipe(Ingredient[] ingredients, Inventory inventory, int gridDimensions, int firstRow, int height, int firstCol, int width) {
-        int ingredientIndex = 0;
-        for (int row = firstRow; row < height + firstRow; row++) {
-            for (int col = firstCol; col < width + firstCol; col++) {
-                GeyserItemStack geyserItemStack = inventory.getItem(col + (row * gridDimensions) + 1);
-                Ingredient ingredient = ingredients[ingredientIndex++];
-                if (ingredient.getOptions().length == 0) {
-                    if (!geyserItemStack.isEmpty()) {
-                        return false;
-                    }
-                } else {
-                    boolean inventoryHasItem = false;
-                    for (ItemStack item : ingredient.getOptions()) {
-                        if (Objects.equals(geyserItemStack.getItemStack(1), item)) {
-                            inventoryHasItem = true;
-                            break;
-                        }
-                    }
-                    if (!inventoryHasItem) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        }, 150, TimeUnit.MILLISECONDS));
     }
 }

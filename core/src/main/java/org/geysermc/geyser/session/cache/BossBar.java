@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,7 +42,7 @@ public class BossBar {
     private final long entityId;
     private Component title;
     private float health;
-    private final int color;
+    private int color;
     private final int overlay;
     private final int darkenSky;
 
@@ -57,9 +57,9 @@ public class BossBar {
         BossEventPacket bossEventPacket = new BossEventPacket();
         bossEventPacket.setBossUniqueEntityId(entityId);
         bossEventPacket.setAction(BossEventPacket.Action.CREATE);
-        bossEventPacket.setTitle(MessageTranslator.convertMessage(title, session.getLocale()));
+        bossEventPacket.setTitle(MessageTranslator.convertMessage(title, session.locale()));
         bossEventPacket.setHealthPercentage(health);
-        bossEventPacket.setColor(color); //ignored by client
+        bossEventPacket.setColor(color);
         bossEventPacket.setOverlay(overlay);
         bossEventPacket.setDarkenSky(darkenSky);
 
@@ -71,7 +71,7 @@ public class BossBar {
         BossEventPacket bossEventPacket = new BossEventPacket();
         bossEventPacket.setBossUniqueEntityId(entityId);
         bossEventPacket.setAction(BossEventPacket.Action.UPDATE_NAME);
-        bossEventPacket.setTitle(MessageTranslator.convertMessage(title, session.getLocale()));
+        bossEventPacket.setTitle(MessageTranslator.convertMessage(title, session.locale()));
 
         session.sendUpstreamPacket(bossEventPacket);
     }
@@ -82,6 +82,16 @@ public class BossBar {
         bossEventPacket.setBossUniqueEntityId(entityId);
         bossEventPacket.setAction(BossEventPacket.Action.UPDATE_PERCENTAGE);
         bossEventPacket.setHealthPercentage(health);
+
+        session.sendUpstreamPacket(bossEventPacket);
+    }
+
+    public void updateColor(int color) {
+        this.color = color;
+        BossEventPacket bossEventPacket = new BossEventPacket();
+        bossEventPacket.setBossUniqueEntityId(entityId);
+        bossEventPacket.setAction(BossEventPacket.Action.UPDATE_STYLE);
+        bossEventPacket.setColor(color);
 
         session.sendUpstreamPacket(bossEventPacket);
     }

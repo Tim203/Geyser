@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,24 +28,24 @@ package org.geysermc.geyser.registry.populator;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
 import com.github.steveice10.mc.protocol.data.game.recipe.Ingredient;
-import com.github.steveice10.mc.protocol.data.game.recipe.Recipe;
 import com.github.steveice10.mc.protocol.data.game.recipe.RecipeType;
-import com.github.steveice10.mc.protocol.data.game.recipe.data.ShapedRecipeData;
-import com.github.steveice10.mc.protocol.data.game.recipe.data.ShapelessRecipeData;
 import com.nukkitx.nbt.NbtMap;
 import com.nukkitx.nbt.NbtUtils;
 import com.nukkitx.protocol.bedrock.data.inventory.CraftingData;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
+import com.nukkitx.protocol.bedrock.data.inventory.descriptor.ItemDescriptorWithCount;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.translator.inventory.item.ItemTranslator;
+import org.geysermc.geyser.inventory.recipe.GeyserRecipe;
+import org.geysermc.geyser.inventory.recipe.GeyserShapedRecipe;
+import org.geysermc.geyser.inventory.recipe.GeyserShapelessRecipe;
 import org.geysermc.geyser.registry.Registries;
 import org.geysermc.geyser.registry.type.ItemMapping;
 import org.geysermc.geyser.registry.type.ItemMappings;
-import org.geysermc.geyser.util.FileUtils;
 import org.geysermc.geyser.text.GeyserLocale;
+import org.geysermc.geyser.translator.inventory.item.ItemTranslator;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -60,10 +60,8 @@ import static org.geysermc.geyser.util.InventoryUtils.LAST_RECIPE_NET_ID;
 public class RecipeRegistryPopulator {
 
     public static void populate() {
-        InputStream stream = FileUtils.getResource("mappings/recipes.json");
-
         JsonNode items;
-        try {
+        try (InputStream stream = GeyserImpl.getInstance().getBootstrap().getResource("mappings/recipes.json")) {
             items = GeyserImpl.JSON_MAPPER.readTree(stream);
         } catch (Exception e) {
             throw new AssertionError(GeyserLocale.getLocaleStringLog("geyser.toolbox.fail.runtime_java"), e);
@@ -74,7 +72,7 @@ public class RecipeRegistryPopulator {
             // Make a bit of an assumption here that the last recipe net ID will be equivalent between all versions
             LAST_RECIPE_NET_ID = currentRecipeId;
             Map<RecipeType, List<CraftingData>> craftingData = new EnumMap<>(RecipeType.class);
-            Int2ObjectMap<Recipe> recipes = new Int2ObjectOpenHashMap<>();
+            Int2ObjectMap<GeyserRecipe> recipes = new Int2ObjectOpenHashMap<>();
 
             craftingData.put(RecipeType.CRAFTING_SPECIAL_BOOKCLONING,
                     Collections.singletonList(CraftingData.fromMulti(UUID.fromString("d1ca6b84-338e-4f2f-9c6b-76cc8b4bd98d"), ++LAST_RECIPE_NET_ID)));
@@ -127,7 +125,7 @@ public class RecipeRegistryPopulator {
      * @param recipes a list of all the recipes
      * @return the {@link CraftingData} to send to the Bedrock client.
      */
-    private static CraftingData getCraftingDataFromJsonNode(JsonNode node, Int2ObjectMap<Recipe> recipes, ItemMappings mappings) {
+    private static CraftingData getCraftingDataFromJsonNode(JsonNode node, Int2ObjectMap<GeyserRecipe> recipes, ItemMappings mappings) {
         int netId = ++LAST_RECIPE_NET_ID;
         int type = node.get("bedrockRecipeType").asInt();
         JsonNode outputNode = node.get("output");
@@ -168,14 +166,13 @@ public class RecipeRegistryPopulator {
             for (ItemData input : inputs) {
                 ingredients.add(new Ingredient(new ItemStack[]{ItemTranslator.translateToJava(input, mappings)}));
             }
-            ShapedRecipeData data = new ShapedRecipeData(shape.get(0).length(), shape.size(), "crafting_table",
+            GeyserRecipe recipe = new GeyserShapedRecipe(shape.get(0).length(), shape.size(),
                     ingredients.toArray(new Ingredient[0]), ItemTranslator.translateToJava(output, mappings));
-            Recipe recipe = new Recipe(RecipeType.CRAFTING_SHAPED, "", data);
             recipes.put(netId, recipe);
             /* Convert end */
 
             return CraftingData.fromShaped(uuid.toString(), shape.get(0).length(), shape.size(),
-                    inputs, Collections.singletonList(output), uuid, "crafting_table", 0, netId);
+                    inputs.stream().map(ItemDescriptorWithCount::fromItem).toList(), Collections.singletonList(output), uuid, "crafting_table", 0, netId);
         }
         List<ItemData> inputs = new ObjectArrayList<>();
         for (JsonNode entry : node.get("inputs")) {
@@ -188,19 +185,17 @@ public class RecipeRegistryPopulator {
         for (ItemData input : inputs) {
             ingredients.add(new Ingredient(new ItemStack[]{ItemTranslator.translateToJava(input, mappings)}));
         }
-        ShapelessRecipeData data = new ShapelessRecipeData("crafting_table",
-                ingredients.toArray(new Ingredient[0]), ItemTranslator.translateToJava(output, mappings));
-        Recipe recipe = new Recipe(RecipeType.CRAFTING_SHAPELESS, "", data);
+        GeyserRecipe recipe = new GeyserShapelessRecipe(ingredients.toArray(new Ingredient[0]), ItemTranslator.translateToJava(output, mappings));
         recipes.put(netId, recipe);
         /* Convert end */
 
         if (type == 5) {
             // Shulker box
             return CraftingData.fromShulkerBox(uuid.toString(),
-                    inputs, Collections.singletonList(output), uuid, "crafting_table", 0, netId);
+                    inputs.stream().map(ItemDescriptorWithCount::fromItem).toList(), Collections.singletonList(output), uuid, "crafting_table", 0, netId);
         }
         return CraftingData.fromShapeless(uuid.toString(),
-                inputs, Collections.singletonList(output), uuid, "crafting_table", 0, netId);
+                inputs.stream().map(ItemDescriptorWithCount::fromItem).toList(), Collections.singletonList(output), uuid, "crafting_table", 0, netId);
     }
 
     private static ItemData getBedrockItemFromIdentifierJson(ItemMapping mapping, JsonNode itemNode) {

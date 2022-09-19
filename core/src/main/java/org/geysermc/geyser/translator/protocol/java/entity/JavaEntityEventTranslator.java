@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,10 +32,12 @@ import com.nukkitx.protocol.bedrock.data.entity.EntityData;
 import com.nukkitx.protocol.bedrock.data.entity.EntityEventType;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
 import com.nukkitx.protocol.bedrock.packet.*;
-import org.geysermc.geyser.entity.type.Entity;
 import org.geysermc.geyser.entity.EntityDefinitions;
+import org.geysermc.geyser.entity.type.Entity;
+import org.geysermc.geyser.entity.type.EvokerFangsEntity;
 import org.geysermc.geyser.entity.type.FishingHookEntity;
 import org.geysermc.geyser.entity.type.LivingEntity;
+import org.geysermc.geyser.entity.type.living.monster.WardenEntity;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
@@ -47,18 +49,13 @@ public class JavaEntityEventTranslator extends PacketTranslator<ClientboundEntit
 
     @Override
     public void translate(GeyserSession session, ClientboundEntityEventPacket packet) {
-        Entity entity;
-        if (packet.getEntityId() == session.getPlayerEntity().getEntityId()) {
-            entity = session.getPlayerEntity();
-        } else {
-            entity = session.getEntityCache().getEntityByJavaId(packet.getEntityId());
-        }
+        Entity entity = session.getEntityCache().getEntityByJavaId(packet.getEntityId());
         if (entity == null)
             return;
 
         EntityEventPacket entityEventPacket = new EntityEventPacket();
         entityEventPacket.setRuntimeEntityId(entity.getGeyserId());
-        switch (packet.getStatus()) {
+        switch (packet.getEvent()) {
             case PLAYER_ENABLE_REDUCED_DEBUG:
                 session.setReducedDebugInfo(true);
                 return;
@@ -97,7 +94,7 @@ public class JavaEntityEventTranslator extends PacketTranslator<ClientboundEntit
                 break;
             case LIVING_DEATH:
                 entityEventPacket.setType(EntityEventType.DEATH);
-                if (entity.getDefinition() == EntityDefinitions.THROWN_EGG) {
+                if (entity.getDefinition() == EntityDefinitions.EGG) {
                     LevelEventPacket particlePacket = new LevelEventPacket();
                     particlePacket.setType(LevelEventType.PARTICLE_ITEM_BREAK);
                     particlePacket.setData(session.getItemMappings().getStoredItems().egg().getBedrockId() << 16);
@@ -124,8 +121,8 @@ public class JavaEntityEventTranslator extends PacketTranslator<ClientboundEntit
                 // Player is pulled from a fishing rod
                 // The physics of this are clientside on Java
                 FishingHookEntity fishingHook = (FishingHookEntity) entity;
-                if (fishingHook.isOwnerSessionPlayer()) {
-                    Entity hookOwner = session.getEntityCache().getEntityByGeyserId(fishingHook.getBedrockTargetId());
+                if (fishingHook.getBedrockTargetId() == session.getPlayerEntity().getGeyserId()) {
+                    Entity hookOwner = session.getEntityCache().getEntityByGeyserId(fishingHook.getBedrockOwnerId());
                     if (hookOwner != null) {
                         // https://minecraft.gamepedia.com/Fishing_Rod#Hooking_mobs_and_other_entities
                         SetEntityMotionPacket motionPacket = new SetEntityMotionPacket();
@@ -150,6 +147,7 @@ public class JavaEntityEventTranslator extends PacketTranslator<ClientboundEntit
                 soundPacket.setRelativeVolumeDisabled(false);
                 session.sendUpstreamPacket(soundPacket);
                 return;
+            case VILLAGER_MATE:
             case ANIMAL_EMIT_HEARTS:
                 entityEventPacket.setType(EntityEventType.LOVE_PARTICLES);
                 break;
@@ -179,12 +177,28 @@ public class JavaEntityEventTranslator extends PacketTranslator<ClientboundEntit
             case IRON_GOLEM_HOLD_POPPY:
                 entityEventPacket.setType(EntityEventType.GOLEM_FLOWER_OFFER);
                 break;
+            case VILLAGER_ANGRY:
+                entityEventPacket.setType(EntityEventType.VILLAGER_ANGRY);
+                break;
+            case VILLAGER_HAPPY:
+                entityEventPacket.setType(EntityEventType.VILLAGER_HAPPY);
+                break;
+            case VILLAGER_SWEAT:
+                LevelEventPacket levelEventPacket = new LevelEventPacket();
+                levelEventPacket.setType(LevelEventType.PARTICLE_SPLASH);
+                levelEventPacket.setPosition(entity.getPosition().up(entity.getDefinition().height()));
+                session.sendUpstreamPacket(levelEventPacket);
+                return;
             case IRON_GOLEM_EMPTY_HAND:
                 entityEventPacket.setType(EntityEventType.GOLEM_FLOWER_WITHDRAW);
                 break;
-            case IRON_GOLEM_ATTACK:
-                if (entity.getDefinition() == EntityDefinitions.IRON_GOLEM) {
+            case ATTACK:
+                if (entity.getDefinition() == EntityDefinitions.IRON_GOLEM || entity.getDefinition() == EntityDefinitions.EVOKER_FANGS
+                        || entity.getDefinition() == EntityDefinitions.WARDEN) {
                     entityEventPacket.setType(EntityEventType.ATTACK_START);
+                    if (entity.getDefinition() == EntityDefinitions.EVOKER_FANGS) {
+                        ((EvokerFangsEntity) entity).setAttackStarted();
+                    }
                 }
                 break;
             case RABBIT_JUMP_OR_MINECART_SPAWNER_DELAY_RESET:
@@ -235,7 +249,19 @@ public class JavaEntityEventTranslator extends PacketTranslator<ClientboundEntit
                 break;
             case MAKE_POOF_PARTICLES:
                 if (entity instanceof LivingEntity) {
+                    // Note that this event usually makes noise, but because we set all entities as silent on the
+                    // client end this isn't an issue.
                     entityEventPacket.setType(EntityEventType.DEATH_SMOKE_CLOUD);
+                }
+                break;
+            case WARDEN_RECEIVE_SIGNAL:
+                if (entity.getDefinition() == EntityDefinitions.WARDEN) {
+                    entityEventPacket.setType(EntityEventType.VIBRATION_DETECTED);
+                }
+                break;
+            case WARDEN_SONIC_BOOM:
+                if (entity instanceof WardenEntity wardenEntity) {
+                    wardenEntity.onSonicBoom();
                 }
                 break;
         }

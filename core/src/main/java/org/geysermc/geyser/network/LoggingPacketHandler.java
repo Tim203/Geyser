@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -854,6 +854,13 @@ public class LoggingPacketHandler implements BedrockPacketHandler {
 
     @Override
     public boolean handle(FilterTextPacket packet) {
+        return defaultHandler(packet);
+    }
+
+    // 1.19.30 new packet
+
+    @Override
+    public boolean handle(RequestNetworkSettingsPacket packet) {
         return defaultHandler(packet);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -34,12 +34,12 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AllArgsConstructor;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.level.physics.BoundingBox;
-import org.geysermc.geyser.translator.collision.CollisionRemapper;
-import org.geysermc.geyser.translator.collision.BlockCollision;
-import org.geysermc.geyser.translator.collision.OtherCollision;
-import org.geysermc.geyser.translator.collision.SolidCollision;
 import org.geysermc.geyser.registry.BlockRegistries;
 import org.geysermc.geyser.registry.type.BlockMapping;
+import org.geysermc.geyser.translator.collision.BlockCollision;
+import org.geysermc.geyser.translator.collision.CollisionRemapper;
+import org.geysermc.geyser.translator.collision.OtherCollision;
+import org.geysermc.geyser.translator.collision.SolidCollision;
 import org.geysermc.geyser.util.FileUtils;
 
 import java.io.InputStream;
@@ -50,10 +50,10 @@ import java.util.regex.Pattern;
 /**
  * Loads collision data from the given resource path.
  */
-public class CollisionRegistryLoader extends MultiResourceRegistryLoader<String, Map<Integer, BlockCollision>> {
+public class CollisionRegistryLoader extends MultiResourceRegistryLoader<String, Int2ObjectMap<BlockCollision>> {
 
     @Override
-    public Map<Integer, BlockCollision> load(Pair<String, String> input) {
+    public Int2ObjectMap<BlockCollision> load(Pair<String, String> input) {
         Int2ObjectMap<BlockCollision> collisions = new Int2ObjectOpenHashMap<>();
 
         Map<Class<?>, CollisionInfo> annotationMap = new IdentityHashMap<>();
@@ -65,10 +65,8 @@ public class CollisionRegistryLoader extends MultiResourceRegistryLoader<String,
         }
 
         // Load collision mappings file
-        InputStream stream = FileUtils.getResource(input.value());
-
         List<BoundingBox[]> collisionList;
-        try {
+        try (InputStream stream = GeyserImpl.getInstance().getBootstrap().getResource(input.value())) {
             ArrayNode collisionNode = (ArrayNode) GeyserImpl.JSON_MAPPER.readTree(stream);
             collisionList = loadBoundingBoxes(collisionNode);
         } catch (Exception e) {

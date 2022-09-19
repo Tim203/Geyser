@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,19 +28,21 @@ package org.geysermc.geyser.network;
 import com.nukkitx.protocol.bedrock.BedrockPacket;
 import com.nukkitx.protocol.bedrock.BedrockPacketCodec;
 import com.nukkitx.protocol.bedrock.data.ExperimentData;
+import com.nukkitx.protocol.bedrock.data.PacketCompressionAlgorithm;
 import com.nukkitx.protocol.bedrock.data.ResourcePackType;
 import com.nukkitx.protocol.bedrock.packet.*;
-import com.nukkitx.protocol.bedrock.v471.Bedrock_v471;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.session.auth.AuthType;
+import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.configuration.GeyserConfiguration;
-import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.pack.ResourcePack;
 import org.geysermc.geyser.pack.ResourcePackManifest;
 import org.geysermc.geyser.registry.BlockRegistries;
 import org.geysermc.geyser.registry.Registries;
+import org.geysermc.geyser.session.GeyserSession;
+import org.geysermc.geyser.session.PendingMicrosoftAuthentication;
 import org.geysermc.geyser.text.GeyserLocale;
-import org.geysermc.geyser.util.*;
+import org.geysermc.geyser.util.LoginEncryptionUtils;
+import org.geysermc.geyser.util.MathUtils;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -61,6 +63,20 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
     }
 
     @Override
+    public boolean handle(RequestNetworkSettingsPacket packet) {
+        // New since 1.19.30 - sent before login packet
+        PacketCompressionAlgorithm algorithm = PacketCompressionAlgorithm.ZLIB;
+
+        NetworkSettingsPacket responsePacket = new NetworkSettingsPacket();
+        responsePacket.setCompressionAlgorithm(algorithm);
+        responsePacket.setCompressionThreshold(512);
+        session.sendUpstreamPacketImmediately(responsePacket);
+
+        session.getUpstream().getSession().setCompression(algorithm);
+        return true;
+    }
+
+    @Override
     public boolean handle(LoginPacket loginPacket) {
         if (geyser.isShuttingDown()) {
             // Don't allow new players in if we're no longer operating
@@ -68,16 +84,14 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
             return true;
         }
 
-        BedrockPacketCodec packetCodec = MinecraftProtocol.getBedrockCodec(loginPacket.getProtocolVersion());
+        BedrockPacketCodec packetCodec = GameProtocol.getBedrockCodec(loginPacket.getProtocolVersion());
         if (packetCodec == null) {
-            String supportedVersions = MinecraftProtocol.getAllSupportedVersions();
-            if (loginPacket.getProtocolVersion() > MinecraftProtocol.DEFAULT_BEDROCK_CODEC.getProtocolVersion()) {
+            String supportedVersions = GameProtocol.getAllSupportedBedrockVersions();
+            if (loginPacket.getProtocolVersion() > GameProtocol.DEFAULT_BEDROCK_CODEC.getProtocolVersion()) {
                 // Too early to determine session locale
-                session.getGeyser().getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.outdated.server", supportedVersions));
                 session.disconnect(GeyserLocale.getLocaleStringLog("geyser.network.outdated.server", supportedVersions));
                 return true;
-            } else if (loginPacket.getProtocolVersion() < MinecraftProtocol.DEFAULT_BEDROCK_CODEC.getProtocolVersion()) {
-                session.getGeyser().getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.outdated.client", supportedVersions));
+            } else if (loginPacket.getProtocolVersion() < GameProtocol.DEFAULT_BEDROCK_CODEC.getProtocolVersion()) {
                 session.disconnect(GeyserLocale.getLocaleStringLog("geyser.network.outdated.client", supportedVersions));
                 return true;
             }
@@ -91,6 +105,11 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
 
         LoginEncryptionUtils.encryptPlayerConnection(session, loginPacket);
 
+        if (session.isClosed()) {
+            // Can happen if Xbox validation fails
+            return true;
+        }
+
         PlayStatusPacket playStatus = new PlayStatusPacket();
         playStatus.setStatus(PlayStatusPacket.Status.LOGIN_SUCCESS);
         session.sendUpstreamPacket(playStatus);
@@ -102,12 +121,12 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
             ResourcePackManifest.Header header = resourcePack.getManifest().getHeader();
             resourcePacksInfo.getResourcePackInfos().add(new ResourcePacksInfoPacket.Entry(
                     header.getUuid().toString(), header.getVersionString(), resourcePack.getFile().length(),
-                            "", "", "", false, false));
+                            resourcePack.getContentKey(), "", header.getUuid().toString(), false, false));
         }
         resourcePacksInfo.setForcedToAccept(GeyserImpl.getInstance().getConfig().isForceResourcePacks());
         session.sendUpstreamPacket(resourcePacksInfo);
 
-        GeyserLocale.loadGeyserLocale(session.getLocale());
+        GeyserLocale.loadGeyserLocale(session.locale());
         return true;
     }
 
@@ -115,13 +134,13 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
     public boolean handle(ResourcePackClientResponsePacket packet) {
         switch (packet.getStatus()) {
             case COMPLETED:
-                if (geyser.getConfig().getRemote().getAuthType() != AuthType.ONLINE) {
-                    session.authenticate(session.getAuthData().getName());
-                } else if (!couldLoginUserByName(session.getAuthData().getName())) {
+                if (geyser.getConfig().getRemote().authType() != AuthType.ONLINE) {
+                    session.authenticate(session.getAuthData().name());
+                } else if (!couldLoginUserByName(session.getAuthData().name())) {
                     // We must spawn the white world
                     session.connect();
                 }
-                geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.connect", session.getAuthData().getName()));
+                geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.connect", session.getAuthData().name()));
                 break;
 
             case SEND_PACKS:
@@ -156,14 +175,9 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
                     stackPacket.getResourcePacks().add(new ResourcePackStackPacket.Entry(header.getUuid().toString(), header.getVersionString(), ""));
                 }
 
-                if (session.getItemMappings().getFurnaceMinecartData() != null) {
+                if (GeyserImpl.getInstance().getConfig().isAddNonBedrockItems()) {
                     // Allow custom items to work
                     stackPacket.getExperiments().add(new ExperimentData("data_driven_items", true));
-                }
-
-                if (session.getUpstream().getProtocolVersion() <= Bedrock_v471.V471_CODEC.getProtocolVersion()) {
-                    // Allow extended world height in the overworld to work for pre-1.18 clients
-                    stackPacket.getExperiments().add(new ExperimentData("caves_and_cliffs", true));
                 }
 
                 session.sendUpstreamPacket(stackPacket);
@@ -184,13 +198,27 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
     }
 
     private boolean couldLoginUserByName(String bedrockUsername) {
+        if (geyser.getConfig().getSavedUserLogins().contains(bedrockUsername)) {
+            String refreshToken = geyser.refreshTokenFor(bedrockUsername);
+            if (refreshToken != null) {
+                geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.auth.stored_credentials", session.getAuthData().name()));
+                session.authenticateWithRefreshToken(refreshToken);
+                return true;
+            }
+        }
         if (geyser.getConfig().getUserAuths() != null) {
             GeyserConfiguration.IUserAuthenticationInfo info = geyser.getConfig().getUserAuths().get(bedrockUsername);
 
             if (info != null) {
-                geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.auth.stored_credentials", session.getAuthData().getName()));
+                geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.auth.stored_credentials", session.getAuthData().name()));
                 session.setMicrosoftAccount(info.isMicrosoftAccount());
                 session.authenticate(info.getEmail(), info.getPassword());
+                return true;
+            }
+        }
+        PendingMicrosoftAuthentication.AuthenticationTask task = geyser.getPendingMicrosoftAuthentication().getTask(session.getAuthData().xuid());
+        if (task != null) {
+            if (task.getAuthentication().isDone() && session.onMicrosoftLoginComplete(task)) {
                 return true;
             }
         }
@@ -203,7 +231,7 @@ public class UpstreamPacketHandler extends LoggingPacketHandler {
         if (session.isLoggingIn()) {
             SetTitlePacket titlePacket = new SetTitlePacket();
             titlePacket.setType(SetTitlePacket.Type.ACTIONBAR);
-            titlePacket.setText(GeyserLocale.getPlayerLocaleString("geyser.auth.login.wait", session.getLocale()));
+            titlePacket.setText(GeyserLocale.getPlayerLocaleString("geyser.auth.login.wait", session.locale()));
             titlePacket.setFadeInTime(0);
             titlePacket.setFadeOutTime(1);
             titlePacket.setStayTime(2);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,27 +26,25 @@
 package org.geysermc.geyser.translator.protocol.java.entity;
 
 import com.github.steveice10.mc.protocol.data.game.entity.metadata.Equipment;
+import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
 import com.github.steveice10.mc.protocol.packet.ingame.clientbound.entity.ClientboundSetEquipmentPacket;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.nukkitx.protocol.bedrock.data.inventory.ItemData;
 import org.geysermc.geyser.entity.type.Entity;
 import org.geysermc.geyser.entity.type.LivingEntity;
+import org.geysermc.geyser.entity.type.player.PlayerEntity;
 import org.geysermc.geyser.session.GeyserSession;
+import org.geysermc.geyser.skin.FakeHeadProvider;
+import org.geysermc.geyser.translator.inventory.item.ItemTranslator;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
-import org.geysermc.geyser.translator.inventory.item.ItemTranslator;
 
 @Translator(packet = ClientboundSetEquipmentPacket.class)
 public class JavaSetEquipmentTranslator extends PacketTranslator<ClientboundSetEquipmentPacket> {
 
     @Override
     public void translate(GeyserSession session, ClientboundSetEquipmentPacket packet) {
-        Entity entity;
-        if (packet.getEntityId() == session.getPlayerEntity().getEntityId()) {
-            entity = session.getPlayerEntity();
-        } else {
-            entity = session.getEntityCache().getEntityByJavaId(packet.getEntityId());
-        }
-
+        Entity entity = session.getEntityCache().getEntityByJavaId(packet.getEntityId());
         if (entity == null)
             return;
 
@@ -63,6 +61,17 @@ public class JavaSetEquipmentTranslator extends PacketTranslator<ClientboundSetE
             ItemData item = ItemTranslator.translateToBedrock(session, equipment.getItem());
             switch (equipment.getSlot()) {
                 case HELMET -> {
+                    ItemStack javaItem = equipment.getItem();
+                    if (livingEntity instanceof PlayerEntity
+                            && javaItem != null
+                            && javaItem.getId() == session.getItemMappings().getStoredItems().playerHead().getJavaId()
+                            && javaItem.getNbt() != null
+                            && javaItem.getNbt().get("SkullOwner") instanceof CompoundTag profile) {
+                        FakeHeadProvider.setHead(session, (PlayerEntity) livingEntity, profile);
+                    } else {
+                        FakeHeadProvider.restoreOriginalSkin(session, livingEntity);
+                    }
+
                     livingEntity.setHelmet(item);
                     armorUpdated = true;
                 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,10 +30,10 @@ import com.nukkitx.math.vector.Vector3f;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.entity.type.player.PlayerEntity;
 import org.geysermc.geyser.session.GeyserSession;
+import org.geysermc.geyser.skin.SkinManager;
+import org.geysermc.geyser.text.GeyserLocale;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
-import org.geysermc.geyser.text.GeyserLocale;
-import org.geysermc.geyser.skin.SkinManager;
 
 @Translator(packet = ClientboundAddPlayerPacket.class)
 public class JavaAddPlayerTranslator extends PacketTranslator<ClientboundAddPlayerPacket> {
@@ -48,7 +48,9 @@ public class JavaAddPlayerTranslator extends PacketTranslator<ClientboundAddPlay
         PlayerEntity entity;
         if (packet.getUuid().equals(session.getPlayerEntity().getUuid())) {
             // Server is sending a fake version of the current player
-            entity = new PlayerEntity(session, packet.getEntityId(), session.getEntityCache().getNextEntityId().incrementAndGet(), session.getPlayerEntity().getProfile(), position, Vector3f.ZERO, yaw, pitch, headYaw);
+            entity = new PlayerEntity(session, packet.getEntityId(), session.getEntityCache().getNextEntityId().incrementAndGet(),
+                    session.getPlayerEntity().getUuid(), position, Vector3f.ZERO, yaw, pitch, headYaw, session.getPlayerEntity().getUsername(),
+                    session.getPlayerEntity().getTexturesProperty());
         } else {
             entity = session.getEntityCache().getPlayerEntity(packet.getUuid());
             if (entity == null) {

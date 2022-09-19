@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ package org.geysermc.geyser.session;
 import com.google.common.collect.ImmutableList;
 import lombok.AccessLevel;
 import lombok.Getter;
-import org.geysermc.geyser.session.GeyserSession;
+import lombok.NonNull;
 import org.geysermc.geyser.text.GeyserLocale;
 
 import java.util.*;
@@ -62,16 +62,27 @@ public final class SessionManager {
     }
 
     public void removeSession(GeyserSession session) {
-        if (sessions.remove(session.getPlayerEntity().getUuid()) == null) {
-            // Session was likely pending
+        UUID uuid = session.getPlayerEntity().getUuid();
+        if (uuid == null || sessions.remove(uuid) == null) {
+            // Connection was likely pending
             pendingSessions.remove(session);
         }
+    }
+
+    public GeyserSession sessionByXuid(@NonNull String xuid) {
+        Objects.requireNonNull(xuid);
+        for (GeyserSession session : sessions.values()) {
+            if (session.xuid().equals(xuid)) {
+                return session;
+            }
+        }
+        return null;
     }
 
     /**
      * Creates a new, immutable list containing all pending and active sessions.
      */
-    public Collection<GeyserSession> getAllSessions() {
+    public List<GeyserSession> getAllSessions() {
         return ImmutableList.<GeyserSession>builder() // builderWithExpectedSize is probably not a good idea yet as older Spigot builds probably won't have it.
                 .addAll(pendingSessions)
                 .addAll(sessions.values())
@@ -81,7 +92,7 @@ public final class SessionManager {
     public void disconnectAll(String message) {
         Collection<GeyserSession> sessions = getAllSessions();
         for (GeyserSession session : sessions) {
-            session.disconnect(GeyserLocale.getPlayerLocaleString(message, session.getLocale()));
+            session.disconnect(GeyserLocale.getPlayerLocaleString(message, session.locale()));
         }
     }
 

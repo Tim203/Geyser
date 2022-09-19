@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,12 +30,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.Getter;
-import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.api.logger.GeyserLogger;
-import org.geysermc.geyser.session.GeyserSession;
-import org.geysermc.geyser.Constants;
-import org.geysermc.geyser.util.PluginMessageUtils;
+import org.geysermc.floodgate.pluginmessage.PluginMessageChannels;
 import org.geysermc.floodgate.util.WebsocketEventType;
+import org.geysermc.geyser.Constants;
+import org.geysermc.geyser.GeyserImpl;
+import org.geysermc.geyser.GeyserLogger;
+import org.geysermc.geyser.session.GeyserSession;
+import org.geysermc.geyser.util.PluginMessageUtils;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -47,8 +48,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
-import static org.geysermc.geyser.util.PluginMessageUtils.getSkinChannel;
 
 public final class FloodgateSkinUploader {
     private final ObjectMapper JACKSON = new ObjectMapper();
@@ -87,7 +86,7 @@ public final class FloodgateSkinUploader {
                     }
 
                     int typeId = node.get("event_id").asInt();
-                    WebsocketEventType type = WebsocketEventType.getById(typeId);
+                    WebsocketEventType type = WebsocketEventType.fromId(typeId);
                     if (type == null) {
                         logger.warning(String.format(
                                 "Got (unknown) type %s. Ensure that Geyser is on the latest version and report this issue!",
@@ -111,11 +110,11 @@ public final class FloodgateSkinUploader {
                             }
 
                             String xuid = node.get("xuid").asText();
-                            GeyserSession session = geyser.getPlayerByXuid(xuid);
+                            GeyserSession session = geyser.connectionByXuid(xuid);
 
                             if (session != null) {
                                 if (!node.get("success").asBoolean()) {
-                                    logger.info("Failed to upload skin for " + session.getName());
+                                    logger.info("Failed to upload skin for " + session.bedrockUsername());
                                     return;
                                 }
 
@@ -126,7 +125,7 @@ public final class FloodgateSkinUploader {
 
                                 byte[] bytes = (value + '\0' + signature)
                                         .getBytes(StandardCharsets.UTF_8);
-                                PluginMessageUtils.sendMessage(session, getSkinChannel(), bytes);
+                                PluginMessageUtils.sendMessage(session, PluginMessageChannels.SKIN, bytes);
                             }
                             break;
                         case LOG_MESSAGE:

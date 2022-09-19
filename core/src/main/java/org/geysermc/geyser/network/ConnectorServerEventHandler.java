@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,18 +28,19 @@ package org.geysermc.geyser.network;
 import com.nukkitx.protocol.bedrock.BedrockPong;
 import com.nukkitx.protocol.bedrock.BedrockServerEventHandler;
 import com.nukkitx.protocol.bedrock.BedrockServerSession;
+import com.nukkitx.protocol.bedrock.v553.Bedrock_v553;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.DefaultEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.ping.GeyserPingInfo;
 import org.geysermc.geyser.configuration.GeyserConfiguration;
-import org.geysermc.geyser.session.GeyserSession;
-import org.geysermc.geyser.translator.text.MessageTranslator;
+import org.geysermc.geyser.ping.GeyserPingInfo;
 import org.geysermc.geyser.ping.IGeyserPingPassthrough;
+import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.text.GeyserLocale;
+import org.geysermc.geyser.translator.text.MessageTranslator;
 
 import javax.annotation.Nonnull;
 import java.net.InetSocketAddress;
@@ -47,10 +48,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class ConnectorServerEventHandler implements BedrockServerEventHandler {
+    private static final boolean PRINT_DEBUG_PINGS = Boolean.parseBoolean(System.getProperty("Geyser.PrintPingsInDebugMode", "true"));
+
     /*
     The following constants are all used to ensure the ping does not reach a length where it is unparsable by the Bedrock client
      */
-    private static final int MINECRAFT_VERSION_BYTES_LENGTH = MinecraftProtocol.DEFAULT_BEDROCK_CODEC.getMinecraftVersion().getBytes(StandardCharsets.UTF_8).length;
+    private static final int MINECRAFT_VERSION_BYTES_LENGTH = GameProtocol.DEFAULT_BEDROCK_CODEC.getMinecraftVersion().getBytes(StandardCharsets.UTF_8).length;
     private static final int BRAND_BYTES_LENGTH = GeyserImpl.NAME.getBytes(StandardCharsets.UTF_8).length;
     /**
      * The MOTD, sub-MOTD and Minecraft version ({@link #MINECRAFT_VERSION_BYTES_LENGTH}) combined cannot reach this length.
@@ -82,14 +85,16 @@ public class ConnectorServerEventHandler implements BedrockServerEventHandler {
             }
         }
 
-        geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.attempt_connect", inetSocketAddress));
+        String ip = geyser.getConfig().isLogPlayerIpAddresses() ? inetSocketAddress.toString() : "<IP address withheld>";
+        geyser.getLogger().info(GeyserLocale.getLocaleStringLog("geyser.network.attempt_connect", ip));
         return true;
     }
 
     @Override
     public BedrockPong onQuery(InetSocketAddress inetSocketAddress) {
-        if (geyser.getConfig().isDebugMode()) {
-            geyser.getLogger().debug(GeyserLocale.getLocaleStringLog("geyser.network.pinged", inetSocketAddress));
+        if (geyser.getConfig().isDebugMode() && PRINT_DEBUG_PINGS) {
+            String ip = geyser.getConfig().isLogPlayerIpAddresses() ? inetSocketAddress.toString() : "<IP address withheld>";
+            geyser.getLogger().debug(GeyserLocale.getLocaleStringLog("geyser.network.pinged", ip));
         }
 
         GeyserConfiguration config = geyser.getConfig();
@@ -104,9 +109,9 @@ public class ConnectorServerEventHandler implements BedrockServerEventHandler {
         pong.setEdition("MCPE");
         pong.setGameType("Survival"); // Can only be Survival or Creative as of 1.16.210.59
         pong.setNintendoLimited(false);
-        pong.setProtocolVersion(MinecraftProtocol.DEFAULT_BEDROCK_CODEC.getProtocolVersion());
-        pong.setVersion(MinecraftProtocol.DEFAULT_BEDROCK_CODEC.getMinecraftVersion()); // Required to not be empty as of 1.16.210.59. Can only contain . and numbers.
-        pong.setIpv4Port(config.getBedrock().getPort());
+        pong.setProtocolVersion(GameProtocol.DEFAULT_BEDROCK_CODEC.getProtocolVersion());
+        pong.setVersion(GameProtocol.DEFAULT_BEDROCK_CODEC.getMinecraftVersion()); // Required to not be empty as of 1.16.210.59. Can only contain . and numbers.
+        pong.setIpv4Port(config.getBedrock().port());
 
         if (config.isPassthroughMotd() && pingInfo != null && pingInfo.getDescription() != null) {
             String[] motd = MessageTranslator.convertMessageLenient(pingInfo.getDescription()).split("\n");
@@ -116,8 +121,8 @@ public class ConnectorServerEventHandler implements BedrockServerEventHandler {
             pong.setMotd(mainMotd.trim());
             pong.setSubMotd(subMotd.trim()); // Trimmed to shift it to the left, prevents the universe from collapsing on us just because we went 2 characters over the text box's limit.
         } else {
-            pong.setMotd(config.getBedrock().getMotd1());
-            pong.setSubMotd(config.getBedrock().getMotd2());
+            pong.setMotd(config.getBedrock().primaryMotd());
+            pong.setSubMotd(config.getBedrock().secondaryMotd());
         }
 
         if (config.isPassthroughPlayerCounts() && pingInfo != null) {
@@ -165,19 +170,32 @@ public class ConnectorServerEventHandler implements BedrockServerEventHandler {
     }
 
     @Override
-    public void onSessionCreation(BedrockServerSession bedrockServerSession) {
-        bedrockServerSession.setLogging(true);
-        bedrockServerSession.setCompressionLevel(geyser.getConfig().getBedrock().getCompressionLevel());
-        bedrockServerSession.setPacketHandler(new UpstreamPacketHandler(geyser, new GeyserSession(geyser, bedrockServerSession, eventLoopGroup.next())));
-        // Set the packet codec to default just in case we need to send disconnect packets.
-        bedrockServerSession.setPacketCodec(MinecraftProtocol.DEFAULT_BEDROCK_CODEC);
+    public void onSessionCreation(@Nonnull BedrockServerSession bedrockServerSession) {
+        try {
+            bedrockServerSession.setPacketCodec(Bedrock_v553.V553_CODEC); // Has the RequestNetworkSettingsPacket
+            bedrockServerSession.setLogging(true);
+            bedrockServerSession.setCompressionLevel(geyser.getConfig().getBedrock().getCompressionLevel());
+            bedrockServerSession.setPacketHandler(new UpstreamPacketHandler(geyser, new GeyserSession(geyser, bedrockServerSession, eventLoopGroup.next())));
+            // Set the packet codec to default just in case we need to send disconnect packets.
+        } catch (Throwable e) {
+            // Error must be caught or it will be swallowed
+            geyser.getLogger().error("Error occurred while initializing player!", e);
+            bedrockServerSession.disconnect(e.getMessage());
+        }
     }
 
     @Override
-    public void onUnhandledDatagram(@Nonnull ChannelHandlerContext ctx, DatagramPacket packet) {
-        ByteBuf content = packet.content();
-        if (QueryPacketHandler.isQueryPacket(content)) {
-            new QueryPacketHandler(geyser, packet.sender(), content);
+    public void onUnhandledDatagram(@Nonnull ChannelHandlerContext ctx, @Nonnull DatagramPacket packet) {
+        try {
+            ByteBuf content = packet.content();
+            if (QueryPacketHandler.isQueryPacket(content)) {
+                new QueryPacketHandler(geyser, packet.sender(), content);
+            }
+        } catch (Throwable e) {
+            // Error must be caught or it will be swallowed
+            if (geyser.getConfig().isDebugMode()) {
+                geyser.getLogger().error("Error occurred during unhandled datagram!", e);
+            }
         }
     }
 }

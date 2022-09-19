@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -38,6 +38,6 @@ public class JavaContainerCloseTranslator extends PacketTranslator<ClientboundCo
     public void translate(GeyserSession session, ClientboundContainerClosePacket packet) {
         // Sometimes the server can request a window close of ID 0... when the window isn't even open
         // Don't confirm in this instance
-        InventoryUtils.closeInventory(session, packet.getContainerId(), (session.getOpenInventory() != null && session.getOpenInventory().getId() == packet.getContainerId()));
+        InventoryUtils.closeInventory(session, packet.getContainerId(), (session.getOpenInventory() != null && session.getOpenInventory().getJavaId() == packet.getContainerId()));
     }
 }

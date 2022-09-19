@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,8 @@ package org.geysermc.geyser.platform.spigot;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
-import org.geysermc.geyser.text.AsteriskSerializer;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
+import org.geysermc.geyser.text.AsteriskSerializer;
 
 import java.util.ArrayList;
 import java.util.List;

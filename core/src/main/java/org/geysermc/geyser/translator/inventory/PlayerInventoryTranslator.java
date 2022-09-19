@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,22 +29,21 @@ import com.github.steveice10.mc.protocol.data.game.entity.metadata.ItemStack;
 import com.github.steveice10.mc.protocol.data.game.entity.player.GameMode;
 import com.github.steveice10.mc.protocol.data.game.inventory.ContainerType;
 import com.github.steveice10.mc.protocol.packet.ingame.serverbound.inventory.ServerboundSetCreativeModeSlotPacket;
+import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.nukkitx.protocol.bedrock.data.inventory.*;
 import com.nukkitx.protocol.bedrock.data.inventory.stackrequestactions.*;
 import com.nukkitx.protocol.bedrock.packet.InventoryContentPacket;
 import com.nukkitx.protocol.bedrock.packet.InventorySlotPacket;
 import com.nukkitx.protocol.bedrock.packet.ItemStackResponsePacket;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import org.geysermc.geyser.inventory.GeyserItemStack;
-import org.geysermc.geyser.inventory.Inventory;
-import org.geysermc.geyser.inventory.PlayerInventory;
+import org.geysermc.geyser.inventory.*;
 import org.geysermc.geyser.session.GeyserSession;
-import org.geysermc.geyser.inventory.BedrockContainerSlot;
-import org.geysermc.geyser.inventory.SlotType;
+import org.geysermc.geyser.skin.FakeHeadProvider;
+import org.geysermc.geyser.text.GeyserLocale;
 import org.geysermc.geyser.translator.inventory.item.ItemTranslator;
 import org.geysermc.geyser.util.InventoryUtils;
-import org.geysermc.geyser.text.GeyserLocale;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -55,6 +54,11 @@ public class PlayerInventoryTranslator extends InventoryTranslator {
 
     public PlayerInventoryTranslator() {
         super(46);
+    }
+
+    @Override
+    public int getGridSize() {
+        return 4;
     }
 
     @Override
@@ -94,7 +98,7 @@ public class PlayerInventoryTranslator extends InventoryTranslator {
 
     /**
      * Update the crafting grid for the player to hide/show the barriers in the creative inventory
-     * @param session Session of the player
+     * @param session Connection of the player
      * @param inventory Inventory of the player
      */
     public static void updateCraftingGrid(GeyserSession session, Inventory inventory) {
@@ -116,6 +120,20 @@ public class PlayerInventoryTranslator extends InventoryTranslator {
 
     @Override
     public void updateSlot(GeyserSession session, Inventory inventory, int slot) {
+        GeyserItemStack javaItem = inventory.getItem(slot);
+        ItemData bedrockItem = javaItem.getItemData(session);
+
+        if (slot == 5) {
+            // Check for custom skull
+            if (javaItem.getJavaId() == session.getItemMappings().getStoredItems().playerHead().getJavaId()
+                    && javaItem.getNbt() != null
+                    && javaItem.getNbt().get("SkullOwner") instanceof CompoundTag profile) {
+                FakeHeadProvider.setHead(session, session.getPlayerEntity(), profile);
+            } else {
+                FakeHeadProvider.restoreOriginalSkin(session, session.getPlayerEntity());
+            }
+        }
+
         if (slot >= 1 && slot <= 44) {
             InventorySlotPacket slotPacket = new InventorySlotPacket();
             if (slot >= 9) {
@@ -132,12 +150,12 @@ public class PlayerInventoryTranslator extends InventoryTranslator {
                 slotPacket.setContainerId(ContainerId.UI);
                 slotPacket.setSlot(slot + 27);
             }
-            slotPacket.setItem(inventory.getItem(slot).getItemData(session));
+            slotPacket.setItem(bedrockItem);
             session.sendUpstreamPacket(slotPacket);
         } else if (slot == 45) {
             InventoryContentPacket offhandPacket = new InventoryContentPacket();
             offhandPacket.setContainerId(ContainerId.OFFHAND);
-            offhandPacket.setContents(Collections.singletonList(inventory.getItem(slot).getItemData(session)));
+            offhandPacket.setContents(Collections.singletonList(bedrockItem));
             session.sendUpstreamPacket(offhandPacket);
         }
     }
@@ -353,19 +371,22 @@ public class PlayerInventoryTranslator extends InventoryTranslator {
                     }
                 }
                 default -> {
-                    session.getGeyser().getLogger().error("Unknown crafting state induced by " + session.getName());
+                    session.getGeyser().getLogger().error("Unknown crafting state induced by " + session.bedrockUsername());
                     return rejectRequest(request);
                 }
             }
         }
-        for (int slot : affectedSlots) {
+        // Manually call iterator to prevent Integer boxing
+        IntIterator it = affectedSlots.iterator();
+        while (it.hasNext()) {
+            int slot = it.nextInt();
             sendCreativeAction(session, inventory, slot);
         }
         return acceptRequest(request, makeContainerEntries(session, inventory, affectedSlots));
     }
 
     @Override
-    public ItemStackResponsePacket.Response translateCreativeRequest(GeyserSession session, Inventory inventory, ItemStackRequest request) {
+    protected ItemStackResponsePacket.Response translateCreativeRequest(GeyserSession session, Inventory inventory, ItemStackRequest request) {
         ItemStack javaCreativeItem = null;
         IntSet affectedSlots = new IntOpenHashSet();
         CraftState craftState = CraftState.START;
@@ -389,7 +410,6 @@ public class PlayerInventoryTranslator extends InventoryTranslator {
                     break;
                 }
                 case CRAFT_RESULTS_DEPRECATED: {
-                    CraftResultsDeprecatedStackRequestActionData deprecatedCraftAction = (CraftResultsDeprecatedStackRequestActionData) action;
                     if (craftState != CraftState.RECIPE_ID) {
                         return rejectRequest(request);
                     }
@@ -441,11 +461,36 @@ public class PlayerInventoryTranslator extends InventoryTranslator {
                     }
                     break;
                 }
+                case DROP: {
+                    // Can be replicated as of 1.18.2 Bedrock on mobile by clicking from the creative menu to outside it
+                    if (craftState != CraftState.DEPRECATED) {
+                        return rejectRequest(request);
+                    }
+
+                    DropStackRequestActionData dropAction = (DropStackRequestActionData) action;
+                    if (dropAction.getSource().getContainer() != ContainerSlotType.CREATIVE_OUTPUT || dropAction.getSource().getSlot() != 50) {
+                        return rejectRequest(request);
+                    }
+
+                    ItemStack dropStack;
+                    if (dropAction.getCount() == javaCreativeItem.getAmount()) {
+                        dropStack = javaCreativeItem;
+                    } else {
+                        // Specify custom count
+                        dropStack = new ItemStack(javaCreativeItem.getId(), dropAction.getCount(), javaCreativeItem.getNbt());
+                    }
+                    ServerboundSetCreativeModeSlotPacket creativeDropPacket = new ServerboundSetCreativeModeSlotPacket(-1, dropStack);
+                    session.sendDownstreamPacket(creativeDropPacket);
+                    break;
+                }
                 default:
                     return rejectRequest(request);
             }
         }
-        for (int slot : affectedSlots) {
+        // Manually call iterator to prevent Integer boxing
+        IntIterator it = affectedSlots.iterator();
+        while (it.hasNext()) {
+            int slot = it.nextInt();
             sendCreativeAction(session, inventory, slot);
         }
         return acceptRequest(request, makeContainerEntries(session, inventory, affectedSlots));

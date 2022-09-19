@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,13 @@
 
 package org.geysermc.geyser.text;
 
+import org.geysermc.geyser.GeyserBootstrap;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.util.FileUtils;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Locale;
@@ -40,17 +41,59 @@ import java.util.Properties;
 public class GeyserLocale {
 
     /**
-     * If we determine the locale that the user wishes to use, use that locale
+     * If we determine the default locale that the user wishes to use, use that locale
      */
-    private static String CACHED_LOCALE;
+    private static String DEFAULT_LOCALE;
+    /**
+     * Whether the system locale cannot be loaded by Geyser.
+     */
+    private static boolean SYSTEM_LOCALE_INVALID;
 
     private static final Map<String, Properties> LOCALE_MAPPINGS = new HashMap<>();
 
-    static {
-        // Load it as a backup in case something goes really wrong
-        if (!"en_US".equals(formatLocale(getDefaultLocale()))) { // getDefaultLocale() loads the locale automatically
-            loadGeyserLocale("en_US");
+    /**
+     * Loads the initial locale(s) with the help of the bootstrap.
+     */
+    public static void init(GeyserBootstrap bootstrap) {
+        String defaultLocale = formatLocale(Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry());
+        String loadedLocale = loadGeyserLocale(defaultLocale, bootstrap);
+        if (loadedLocale != null) {
+            DEFAULT_LOCALE = loadedLocale;
+            // Load English as a backup in case something goes really wrong
+            if (!"en_US".equals(loadedLocale)) {
+                loadGeyserLocale("en_US", bootstrap);
+            }
+            SYSTEM_LOCALE_INVALID = false;
+        } else {
+            DEFAULT_LOCALE = loadGeyserLocale("en_US", bootstrap);
+            if (DEFAULT_LOCALE == null) {
+                // en_US can't be loaded?
+                throw new IllegalStateException("English locale not found in Geyser. Did you clone the submodules? (git submodule update --init)");
+            }
+            SYSTEM_LOCALE_INVALID = true;
         }
+    }
+
+    /**
+     * Finalize the default locale, now that we know what the default locale should be.
+     */
+    public static void finalizeDefaultLocale(GeyserImpl geyser) {
+        String newDefaultLocale = geyser.getConfig().getDefaultLocale();
+        if (newDefaultLocale == null) {
+            // We want to use the system locale which is already loaded
+            return;
+        }
+        String loadedNewLocale = loadGeyserLocale(newDefaultLocale, geyser.getBootstrap());
+        if (loadedNewLocale != null) {
+            // The config's locale is valid
+            DEFAULT_LOCALE = loadedNewLocale;
+        } else if (SYSTEM_LOCALE_INVALID) {
+            geyser.getLogger().warning(Locale.getDefault().toString() + " is not a valid Bedrock language.");
+        }
+    }
+
+    public static String getDefaultLocale() {
+        return DEFAULT_LOCALE;
     }
 
     /**
@@ -59,30 +102,75 @@ public class GeyserLocale {
      * @param locale Locale to load
      */
     public static void loadGeyserLocale(String locale) {
+        GeyserImpl geyser = GeyserImpl.getInstance();
+        if (geyser == null) {
+            throw new IllegalStateException("Geyser instance cannot be null when loading a locale!");
+        }
+        loadGeyserLocale(locale, geyser.getBootstrap());
+    }
+
+    private static String loadGeyserLocale(String locale, GeyserBootstrap bootstrap) {
         locale = formatLocale(locale);
         // Don't load the locale if it's already loaded.
         if (LOCALE_MAPPINGS.containsKey(locale)) {
-            return;
+            return locale;
         }
 
-        InputStream localeStream = GeyserImpl.class.getClassLoader().getResourceAsStream("languages/texts/" + locale + ".properties");
+        Properties localeProp = new Properties();
+
+        File localLanguage;
+        Path localFolder = bootstrap.getConfigFolder().resolve("languages");
+        if (Files.exists(localFolder)) {
+            localLanguage = localFolder.resolve(locale + ".properties").toFile();
+        } else {
+            localLanguage = null;
+        }
+        boolean validLocalLanguage = localLanguage != null && localLanguage.exists();
+
+        InputStream localeStream = bootstrap.getResourceOrNull("languages/texts/" + locale + ".properties");
 
         // Load the locale
         if (localeStream != null) {
-            Properties localeProp = new Properties();
-            try (InputStreamReader reader = new InputStreamReader(localeStream, StandardCharsets.UTF_8)) {
-                localeProp.load(reader);
-            } catch (Exception e) {
-                throw new AssertionError(getLocaleStringLog("geyser.language.load_failed", locale), e);
-            }
+            try {
+                try (InputStreamReader reader = new InputStreamReader(localeStream, StandardCharsets.UTF_8)) {
+                    localeProp.load(reader);
+                } catch (Exception e) {
+                    throw new AssertionError(getLocaleStringLog("geyser.language.load_failed", locale), e);
+                }
 
-            // Insert the locale into the mappings
-            LOCALE_MAPPINGS.put(locale, localeProp);
+                // Insert the locale into the mappings
+                LOCALE_MAPPINGS.put(locale, localeProp);
+            } finally {
+                try {
+                    localeStream.close();
+                } catch (IOException ignored) {}
+            }
         } else {
-            if (GeyserImpl.getInstance() != null && GeyserImpl.getInstance().getLogger() != null) {
+            if (GeyserImpl.getInstance() != null && !validLocalLanguage) {
+                // Don't warn on missing locales if a local file has been found
                 GeyserImpl.getInstance().getLogger().warning("Missing locale: " + locale);
             }
         }
+
+        // Load any language overrides that exist after, to override any strings that we just added
+        // By loading both, we ensure that if a language string doesn't exist in the custom properties folder,
+        // it's loaded from our jar
+        if (validLocalLanguage) {
+            try (InputStream stream = new FileInputStream(localLanguage)) {
+                localeProp.load(stream);
+            } catch (IOException e) {
+                String message = "Unable to load custom language override!";
+                if (GeyserImpl.getInstance() != null) {
+                    GeyserImpl.getInstance().getLogger().error(message, e);
+                } else {
+                    System.err.println(message);
+                    e.printStackTrace();
+                }
+            }
+
+            LOCALE_MAPPINGS.putIfAbsent(locale, localeProp);
+        }
+        return localeProp.isEmpty() ? null : locale;
     }
 
     /**
@@ -156,67 +244,5 @@ public class GeyserLocale {
         String language = locale.substring(0, 2);
         String country = locale.substring(3);
         return language.toLowerCase(Locale.ENGLISH) + "_" + country.toUpperCase(Locale.ENGLISH);
-    }
-
-    /**
-     * Get the default locale that Geyser should use
-     * @return the current default locale
-     */
-    public static String getDefaultLocale() {
-        if (CACHED_LOCALE != null) {
-            return CACHED_LOCALE; // We definitely know the locale the user is using
-        }
-
-        String locale;
-        boolean isValid = true;
-        if (GeyserImpl.getInstance() != null &&
-                GeyserImpl.getInstance().getConfig() != null &&
-                GeyserImpl.getInstance().getConfig().getDefaultLocale() != null) { // If the config option for getDefaultLocale does not equal null, use that
-            locale = formatLocale(GeyserImpl.getInstance().getConfig().getDefaultLocale());
-            if (isValidLanguage(locale)) {
-                CACHED_LOCALE = locale;
-                return locale;
-            } else {
-                isValid = false;
-            }
-        }
-        locale = formatLocale(Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry());
-        if (!isValidLanguage(locale)) { // Bedrock does not support this language
-            locale = "en_US";
-            loadGeyserLocale(locale);
-        }
-        if (GeyserImpl.getInstance() != null &&
-                GeyserImpl.getInstance().getConfig() != null && (GeyserImpl.getInstance().getConfig().getDefaultLocale() == null || !isValid)) { // Means we should use the system locale for sure
-            CACHED_LOCALE = locale;
-        }
-        return locale;
-    }
-
-    /**
-     * Ensures that the given locale is supported by Bedrock
-     * @param locale the locale to validate
-     * @return true if the given locale is supported by Bedrock and by extension Geyser
-     */
-    private static boolean isValidLanguage(String locale) {
-        boolean result = true;
-        if (FileUtils.class.getResource("/languages/texts/" + locale + ".properties") == null) {
-            result = false;
-            if (GeyserImpl.getInstance() != null && GeyserImpl.getInstance().getLogger() != null) { // Could be too early for these to be initialized
-                if (locale.equals("en_US")) {
-                    GeyserImpl.getInstance().getLogger().error("English locale not found in Geyser. Did you clone the submodules? (git submodule update --init)");
-                } else {
-                    GeyserImpl.getInstance().getLogger().warning(locale + " is not a valid Bedrock language."); // We can't translate this since we just loaded an invalid language
-                }
-            }
-        } else {
-            if (!LOCALE_MAPPINGS.containsKey(locale)) {
-                loadGeyserLocale(locale);
-            }
-        }
-        return result;
-    }
-
-    public static void init() {
-        // no-op
     }
 }

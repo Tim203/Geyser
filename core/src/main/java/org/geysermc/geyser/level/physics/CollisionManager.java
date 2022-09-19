@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@
 
 package org.geysermc.geyser.level.physics;
 
+import com.nukkitx.math.GenericMath;
 import com.nukkitx.math.vector.Vector3d;
 import com.nukkitx.math.vector.Vector3f;
 import com.nukkitx.math.vector.Vector3i;
@@ -32,15 +33,15 @@ import com.nukkitx.protocol.bedrock.data.entity.EntityFlag;
 import com.nukkitx.protocol.bedrock.packet.MovePlayerPacket;
 import lombok.Getter;
 import lombok.Setter;
-import org.geysermc.geyser.entity.type.Entity;
 import org.geysermc.geyser.entity.EntityDefinitions;
+import org.geysermc.geyser.entity.type.Entity;
 import org.geysermc.geyser.entity.type.player.PlayerEntity;
+import org.geysermc.geyser.level.block.BlockPositionIterator;
+import org.geysermc.geyser.level.block.BlockStateValues;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.session.cache.PistonCache;
 import org.geysermc.geyser.translator.collision.BlockCollision;
 import org.geysermc.geyser.translator.collision.ScaffoldingCollision;
-import org.geysermc.geyser.level.block.BlockStateValues;
-import org.geysermc.geyser.level.block.BlockPositionIterator;
 import org.geysermc.geyser.util.BlockUtils;
 
 import java.text.DecimalFormat;
@@ -362,7 +363,22 @@ public class CollisionManager {
      * @return true if the block located at the player's floor position plus 1 would intersect with the player,
      * were they not sneaking
      */
-    public boolean isUnderSlab() {
+    public boolean mustPlayerSneakHere() {
+        return checkPose(EntityDefinitions.PLAYER.height());
+    }
+
+    /**
+     * @return true if the block located at the player's floor position plus 1 would intersect with the player,
+     * were they not crawling
+     */
+    public boolean mustPlayerCrawlHere() {
+        return checkPose(PlayerEntity.SNEAKING_POSE_HEIGHT);
+    }
+
+    /**
+     * @param height check and see if this height is invalid in the current player position
+     */
+    private boolean checkPose(float height) {
         Vector3i position = session.getPlayerEntity().getPosition().toInt();
         BlockCollision collision = BlockUtils.getCollisionAt(session, position);
         if (collision != null) {
@@ -370,7 +386,7 @@ public class CollisionManager {
             // at the current location.
             double originalY = playerBoundingBox.getMiddleY();
             double originalHeight = playerBoundingBox.getSizeY();
-            double standingY = originalY - (originalHeight / 2.0) + (EntityDefinitions.PLAYER.height() / 2.0);
+            double standingY = originalY - (originalHeight / 2.0) + (height / 2.0);
 
             playerBoundingBox.setSizeY(EntityDefinitions.PLAYER.height());
             playerBoundingBox.setMiddleY(standingY);
@@ -388,6 +404,18 @@ public class CollisionManager {
      */
     public boolean isPlayerInWater() {
         return session.getGeyser().getWorldManager().getBlockAt(session, session.getPlayerEntity().getPosition().toInt()) == BlockStateValues.JAVA_WATER_ID;
+    }
+
+    public boolean isWaterInEyes() {
+        double eyeX = playerBoundingBox.getMiddleX();
+        double eyeY = playerBoundingBox.getMiddleY() - playerBoundingBox.getSizeY() / 2d + session.getEyeHeight();
+        double eyeZ = playerBoundingBox.getMiddleZ();
+
+        eyeY -= 1 / ((double) BlockStateValues.NUM_WATER_LEVELS); // Subtract the height of one water layer
+        int blockID = session.getGeyser().getWorldManager().getBlockAt(session, GenericMath.floor(eyeX), GenericMath.floor(eyeY), GenericMath.floor(eyeZ));
+        double waterHeight = BlockStateValues.getWaterHeight(blockID);
+
+        return waterHeight != -1 && eyeY < (Math.floor(eyeY) + waterHeight);
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,25 +29,30 @@ import com.fasterxml.jackson.databind.JsonNode;
 import it.unimi.dsi.fastutil.ints.*;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import org.geysermc.geyser.translator.level.block.entity.PistonBlockEntityTranslator;
-import org.geysermc.geyser.registry.BlockRegistries;
-import org.geysermc.geyser.registry.type.BlockMapping;
 import org.geysermc.geyser.level.physics.Direction;
 import org.geysermc.geyser.level.physics.PistonBehavior;
+import org.geysermc.geyser.registry.BlockRegistries;
+import org.geysermc.geyser.registry.type.BlockMapping;
+import org.geysermc.geyser.translator.level.block.entity.PistonBlockEntityTranslator;
 import org.geysermc.geyser.util.collection.FixedInt2ByteMap;
 import org.geysermc.geyser.util.collection.FixedInt2IntMap;
 import org.geysermc.geyser.util.collection.LecternHasBookMap;
+
+import java.util.Locale;
 
 /**
  * Used for block entities if the Java block state contains Bedrock block information.
  */
 public final class BlockStateValues {
+    private static final IntSet ALL_CAULDRONS = new IntOpenHashSet();
     private static final Int2IntMap BANNER_COLORS = new FixedInt2IntMap();
     private static final Int2ByteMap BED_COLORS = new FixedInt2ByteMap();
     private static final Int2ByteMap COMMAND_BLOCK_VALUES = new Int2ByteOpenHashMap();
     private static final Int2ObjectMap<DoubleChestValue> DOUBLE_CHEST_VALUES = new Int2ObjectOpenHashMap<>();
     private static final Int2ObjectMap<String> FLOWER_POT_VALUES = new Int2ObjectOpenHashMap<>();
+    private static final IntSet HORIZONTAL_FACING_JIGSAWS = new IntOpenHashSet();
     private static final LecternHasBookMap LECTERN_BOOK_STATES = new LecternHasBookMap();
+    private static final IntSet NON_WATER_CAULDRONS = new IntOpenHashSet();
     private static final Int2IntMap NOTEBLOCK_PITCHES = new FixedInt2IntMap();
     private static final Int2BooleanMap PISTON_VALUES = new Int2BooleanOpenHashMap();
     private static final IntSet STICKY_PISTONS = new IntOpenHashSet();
@@ -71,6 +76,8 @@ public final class BlockStateValues {
     public static int JAVA_SLIME_BLOCK_ID;
     public static int JAVA_SPAWNER_ID;
     public static int JAVA_WATER_ID;
+
+    public static final int NUM_WATER_LEVELS = 9;
 
     /**
      * Determines if the block state contains Bedrock block information
@@ -170,12 +177,30 @@ public final class BlockStateValues {
         JsonNode shulkerDirection = blockData.get("shulker_direction");
         if (shulkerDirection != null) {
             BlockStateValues.SHULKERBOX_DIRECTIONS.put(javaBlockState, (byte) shulkerDirection.intValue());
+            return;
         }
 
-        if (javaId.startsWith("minecraft:water")) {
+        if (javaId.startsWith("minecraft:water") && !javaId.contains("cauldron")) {
             String strLevel = javaId.substring(javaId.lastIndexOf("level=") + 6, javaId.length() - 1);
             int level = Integer.parseInt(strLevel);
             WATER_LEVEL.put(javaBlockState, level);
+            return;
+        }
+
+        if (javaId.startsWith("minecraft:jigsaw[orientation=")) {
+            String blockStateData = javaId.substring(javaId.indexOf("orientation=") + "orientation=".length(), javaId.lastIndexOf('_'));
+            Direction direction = Direction.valueOf(blockStateData.toUpperCase(Locale.ROOT));
+            if (direction.isHorizontal()) {
+                HORIZONTAL_FACING_JIGSAWS.add(javaBlockState);
+            }
+            return;
+        }
+
+        if (javaId.contains("cauldron")) {
+            ALL_CAULDRONS.add(javaBlockState);
+        }
+        if (javaId.contains("_cauldron") && !javaId.contains("water_")) {
+             NON_WATER_CAULDRONS.add(javaBlockState);
         }
     }
 
@@ -199,6 +224,24 @@ public final class BlockStateValues {
      */
     public static byte getBedColor(int state) {
         return BED_COLORS.getOrDefault(state, (byte) -1);
+    }
+
+    /**
+     * Non-water cauldrons (since Bedrock 1.18.30) must have a block entity packet sent on chunk load to fix rendering issues.
+     *
+     * @return if this Java block state is a non-empty non-water cauldron
+     */
+    public static boolean isNonWaterCauldron(int state) {
+        return NON_WATER_CAULDRONS.contains(state);
+    }
+
+    /**
+     * When using a bucket on a cauldron sending a ServerboundUseItemPacket can result in the liquid being placed.
+     *
+     * @return if this Java block state is a cauldron
+     */
+    public static boolean isCauldron(int state) {
+        return ALL_CAULDRONS.contains(state);
     }
 
     /**
@@ -228,6 +271,13 @@ public final class BlockStateValues {
      */
     public static Int2ObjectMap<String> getFlowerPotValues() {
         return FLOWER_POT_VALUES;
+    }
+
+    /**
+     * @return a set of all forward-facing jigsaws, to use as a fallback if NBT is missing.
+     */
+    public static IntSet getHorizontalFacingJigsaws() {
+        return HORIZONTAL_FACING_JIGSAWS;
     }
 
     /**
@@ -401,13 +451,36 @@ public final class BlockStateValues {
 
     /**
      * Get the level of water from the block state.
-     * This is used in FishingHookEntity to create splash sounds when the hook hits the water.
      *
      * @param state BlockState of the block
      * @return The water level or -1 if the block isn't water
      */
     public static int getWaterLevel(int state) {
         return WATER_LEVEL.getOrDefault(state, -1);
+    }
+
+    /**
+     * Get the height of water from the block state
+     * This is used in FishingHookEntity to create splash sounds when the hook hits the water. In addition,
+     * CollisionManager uses this to determine if the player's eyes are in water.
+     *
+     * @param state BlockState of the block
+     * @return The water height or -1 if the block does not contain water
+     */
+    public static double getWaterHeight(int state) {
+        int waterLevel = BlockStateValues.getWaterLevel(state);
+        if (BlockRegistries.WATERLOGGED.get().contains(state)) {
+            waterLevel = 0;
+        }
+        if (waterLevel >= 0) {
+            double waterHeight = 1 - (waterLevel + 1) / ((double) NUM_WATER_LEVELS);
+            // Falling water is a full block
+            if (waterLevel >= 8) {
+                waterHeight = 1;
+            }
+            return waterHeight;
+        }
+        return -1;
     }
 
     /**

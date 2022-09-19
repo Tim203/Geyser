@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,12 +41,12 @@ import org.bukkit.event.block.BlockPistonEvent;
 import org.bukkit.event.block.BlockPistonExtendEvent;
 import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.session.GeyserSession;
-import org.geysermc.geyser.session.cache.PistonCache;
 import org.geysermc.geyser.level.block.BlockStateValues;
-import org.geysermc.geyser.translator.level.block.entity.PistonBlockEntity;
 import org.geysermc.geyser.level.physics.Direction;
 import org.geysermc.geyser.platform.spigot.world.manager.GeyserSpigotWorldManager;
+import org.geysermc.geyser.session.GeyserSession;
+import org.geysermc.geyser.session.cache.PistonCache;
+import org.geysermc.geyser.translator.level.block.entity.PistonBlockEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -97,7 +97,7 @@ public class GeyserPistonListener implements Listener {
 
             int dX = Math.abs(location.getBlockX() - player.getLocation().getBlockX()) >> 4;
             int dZ = Math.abs(location.getBlockZ() - player.getLocation().getBlockZ()) >> 4;
-            if ((dX * dX + dZ * dZ) > session.getRenderDistance() * session.getRenderDistance()) {
+            if ((dX * dX + dZ * dZ) > session.getServerRenderDistance() * session.getServerRenderDistance()) {
                 // Ignore pistons outside the player's render distance
                 continue;
             }

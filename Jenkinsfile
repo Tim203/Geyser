@@ -1,8 +1,8 @@
 pipeline {
     agent any
     tools {
-        maven 'Maven 3'
-        jdk 'Java 16'
+        gradle 'Gradle 7'
+        jdk 'Java 17'
     }
     options {
         buildDiscarder(logRotator(artifactNumToKeepStr: '20'))
@@ -11,38 +11,48 @@ pipeline {
         stage ('Build') {
             steps {
                 sh 'git submodule update --init --recursive'
-                sh 'mvn clean package'
+                rtGradleRun(
+                    usesPlugin: true,
+                    tool: 'Gradle 7',
+                    buildFile: 'build.gradle.kts',
+                    tasks: 'clean build',
+                )
             }
             post {
                 success {
-                    archiveArtifacts artifacts: 'bootstrap/**/target/*.jar', excludes: 'bootstrap/**/target/original-*.jar', fingerprint: true
+                    archiveArtifacts artifacts: 'bootstrap/**/build/libs/*.jar', excludes: 'bootstrap/**/build/libs/*-sources.jar,bootstrap/**/build/libs/*-unshaded.jar', fingerprint: true
                 }
             }
         }
 
         stage ('Deploy') {
             when {
-                branch "master"
+                anyOf {
+                    branch "master"
+                    branch "feature/extensions"
+                }
             }
 
             steps {
-                rtMavenDeployer(
-                        id: "maven-deployer",
+                rtGradleDeployer(
+                        id: "GRADLE_DEPLOYER",
                         serverId: "opencollab-artifactory",
                         releaseRepo: "maven-releases",
                         snapshotRepo: "maven-snapshots"
                 )
-                rtMavenResolver(
-                        id: "maven-resolver",
-                        serverId: "opencollab-artifactory",
-                        releaseRepo: "maven-deploy-release",
-                        snapshotRepo: "maven-deploy-snapshot"
+                rtGradleResolver(
+                        id: "GRADLE_RESOLVER",
+                        serverId: "opencollab-artifactory"
                 )
-                rtMavenRun(
-                        pom: 'pom.xml',
-                        goals: 'javadoc:jar source:jar install -pl :core -am -DskipTests',
-                        deployerId: "maven-deployer",
-                        resolverId: "maven-resolver"
+                rtGradleRun(
+                        usesPlugin: true,
+                        tool: 'Gradle 7',
+                        rootDir: "",
+                        useWrapper: true,
+                        buildFile: 'build.gradle.kts',
+                        tasks: 'build artifactoryPublish',
+                        deployerId: "GRADLE_DEPLOYER",
+                        resolverId: "GRADLE_RESOLVER"
                 )
                 rtPublishBuildInfo(
                         serverId: "opencollab-artifactory"
@@ -92,7 +102,7 @@ pipeline {
         success {
             script {
                 if (env.BRANCH_NAME == 'master') {
-                    build propagate: false, wait: false, job: 'GeyserMC/Geyser-Fabric/java-1.17', parameters: [booleanParam(name: 'SKIP_DISCORD', value: true)]
+                    build propagate: false, wait: false, job: 'GeyserMC/Geyser-Fabric/master', parameters: [booleanParam(name: 'SKIP_DISCORD', value: true)]
                     build propagate: false, wait: false, job: 'GeyserMC/GeyserConnect/master', parameters: [booleanParam(name: 'SKIP_DISCORD', value: true)]
                 }
             }

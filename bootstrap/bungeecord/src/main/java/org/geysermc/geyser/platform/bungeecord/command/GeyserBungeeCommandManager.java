@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,16 @@
 package org.geysermc.geyser.platform.bungeecord.command;
 
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.command.CommandManager;
+import org.geysermc.geyser.command.GeyserCommandManager;
 
-public class GeyserBungeeCommandManager extends CommandManager {
+public class GeyserBungeeCommandManager extends GeyserCommandManager {
 
     public GeyserBungeeCommandManager(GeyserImpl geyser) {
         super(geyser);
     }
 
     @Override
-    public String getDescription(String command) {
+    public String description(String command) {
         return ""; // no support for command descriptions in bungee
     }
 }

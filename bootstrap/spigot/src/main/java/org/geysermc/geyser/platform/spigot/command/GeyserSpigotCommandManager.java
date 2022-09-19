@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,25 +26,34 @@
 package org.geysermc.geyser.platform.spigot.command;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandMap;
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.command.CommandManager;
+import org.geysermc.geyser.command.GeyserCommandManager;
 
 import java.lang.reflect.Field;
 
-public class GeyserSpigotCommandManager extends CommandManager {
+public class GeyserSpigotCommandManager extends GeyserCommandManager {
 
-    private static CommandMap COMMAND_MAP;
+    private static final CommandMap COMMAND_MAP;
 
     static {
+        CommandMap commandMap = null;
         try {
-            Field cmdMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            cmdMapField.setAccessible(true);
-            COMMAND_MAP = (CommandMap) cmdMapField.get(Bukkit.getServer());
-        } catch (NoSuchFieldException | IllegalAccessException ex) {
-            ex.printStackTrace();
+            // Paper-only
+            Server.class.getMethod("getCommandMap");
+            commandMap = Bukkit.getServer().getCommandMap();
+        } catch (NoSuchMethodException e) {
+            try {
+                Field cmdMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+                cmdMapField.setAccessible(true);
+                commandMap = (CommandMap) cmdMapField.get(Bukkit.getServer());
+            } catch (NoSuchFieldException | IllegalAccessException ex) {
+                ex.printStackTrace();
+            }
         }
+        COMMAND_MAP = commandMap;
     }
 
     public GeyserSpigotCommandManager(GeyserImpl geyser) {
@@ -52,8 +61,12 @@ public class GeyserSpigotCommandManager extends CommandManager {
     }
 
     @Override
-    public String getDescription(String command) {
+    public String description(String command) {
         Command cmd = COMMAND_MAP.getCommand(command.replace("/", ""));
         return cmd != null ? cmd.getDescription() : "";
+    }
+
+    public static CommandMap getCommandMap() {
+        return COMMAND_MAP;
     }
 }

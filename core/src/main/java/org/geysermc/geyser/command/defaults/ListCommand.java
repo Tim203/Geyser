@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,8 +26,8 @@
 package org.geysermc.geyser.command.defaults;
 
 import org.geysermc.geyser.GeyserImpl;
-import org.geysermc.geyser.command.CommandSender;
 import org.geysermc.geyser.command.GeyserCommand;
+import org.geysermc.geyser.command.GeyserCommandSource;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.text.GeyserLocale;
 
@@ -44,11 +44,16 @@ public class ListCommand extends GeyserCommand {
     }
 
     @Override
-    public void execute(GeyserSession session, CommandSender sender, String[] args) {
-        String message = GeyserLocale.getPlayerLocaleString("geyser.commands.list.message", sender.getLocale(),
+    public void execute(GeyserSession session, GeyserCommandSource sender, String[] args) {
+        String message = GeyserLocale.getPlayerLocaleString("geyser.commands.list.message", sender.locale(),
                 geyser.getSessionManager().size(),
-                geyser.getSessionManager().getAllSessions().stream().map(GeyserSession::getName).collect(Collectors.joining(" ")));
+                geyser.getSessionManager().getAllSessions().stream().map(GeyserSession::bedrockUsername).collect(Collectors.joining(" ")));
 
         sender.sendMessage(message);
+    }
+
+    @Override
+    public boolean isSuggestedOpOnly() {
+        return true;
     }
 }

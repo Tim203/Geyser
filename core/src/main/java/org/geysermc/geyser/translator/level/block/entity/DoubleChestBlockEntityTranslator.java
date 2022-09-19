@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,9 @@ import com.github.steveice10.mc.protocol.data.game.level.block.BlockEntityType;
 import com.github.steveice10.opennbt.tag.builtin.CompoundTag;
 import com.nukkitx.math.vector.Vector3i;
 import com.nukkitx.nbt.NbtMapBuilder;
-import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.level.block.BlockStateValues;
 import org.geysermc.geyser.level.block.DoubleChestValue;
+import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.util.BlockEntityUtils;
 
 /**
@@ -46,18 +46,17 @@ public class DoubleChestBlockEntityTranslator extends BlockEntityTranslator impl
 
     @Override
     public void updateBlock(GeyserSession session, int blockState, Vector3i position) {
-        CompoundTag javaTag = getConstantJavaTag("chest", position.getX(), position.getY(), position.getZ());
         NbtMapBuilder tagBuilder = getConstantBedrockTag(BlockEntityUtils.getBedrockBlockEntityId(BlockEntityType.CHEST), position.getX(), position.getY(), position.getZ());
-        translateTag(tagBuilder, javaTag, blockState);
+        translateTag(tagBuilder, null, blockState);
         BlockEntityUtils.updateBlockEntity(session, tagBuilder.build(), position);
     }
 
     @Override
     public void translateTag(NbtMapBuilder builder, CompoundTag tag, int blockState) {
-        DoubleChestValue chestValues = BlockStateValues.getDoubleChestValues().getOrDefault(blockState, null);
+        DoubleChestValue chestValues = BlockStateValues.getDoubleChestValues().get(blockState);
         if (chestValues != null) {
-            int x = (int) tag.getValue().get("x").getValue();
-            int z = (int) tag.getValue().get("z").getValue();
+            int x = (int) builder.get("x");
+            int z = (int) builder.get("z");
             translateChestValue(builder, chestValues, x, z);
         }
     }

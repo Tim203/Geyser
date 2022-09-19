@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,9 +35,14 @@ import com.velocitypowered.api.network.ListenerType;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
+import net.kyori.adventure.util.Codec;
 import org.geysermc.common.PlatformType;
-import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.GeyserBootstrap;
+import org.geysermc.geyser.GeyserImpl;
+import org.geysermc.geyser.api.command.Command;
+import org.geysermc.geyser.api.extension.Extension;
+import org.geysermc.geyser.api.network.AuthType;
+import org.geysermc.geyser.command.GeyserCommandManager;
 import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
 import org.geysermc.geyser.ping.GeyserLegacyPingPassthrough;
@@ -51,6 +56,7 @@ import org.slf4j.Logger;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 @Plugin(id = "geyser", name = GeyserImpl.NAME + "-Velocity", version = GeyserImpl.VERSION, url = "https://geysermc.org", authors = "GeyserMC")
 public class GeyserVelocityPlugin implements GeyserBootstrap {
@@ -78,6 +84,8 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
 
     @Override
     public void onEnable() {
+        GeyserLocale.init(this);
+
         try {
             geyserConfig = new ConfigLoader<>("config-plugin.yml", GeyserVelocityConfiguration.class, this).load();
         } catch (Throwable throwable) {
@@ -85,19 +93,46 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
         }
 
         this.geyserLogger = new GeyserVelocityLogger(logger, geyserConfig.isDebugMode());
+        GeyserConfiguration.checkGeyserConfiguration(geyserConfig, geyserLogger);
 
-        this.geyser = GeyserImpl.start(PlatformType.VELOCITY, this);
+        this.geyser = GeyserImpl.load(PlatformType.VELOCITY, this);
+
+        try {
+            Codec.class.getMethod("codec", Codec.Decoder.class, Codec.Encoder.class);
+        } catch (NoSuchMethodException e) {
+            // velocitypowered.com has a build that is very outdated
+            logger.error("Please download Velocity from https://papermc.io/downloads#Velocity - the 'stable' Velocity version " +
+                    "that has likely been downloaded is very outdated and does not support 1.19.");
+            return;
+        }
+    }
+
+    private void postStartup() {
+        GeyserImpl.start();
 
         this.geyserInjector = new GeyserVelocityInjector(proxyServer);
         // Will be initialized after the proxy has been bound
 
         this.geyserCommandManager = new GeyserVelocityCommandManager(geyser);
-        this.commandManager.register("geyser", new GeyserVelocityCommandExecutor(geyser));
+        this.geyserCommandManager.init();
+
+        this.commandManager.register("geyser", new GeyserVelocityCommandExecutor(geyser, geyserCommandManager.getCommands()));
+        for (Map.Entry<Extension, Map<String, Command>> entry : this.geyserCommandManager.extensionCommands().entrySet()) {
+            Map<String, Command> commands = entry.getValue();
+            if (commands.isEmpty()) {
+                continue;
+            }
+
+            this.commandManager.register(entry.getKey().description().id(), new GeyserVelocityCommandExecutor(this.geyser, commands));
+        }
+
         if (geyserConfig.isLegacyPingPassthrough()) {
             this.geyserPingPassthrough = GeyserLegacyPingPassthrough.init(geyser);
         } else {
             this.geyserPingPassthrough = new GeyserVelocityPingPassthrough(proxyServer);
         }
+
+        proxyServer.getEventManager().register(this, new GeyserVelocityUpdateListener());
     }
 
     @Override
@@ -121,7 +156,7 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
     }
 
     @Override
-    public org.geysermc.geyser.command.CommandManager getGeyserCommandManager() {
+    public GeyserCommandManager getGeyserCommandManager() {
         return this.geyserCommandManager;
     }
 
@@ -142,9 +177,14 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
 
     @Subscribe
     public void onProxyBound(ListenerBoundEvent event) {
-        if (event.getListenerType() == ListenerType.MINECRAFT && geyserInjector != null) {
-            // After this bound, we know that the channel initializer cannot change without it being ineffective for Velocity, too
-            geyserInjector.initializeLocalChannel(this);
+        if (event.getListenerType() == ListenerType.MINECRAFT) {
+            // Once listener is bound, do our startup process
+            this.postStartup();
+
+            if (geyserInjector != null) {
+                // After this bound, we know that the channel initializer cannot change without it being ineffective for Velocity, too
+                geyserInjector.initializeLocalChannel(this);
+            }
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2021 GeyserMC. http://geysermc.org
+ * Copyright (c) 2019-2022 GeyserMC. http://geysermc.org
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,16 +35,10 @@ import org.geysermc.geyser.session.GeyserSession;
 import java.util.UUID;
 
 public class FallingBlockEntity extends Entity {
-    private final int javaId;
 
-    public FallingBlockEntity(GeyserSession session, long entityId, long geyserId, UUID uuid, Vector3f position, Vector3f motion, float yaw, float pitch, int javaId) {
-        super(session, entityId, geyserId, uuid, EntityDefinitions.FALLING_BLOCK, position, motion, yaw, pitch, 0f);
-        this.javaId = javaId;
-    }
+    public FallingBlockEntity(GeyserSession session, int entityId, long geyserId, UUID uuid, Vector3f position, Vector3f motion, float yaw, float pitch, float headYaw, int javaId) {
+        super(session, entityId, geyserId, uuid, EntityDefinitions.FALLING_BLOCK, position, motion, yaw, pitch, headYaw);
 
-    @Override
-    protected void initializeMetadata() {
-        super.initializeMetadata();
         this.dirtyMetadata.put(EntityData.VARIANT, session.getBlockMappings().getBedrockBlockId(javaId));
     }
 
