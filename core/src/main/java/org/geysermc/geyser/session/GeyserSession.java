@@ -804,7 +804,7 @@ public class GeyserSession implements CommandSender {
                     ClientIntentionPacket intentionPacket = event.getPacket();
 
                     String address;
-                    if (geyser.getConfig().getRemote().isForwardHost()) {
+                    if (geyser.getConfig().getRemote().isForwardHostname()) {
                         address = clientData.getServerAddress().split(":")[0];
                     } else {
                         address = intentionPacket.getHostname();

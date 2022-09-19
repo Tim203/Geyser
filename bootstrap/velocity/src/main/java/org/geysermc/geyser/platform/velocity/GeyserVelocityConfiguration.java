@@ -25,28 +25,30 @@
 
 package org.geysermc.geyser.platform.velocity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.velocitypowered.api.plugin.PluginContainer;
-import com.velocitypowered.api.proxy.ProxyServer;
-import lombok.Getter;
+import org.geysermc.configutils.loader.callback.CallbackResult;
 import org.geysermc.geyser.FloodgateKeyLoader;
-import org.geysermc.geyser.configuration.GeyserJacksonConfiguration;
+import org.geysermc.geyser.configuration.GeyserCommonConfiguration;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-@Getter
-@JsonIgnoreProperties(ignoreUnknown = true)
-public final class GeyserVelocityConfiguration extends GeyserJacksonConfiguration {
-    @JsonIgnore
-    private Path floodgateKeyPath;
-
-    public void loadFloodgate(GeyserVelocityPlugin plugin, ProxyServer proxyServer, File dataFolder) {
-        Optional<PluginContainer> floodgate = proxyServer.getPluginManager().getPlugin("floodgate");
+public final class GeyserVelocityConfiguration extends GeyserCommonConfiguration<GeyserVelocityPlugin> {
+    @Override
+    public Path retrieveFloodgateKeyPath(GeyserVelocityPlugin plugin) {
+        Optional<PluginContainer> floodgate = plugin.getProxyServer().getPluginManager().getPlugin("floodgate");
         Path floodgateDataPath = floodgate.isPresent() ? Paths.get("plugins/floodgate/") : null;
-        floodgateKeyPath = FloodgateKeyLoader.getKeyPath(this, floodgateDataPath, dataFolder.toPath(), plugin.getGeyserLogger());
+        return FloodgateKeyLoader.getKeyPath(this, floodgateDataPath, plugin.getConfigFolder(), plugin.getGeyserLogger());
+    }
+
+    @Override
+    public CallbackResult postInitialize(GeyserVelocityPlugin plugin) {
+        boolean hasFloodgate = plugin.getProxyServer().getPluginManager().getPlugin("floodgate").isPresent();
+
+        return checkForFloodgate(hasFloodgate).ifSucceeded(() -> {
+            getRemote().setPort(plugin.getProxyServer().getBoundAddress().getPort());
+            return super.postInitialize(plugin);
+        });
     }
 }

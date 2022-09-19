@@ -217,7 +217,7 @@ public class LoginEncryptionUtils {
         session.setDaylightCycle(false);
 
         GeyserConfiguration config = session.getGeyser().getConfig();
-        boolean isPasswordAuthEnabled = config.getRemote().isPasswordAuthentication();
+        boolean isPasswordAuthEnabled = config.getRemote().isAllowPasswordAuthentication();
 
         session.sendForm(
                 SimpleForm.builder()

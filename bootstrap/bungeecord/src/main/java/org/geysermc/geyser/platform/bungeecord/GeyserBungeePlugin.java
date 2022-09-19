@@ -25,30 +25,24 @@
 
 package org.geysermc.geyser.platform.bungeecord;
 
-import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.geysermc.common.PlatformType;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.GeyserBootstrap;
 import org.geysermc.geyser.command.CommandManager;
 import org.geysermc.geyser.session.auth.AuthType;
-import org.geysermc.geyser.configuration.GeyserConfiguration;
+import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
 import org.geysermc.geyser.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.geyser.ping.IGeyserPingPassthrough;
-import org.geysermc.geyser.util.FileUtils;
 import org.geysermc.geyser.text.GeyserLocale;
 import org.geysermc.geyser.platform.bungeecord.command.GeyserBungeeCommandExecutor;
 import org.geysermc.geyser.platform.bungeecord.command.GeyserBungeeCommandManager;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
 import java.util.logging.Level;
 
 public class GeyserBungeePlugin extends Plugin implements GeyserBootstrap {
@@ -63,58 +57,13 @@ public class GeyserBungeePlugin extends Plugin implements GeyserBootstrap {
 
     @Override
     public void onEnable() {
-        if (!getDataFolder().exists())
-            getDataFolder().mkdir();
-
         try {
-            if (!getDataFolder().exists())
-                getDataFolder().mkdir();
-            File configFile = FileUtils.fileOrCopiedFromResource(new File(getDataFolder(), "config.yml"), "config.yml", (x) -> x.replaceAll("generateduuid", UUID.randomUUID().toString()));
-            this.geyserConfig = FileUtils.loadConfig(configFile, GeyserBungeeConfiguration.class);
-        } catch (IOException ex) {
-            getLogger().log(Level.WARNING, GeyserLocale.getLocaleStringLog("geyser.config.failed"), ex);
-            ex.printStackTrace();
-        }
-
-        if (getProxy().getConfig().getListeners().size() == 1) {
-            ListenerInfo listener = getProxy().getConfig().getListeners().toArray(new ListenerInfo[0])[0];
-
-            InetSocketAddress javaAddr = listener.getHost();
-
-            // By default this should be localhost but may need to be changed in some circumstances
-            if (this.geyserConfig.getRemote().getAddress().equalsIgnoreCase("auto")) {
-                this.geyserConfig.setAutoconfiguredRemote(true);
-                // Don't use localhost if not listening on all interfaces
-                if (!javaAddr.getHostString().equals("0.0.0.0") && !javaAddr.getHostString().equals("")) {
-                    this.geyserConfig.getRemote().setAddress(javaAddr.getHostString());
-                }
-                this.geyserConfig.getRemote().setPort(javaAddr.getPort());
-            }
-
-            if (geyserConfig.getBedrock().isCloneRemotePort()) {
-                geyserConfig.getBedrock().setPort(javaAddr.getPort());
-            }
+            geyserConfig = new ConfigLoader<>("config-plugin.yml", GeyserBungeeConfiguration.class, this).load();
+        } catch (Throwable throwable) {
+            getLogger().log(Level.WARNING, GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
         }
 
         this.geyserLogger = new GeyserBungeeLogger(getLogger(), geyserConfig.isDebugMode());
-        GeyserConfiguration.checkGeyserConfiguration(geyserConfig, geyserLogger);
-
-        // Remove this in like a year
-        if (getProxy().getPluginManager().getPlugin("floodgate-bungee") != null) {
-            geyserLogger.severe(GeyserLocale.getLocaleStringLog("geyser.bootstrap.floodgate.outdated", "https://ci.opencollab.dev/job/GeyserMC/job/Floodgate/job/master/"));
-            return;
-        }
-
-        if (geyserConfig.getRemote().getAuthType() == AuthType.FLOODGATE && getProxy().getPluginManager().getPlugin("floodgate") == null) {
-            geyserLogger.severe(GeyserLocale.getLocaleStringLog("geyser.bootstrap.floodgate.not_installed") + " " + GeyserLocale.getLocaleStringLog("geyser.bootstrap.floodgate.disabling"));
-            return;
-        } else if (geyserConfig.isAutoconfiguredRemote() && getProxy().getPluginManager().getPlugin("floodgate") != null) {
-            // Floodgate installed means that the user wants Floodgate authentication
-            geyserLogger.debug("Auto-setting to Floodgate authentication.");
-            geyserConfig.getRemote().setAuthType(AuthType.FLOODGATE);
-        }
-
-        geyserConfig.loadFloodgate(this);
 
         this.geyser = GeyserImpl.start(PlatformType.BUNGEECORD, this);
 

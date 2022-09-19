@@ -27,14 +27,14 @@ package org.geysermc.geyser;
 
 import org.geysermc.geyser.api.logger.GeyserLogger;
 import org.geysermc.geyser.session.auth.AuthType;
-import org.geysermc.geyser.configuration.GeyserJacksonConfiguration;
+import org.geysermc.geyser.configuration.GeyserCommonConfiguration;
 import org.geysermc.geyser.text.GeyserLocale;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class FloodgateKeyLoader {
-    public static Path getKeyPath(GeyserJacksonConfiguration config, Path floodgateDataFolder, Path geyserDataFolder, GeyserLogger logger) {
+    public static Path getKeyPath(GeyserCommonConfiguration<?> config, Path floodgateDataFolder, Path geyserDataFolder, GeyserLogger logger) {
         if (config.getRemote().getAuthType() != AuthType.FLOODGATE) {
             return geyserDataFolder.resolve(config.getFloodgateKeyFile());
         }

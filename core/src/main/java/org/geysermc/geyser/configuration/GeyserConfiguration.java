@@ -37,9 +37,6 @@ import java.util.Map;
 
 public interface GeyserConfiguration {
 
-    // Modify this when you introduce breaking changes into the config
-    int CURRENT_CONFIG_VERSION = 4;
-
     IBedrockConfiguration getBedrock();
 
     IRemoteConfiguration getRemote();
@@ -114,12 +111,12 @@ public interface GeyserConfiguration {
 
         boolean isEnableProxyProtocol();
 
-        List<String> getProxyProtocolWhitelistedIPs();
+        List<String> getProxyProtocolWhitelistedIps();
 
         /**
-         * @return Unmodifiable list of {@link CIDRMatcher}s from {@link #getProxyProtocolWhitelistedIPs()}
+         * @return Unmodifiable list of {@link CIDRMatcher}s from {@link #getProxyProtocolWhitelistedIps()}
          */
-        List<CIDRMatcher> getWhitelistedIPsMatchers();
+        List<CIDRMatcher> getWhitelistedIpsMatchers();
     }
 
     interface IRemoteConfiguration {
@@ -134,11 +131,11 @@ public interface GeyserConfiguration {
 
         AuthType getAuthType();
 
-        boolean isPasswordAuthentication();
+        boolean isAllowPasswordAuthentication();
 
         boolean isUseProxyProtocol();
 
-        boolean isForwardHost();
+        boolean isForwardHostname();
     }
 
     interface IUserAuthenticationInfo {
@@ -157,7 +154,7 @@ public interface GeyserConfiguration {
 
         boolean isEnabled();
 
-        String getUniqueId();
+        String getUuid();
     }
 
     int getScoreboardPacketThreshold();
@@ -170,12 +167,4 @@ public interface GeyserConfiguration {
     boolean isUseDirectConnection();
 
     int getConfigVersion();
-
-    static void checkGeyserConfiguration(GeyserConfiguration geyserConfig, GeyserLogger geyserLogger) {
-        if (geyserConfig.getConfigVersion() < CURRENT_CONFIG_VERSION) {
-            geyserLogger.warning(GeyserLocale.getLocaleStringLog("geyser.bootstrap.config.outdated"));
-        } else if (geyserConfig.getConfigVersion() > CURRENT_CONFIG_VERSION) {
-            geyserLogger.warning(GeyserLocale.getLocaleStringLog("geyser.bootstrap.config.too_new"));
-        }
-    }
 }

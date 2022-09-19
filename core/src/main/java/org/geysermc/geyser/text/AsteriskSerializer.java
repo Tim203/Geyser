@@ -91,11 +91,6 @@ public class AsteriskSerializer extends StdSerializer<Object> implements Context
     }
 
     private boolean isSensitiveIp(String ip) {
-        if (ip.equalsIgnoreCase("localhost") || ip.equalsIgnoreCase("auto")) {
-            // `auto` should not be shown unless there is an obscure issue with setting the localhost address
-            return false;
-        }
-
-        return !ip.isEmpty() && !ip.equals("0.0.0.0") && !ip.equals("127.0.0.1");
+        return !ip.isEmpty() && !ip.equals("0.0.0.0") && !ip.equals("127.0.0.1") && !ip.equalsIgnoreCase("localhost");
     }
 }

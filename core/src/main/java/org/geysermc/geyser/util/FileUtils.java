@@ -25,10 +25,6 @@
 
 package org.geysermc.geyser.util;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.geysermc.geyser.GeyserImpl;
 
 import java.io.*;
@@ -43,26 +39,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FileUtils {
-
-    /**
-     * Load the given YAML file into the given class
-     *
-     * @param src File to load
-     * @param valueType Class to load file into
-     * @param <T> the type
-     * @return The data as the given class
-     * @throws IOException if the config could not be loaded
-     */
-    public static <T> T loadConfig(File src, Class<T> valueType) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return objectMapper.readValue(src, valueType);
-    }
-
-    public static <T> T loadYaml(InputStream src, Class<T> valueType) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory()).enable(JsonParser.Feature.IGNORE_UNDEFINED).disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-        return objectMapper.readValue(src, valueType);
-    }
-
     public static <T> T loadJson(InputStream src, Class<T> valueType) throws IOException {
         // Read specifically with UTF-8 to allow any non-UTF-encoded JSON to read
         return GeyserImpl.JSON_MAPPER.readValue(new InputStreamReader(src, StandardCharsets.UTF_8), valueType);

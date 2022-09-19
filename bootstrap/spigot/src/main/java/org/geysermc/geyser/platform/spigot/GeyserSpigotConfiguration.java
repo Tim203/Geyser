@@ -25,27 +25,41 @@
 
 package org.geysermc.geyser.platform.spigot;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.JavaPlugin;
+import org.geysermc.configutils.loader.callback.CallbackResult;
 import org.geysermc.geyser.FloodgateKeyLoader;
-import org.geysermc.geyser.configuration.GeyserJacksonConfiguration;
+import org.geysermc.geyser.configuration.GeyserCommonConfiguration;
 
 import java.nio.file.Path;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class GeyserSpigotConfiguration extends GeyserJacksonConfiguration {
-    @JsonIgnore
-    private Path floodgateKeyPath;
-
-    public void loadFloodgate(GeyserSpigotPlugin plugin) {
+public final class GeyserSpigotConfiguration extends GeyserCommonConfiguration<GeyserSpigotPlugin> {
+    @Override
+    public Path retrieveFloodgateKeyPath(GeyserSpigotPlugin spigotPlugin) {
+        GeyserSpigotPlugin plugin = JavaPlugin.getPlugin(GeyserSpigotPlugin.class);
         Plugin floodgate = Bukkit.getPluginManager().getPlugin("floodgate");
+
         Path geyserDataFolder = plugin.getDataFolder().toPath();
         Path floodgateDataFolder = floodgate != null ? floodgate.getDataFolder().toPath() : null;
 
-        floodgateKeyPath = FloodgateKeyLoader.getKeyPath(this, floodgateDataFolder, geyserDataFolder, plugin.getGeyserLogger());
+        return FloodgateKeyLoader.getKeyPath(this, floodgateDataFolder, geyserDataFolder, plugin.getGeyserLogger());
+    }
+
+    @Override
+    public CallbackResult postInitialize(GeyserSpigotPlugin spigotPlugin) {
+        boolean hasFloodgate = Bukkit.getPluginManager().getPlugin("floodgate") != null;
+
+        return checkForFloodgate(hasFloodgate).ifSucceeded(() -> {
+            // Spigot can't use the remote port / address, so for clone-remote-port to work correctly
+            // we have to set the remote port correctly.
+            getRemote().setPort(Bukkit.getPort());
+
+            return super.postInitialize(spigotPlugin);
+        });
     }
 }

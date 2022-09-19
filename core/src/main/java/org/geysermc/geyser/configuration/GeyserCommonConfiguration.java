@@ -25,22 +25,19 @@
 
 package org.geysermc.geyser.configuration;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.Setter;
+import org.geysermc.configutils.loader.callback.CallbackResult;
+import org.geysermc.configutils.loader.callback.GenericPostInitializeCallback;
+import org.geysermc.configutils.loader.validate.ValidationResult;
+import org.geysermc.configutils.loader.validate.Validator;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.session.auth.AuthType;
 import org.geysermc.geyser.text.AsteriskSerializer;
 import org.geysermc.geyser.network.CIDRMatcher;
 import org.geysermc.geyser.text.GeyserLocale;
+import org.geysermc.geyser.utils.Constants;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
@@ -49,94 +46,118 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Getter
-@JsonIgnoreProperties(ignoreUnknown = true)
-@SuppressWarnings("FieldMayBeFinal") // Jackson requires that the fields are not final
-public abstract class GeyserJacksonConfiguration implements GeyserConfiguration {
-
-    /**
-     * If the config was originally 'auto' before the values changed
-     */
-    @Setter
-    private boolean autoconfiguredRemote = false;
+@SuppressWarnings("FieldMayBeFinal")
+public abstract class GeyserCommonConfiguration<T>
+        implements GeyserConfiguration, GenericPostInitializeCallback<T> {
 
     private BedrockConfiguration bedrock = new BedrockConfiguration();
     private RemoteConfiguration remote = new RemoteConfiguration();
 
-    @JsonProperty("floodgate-key-file")
     private String floodgateKeyFile = "key.pem";
 
-    public abstract Path getFloodgateKeyPath();
+    private Path floodgateKeyPath;
 
     private Map<String, UserAuthenticationInfo> userAuths;
 
-    @JsonProperty("command-suggestions")
     private boolean commandSuggestions = true;
 
-    @JsonProperty("passthrough-motd")
-    private boolean isPassthroughMotd = false;
+    private boolean passthroughMotd = false;
 
-    @JsonProperty("passthrough-player-counts")
-    private boolean isPassthroughPlayerCounts = false;
+    private boolean passthroughPlayerCounts = false;
 
-    @JsonProperty("passthrough-protocol-name")
-    private boolean isPassthroughProtocolName = false;
+    private boolean passthroughProtocolName = false;
 
-    @JsonProperty("legacy-ping-passthrough")
-    private boolean isLegacyPingPassthrough = false;
+    private boolean legacyPingPassthrough = false;
 
-    @JsonProperty("ping-passthrough-interval")
     private int pingPassthroughInterval = 3;
 
-    @JsonProperty("forward-player-ping")
     private boolean forwardPlayerPing = false;
 
-    @JsonProperty("max-players")
     private int maxPlayers = 100;
 
-    @JsonProperty("debug-mode")
     private boolean debugMode = false;
 
-    @JsonProperty("allow-third-party-capes")
     private boolean allowThirdPartyCapes = true;
 
-    @JsonProperty("show-cooldown")
     private String showCooldown = "title";
 
-    @JsonProperty("show-coordinates")
     private boolean showCoordinates = true;
 
-    @JsonDeserialize(using = EmoteOffhandWorkaroundOption.Deserializer.class)
-    @JsonProperty("emote-offhand-workaround")
     private EmoteOffhandWorkaroundOption emoteOffhandWorkaround = EmoteOffhandWorkaroundOption.DISABLED;
 
-    @JsonProperty("allow-third-party-ears")
     private boolean allowThirdPartyEars = false;
 
-    @JsonProperty("default-locale")
     private String defaultLocale = null; // is null by default so system language takes priority
 
-    @JsonProperty("cache-images")
     private int cacheImages = 0;
 
-    @JsonProperty("allow-custom-skulls")
     private boolean allowCustomSkulls = true;
 
-    @JsonProperty("add-non-bedrock-items")
     private boolean addNonBedrockItems = true;
 
-    @JsonProperty("above-bedrock-nether-building")
     private boolean aboveBedrockNetherBuilding = false;
 
-    @JsonProperty("force-resource-packs")
     private boolean forceResourcePacks = true;
 
-    @JsonProperty("xbox-achievements-enabled")
     private boolean xboxAchievementsEnabled = false;
 
     private MetricsInfo metrics = new MetricsInfo();
 
+    private int scoreboardPacketThreshold = 10;
+
+    private boolean enableProxyConnections = false;
+
+    private int mtu = 1400;
+
+    private boolean useDirectConnection = true;
+
+    private int configVersion = 0;
+
+    @Override
+    public CallbackResult postInitialize(T callbackArgument) {
+        return postInitialize().ifSucceeded(() -> {
+            // other platforms had their chance to change stuff by overriding postInitialize/0
+            if (getBedrock().isCloneRemotePort()) {
+                getBedrock().setPort(getRemote().getPort());
+            }
+
+            floodgateKeyPath = retrieveFloodgateKeyPath(callbackArgument);
+            return CallbackResult.ok();
+        });
+    }
+
+    protected CallbackResult postInitialize() {
+        return CallbackResult.ok();
+    }
+
+    protected CallbackResult checkForFloodgate(boolean hasFloodgate) {
+        // Remove this in like a year
+        try {
+            // Should only exist on 1.0
+            Class.forName("org.geysermc.floodgate.FloodgateAPI");
+
+            return CallbackResult.failed(LanguageUtils.getLocaleStringLog(
+                    "geyser.bootstrap.floodgate.outdated",
+                    Constants.FLOODGATE_DOWNLOAD_LOCATION
+            ));
+        } catch (ClassNotFoundException ignored) {}
+
+        if (getRemote().getAuthType() == AuthType.FLOODGATE && !hasFloodgate) {
+            return CallbackResult.failed(
+                    LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.not_installed") + " " +
+                            LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.disabling")
+            );
+        } else if (hasFloodgate) {
+            // Auto-setting to Floodgate auth when Floodgate is installed
+            getRemote().setAuthType(AuthType.FLOODGATE);
+        }
+
+        return CallbackResult.ok();
+    }
+
+    abstract protected Path retrieveFloodgateKeyPath(T callbackArgument);
+
     @Getter
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class BedrockConfiguration implements IBedrockConfiguration {
         @AsteriskSerializer.Asterisk(isIp = true)
         private String address = "0.0.0.0";
@@ -144,38 +165,31 @@ public abstract class GeyserJacksonConfiguration implements GeyserConfiguration 
         @Setter
         private int port = 19132;
 
-        @JsonProperty("clone-remote-port")
         private boolean cloneRemotePort = false;
 
         private String motd1 = "GeyserMC";
         private String motd2 = "Geyser";
 
-        @JsonProperty("server-name")
         private String serverName = GeyserImpl.NAME;
 
-        @JsonProperty("compression-level")
         private int compressionLevel = 6;
 
         public int getCompressionLevel() {
             return Math.max(-1, Math.min(compressionLevel, 9));
         }
 
-        @JsonProperty("enable-proxy-protocol")
         private boolean enableProxyProtocol = false;
 
-        @JsonProperty("proxy-protocol-whitelisted-ips")
-        private List<String> proxyProtocolWhitelistedIPs = Collections.emptyList();
+        private List<String> proxyProtocolWhitelistedIps = Collections.emptyList(); //todo support
 
-        @JsonIgnore
-        private List<CIDRMatcher> whitelistedIPsMatchers = null;
+        private List<CIDRMatcher> whitelistedIpsMatchers = null;
 
-        @Override
-        public List<CIDRMatcher> getWhitelistedIPsMatchers() {
+        public List<CIDRMatcher> getWhitelistedIpsMatchers() {
             // Effective Java, Third Edition; Item 83: Use lazy initialization judiciously
-            List<CIDRMatcher> matchers = this.whitelistedIPsMatchers;
+            List<CIDRMatcher> matchers = this.whitelistedIpsMatchers;
             if (matchers == null) {
                 synchronized (this) {
-                    this.whitelistedIPsMatchers = matchers = proxyProtocolWhitelistedIPs.stream()
+                    this.whitelistedIpsMatchers = matchers = proxyProtocolWhitelistedIps.stream()
                             .map(CIDRMatcher::new)
                             .collect(Collectors.toList());
                 }
@@ -185,33 +199,25 @@ public abstract class GeyserJacksonConfiguration implements GeyserConfiguration 
     }
 
     @Getter
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RemoteConfiguration implements IRemoteConfiguration {
         @Setter
         @AsteriskSerializer.Asterisk(isIp = true)
-        private String address = "auto";
+        private String address = "127.0.0.1";
 
-        @JsonDeserialize(using = PortDeserializer.class)
         @Setter
         private int port = 25565;
 
         @Setter
-        @JsonDeserialize(using = AuthType.Deserializer.class)
-        @JsonProperty("auth-type")
         private AuthType authType = AuthType.ONLINE;
 
-        @JsonProperty("allow-password-authentication")
-        private boolean passwordAuthentication = true;
+        private boolean allowPasswordAuthentication = true;
 
-        @JsonProperty("use-proxy-protocol")
         private boolean useProxyProtocol = false;
 
-        @JsonProperty("forward-hostname")
-        private boolean forwardHost = false;
+        private boolean forwardHostname = true; // only true by default for plugin versions
     }
 
     @Getter
-    @JsonIgnoreProperties(ignoreUnknown = true) // DO NOT REMOVE THIS! Otherwise, after we remove microsoft-account configs will not load
     public static class UserAuthenticationInfo implements IUserAuthenticationInfo {
         @AsteriskSerializer.Asterisk()
         private String email;
@@ -219,47 +225,32 @@ public abstract class GeyserJacksonConfiguration implements GeyserConfiguration 
         @AsteriskSerializer.Asterisk()
         private String password;
 
-        @JsonProperty("microsoft-account")
         private boolean microsoftAccount = false;
     }
 
     @Getter
-    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MetricsInfo implements IMetricsInfo {
         private boolean enabled = true;
 
-        @JsonProperty("uuid")
-        private String uniqueId = UUID.randomUUID().toString();
+        private String uuid = UUID.randomUUID().toString();
     }
-
-    @JsonProperty("scoreboard-packet-threshold")
-    private int scoreboardPacketThreshold = 10;
-
-    @JsonProperty("enable-proxy-connections")
-    private boolean enableProxyConnections = false;
-
-    @JsonProperty("mtu")
-    private int mtu = 1400;
-
-    @JsonProperty("use-direct-connection")
-    private boolean useDirectConnection = true;
-
-    @JsonProperty("config-version")
-    private int configVersion = 0;
 
     /**
      * Ensure that the port deserializes in the config as a number no matter what.
      */
-    protected static class PortDeserializer extends JsonDeserializer<Integer> {
+    protected static class PortValidator implements Validator {
         @Override
-        public Integer deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-            String value = p.getValueAsString();
-            try {
-                return Integer.parseInt(value);
-            } catch (NumberFormatException e) {
-                System.err.println(GeyserLocale.getLocaleStringLog("geyser.bootstrap.config.invalid_port"));
-                return 25565;
+        public ValidationResult validate(String ignored, Object value) {
+            if (!(value instanceof Integer)) {
+                return ValidationResult.failed("Port number should be an integer");
             }
+            int port = (int) value;
+            if (port <= 0) {
+                return ValidationResult.failed("Port number should be greater than " + 0);
+            } else if (port > 65535) {
+                return ValidationResult.failed("Port number cannot be greater than " + 65535);
+            }
+            return ValidationResult.ok(port);
         }
     }
 }

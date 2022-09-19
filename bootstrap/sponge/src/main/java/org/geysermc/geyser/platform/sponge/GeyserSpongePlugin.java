@@ -30,11 +30,10 @@ import org.geysermc.common.PlatformType;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.GeyserBootstrap;
 import org.geysermc.geyser.command.CommandManager;
-import org.geysermc.geyser.configuration.GeyserConfiguration;
+import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
 import org.geysermc.geyser.ping.GeyserLegacyPingPassthrough;
 import org.geysermc.geyser.ping.IGeyserPingPassthrough;
-import org.geysermc.geyser.util.FileUtils;
 import org.geysermc.geyser.text.GeyserLocale;
 import org.geysermc.geyser.platform.sponge.command.GeyserSpongeCommandExecutor;
 import org.geysermc.geyser.platform.sponge.command.GeyserSpongeCommandManager;
@@ -47,10 +46,7 @@ import org.spongepowered.api.event.game.state.GameStoppedEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.file.Path;
-import java.util.UUID;
 
 @Plugin(id = "geyser", name = GeyserImpl.NAME + "-Sponge", version = GeyserImpl.VERSION, url = "https://geysermc.org", authors = "GeyserMC")
 public class GeyserSpongePlugin implements GeyserBootstrap {
@@ -71,42 +67,14 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
 
     @Override
     public void onEnable() {
-        if (!configDir.exists())
-            configDir.mkdirs();
-
-        File configFile = null;
         try {
-            configFile = FileUtils.fileOrCopiedFromResource(new File(configDir, "config.yml"), "config.yml", (file) -> file.replaceAll("generateduuid", UUID.randomUUID().toString()));
-        } catch (IOException ex) {
-            logger.warn(GeyserLocale.getLocaleStringLog("geyser.config.failed"));
-            ex.printStackTrace();
-        }
-
-        try {
-            this.geyserConfig = FileUtils.loadConfig(configFile, GeyserSpongeConfiguration.class);
-        } catch (IOException ex) {
-            logger.warn(GeyserLocale.getLocaleStringLog("geyser.config.failed"));
-            ex.printStackTrace();
+            geyserConfig = new ConfigLoader<>("config-sponge.yml", GeyserSpongeConfiguration.class).load();
+        } catch (Throwable throwable) {
+            logger.warn(GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
             return;
         }
 
-        if (Sponge.getServer().getBoundAddress().isPresent()) {
-            InetSocketAddress javaAddr = Sponge.getServer().getBoundAddress().get();
-
-            // Don't change the ip if its listening on all interfaces
-            // By default this should be 127.0.0.1 but may need to be changed in some circumstances
-            if (this.geyserConfig.getRemote().getAddress().equalsIgnoreCase("auto")) {
-                this.geyserConfig.setAutoconfiguredRemote(true);
-                geyserConfig.getRemote().setPort(javaAddr.getPort());
-            }
-        }
-
-        if (geyserConfig.getBedrock().isCloneRemotePort()) {
-            geyserConfig.getBedrock().setPort(geyserConfig.getRemote().getPort());
-        }
-
         this.geyserLogger = new GeyserSpongeLogger(logger, geyserConfig.isDebugMode());
-        GeyserConfiguration.checkGeyserConfiguration(geyserConfig, geyserLogger);
         this.geyser = GeyserImpl.start(PlatformType.SPONGE, this);
 
         if (geyserConfig.isLegacyPingPassthrough()) {

@@ -27,16 +27,16 @@ package org.geysermc.geyser.platform.standalone;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
-import org.geysermc.geyser.configuration.GeyserJacksonConfiguration;
+import org.geysermc.geyser.configuration.GeyserCommonConfiguration;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class GeyserStandaloneConfiguration extends GeyserJacksonConfiguration {
+public final class GeyserStandaloneConfiguration extends GeyserCommonConfiguration<Object> {
     @Override
-    public Path getFloodgateKeyPath() {
+    public Path retrieveFloodgateKeyPath(Object ignored) {
         return Paths.get(getFloodgateKeyFile());
     }
 }
