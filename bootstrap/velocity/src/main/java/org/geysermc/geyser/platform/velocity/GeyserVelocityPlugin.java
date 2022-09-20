@@ -33,6 +33,7 @@ import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.network.ListenerType;
 import com.velocitypowered.api.plugin.Plugin;
+import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import lombok.Getter;
 import net.kyori.adventure.util.Codec;
@@ -41,7 +42,6 @@ import org.geysermc.geyser.GeyserBootstrap;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.api.command.Command;
 import org.geysermc.geyser.api.extension.Extension;
-import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.command.GeyserCommandManager;
 import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
@@ -55,7 +55,6 @@ import org.slf4j.Logger;
 
 import java.net.SocketAddress;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 @Plugin(id = "geyser", name = GeyserImpl.NAME + "-Velocity", version = GeyserImpl.VERSION, url = "https://geysermc.org", authors = "GeyserMC")
@@ -80,20 +79,25 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
     private GeyserImpl geyser;
 
     @Getter
-    private final Path configFolder = Paths.get("plugins/" + GeyserImpl.NAME + "-Velocity/");
+    @Inject
+    private @DataDirectory Path configDirectory;
 
     @Override
     public void onEnable() {
         GeyserLocale.init(this);
 
+        this.geyserLogger = new GeyserVelocityLogger(logger);
+
         try {
-            geyserConfig = new ConfigLoader<>("config-plugin.yml", GeyserVelocityConfiguration.class, this).load();
+            geyserConfig = new ConfigLoader<>(
+                    "config-plugin.yml",
+                    GeyserVelocityConfiguration.class,
+                    getConfigDirectory(),
+                    this
+            ).load();
         } catch (Throwable throwable) {
             logger.warn(GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
         }
-
-        this.geyserLogger = new GeyserVelocityLogger(logger, geyserConfig.isDebugMode());
-        GeyserConfiguration.checkGeyserConfiguration(geyserConfig, geyserLogger);
 
         this.geyser = GeyserImpl.load(PlatformType.VELOCITY, this);
 

@@ -32,33 +32,34 @@ import org.geysermc.configutils.file.codec.PathFileCodec;
 import org.geysermc.configutils.file.template.ResourceTemplateReader;
 import org.geysermc.configutils.loader.validate.Validations;
 import org.geysermc.configutils.updater.change.Changes;
+import org.geysermc.geyser.GeyserBootstrap;
 
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.UUID;
 
-public class ConfigLoader<T extends GeyserCommonConfiguration<X>, X> {
+public class ConfigLoader<T extends GeyserCommonConfiguration<B>, B extends GeyserBootstrap> {
     private final String templateFile;
     private final Class<T> mapTo;
-    private final X configCallbackArgument;
+    private final Path dataDirectory;
+    private final B geyserBootstrap;
 
     public ConfigLoader(
             @NonNull String templateFile,
             @NonNull Class<T> mapTo,
-            @Nullable X configCallbackArgument) {
-
+            @NonNull Path dataDirectory,
+            @Nullable B geyserBootstrap
+    ) {
         this.templateFile = Objects.requireNonNull(templateFile);
         this.mapTo = Objects.requireNonNull(mapTo);
-        this.configCallbackArgument = configCallbackArgument;
-    }
-
-    public ConfigLoader(@NonNull String templateFile, @NonNull Class<T> mapTo) {
-        this(templateFile, mapTo, null);
+        this.dataDirectory = Objects.requireNonNull(dataDirectory);
+        this.geyserBootstrap = geyserBootstrap;
     }
 
     public T load() throws Throwable {
         ConfigUtilities utilities =
                 ConfigUtilities.builder()
-                        .fileCodec(PathFileCodec.instance())
+                        .fileCodec(PathFileCodec.of(dataDirectory))
                         .configFile("config.yml")
                         .templateReader(ResourceTemplateReader.of(getClass()))
                         .template(templateFile)
@@ -66,14 +67,15 @@ public class ConfigLoader<T extends GeyserCommonConfiguration<X>, X> {
                                 .version(
                                         5,
                                         Changes.versionBuilder()
-                                                .keyRenamed("userAuths", "user-auths"))
+                                                .keyRenamed("userAuths", "user-auths")
+                                                .valueChanged("metrics.uuid", "generateduuid", UUID.randomUUID()))
                                 .build())
                         .copyDirectly("user-auths")
                         .definePlaceholder("metrics.uuid", UUID::randomUUID)
                         .validations(Validations.builder()
                                 .validation("remote.port", new GeyserCommonConfiguration.PortValidator())
                                 .build())
-                        .postInitializeCallbackArgument(configCallbackArgument)
+                        .postInitializeCallbackArgument(geyserBootstrap)
                         .build();
 
         return utilities.executeOn(mapTo);

@@ -119,7 +119,7 @@ public class SkinProvider {
         // Schedule Daily Image Expiry if we are caching them
         if (geyser.getConfig().getCacheImages() > 0) {
             geyser.getScheduledThread().scheduleAtFixedRate(() -> {
-                File cacheFolder = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("cache").resolve("images").toFile();
+                File cacheFolder = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("cache").resolve("images").toFile();
                 if (!cacheFolder.exists()) {
                     return;
                 }
@@ -477,7 +477,7 @@ public class SkinProvider {
         BufferedImage image = null;
 
         // First see if we have a cached file. We also update the modification stamp so we know when the file was last used
-        File imageFile = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("cache").resolve("images").resolve(UUID.nameUUIDFromBytes(imageUrl.getBytes()).toString() + ".png").toFile();
+        File imageFile = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("cache").resolve("images").resolve(UUID.nameUUIDFromBytes(imageUrl.getBytes()).toString() + ".png").toFile();
         if (imageFile.exists()) {
             try {
                 GeyserImpl.getInstance().getLogger().debug("Reading cached image from file " + imageFile.getPath() + " for " + imageUrl);

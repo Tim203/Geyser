@@ -24,6 +24,9 @@
  */
 
 object Versions {
+    const val cumulusVersion  = "1.1.1"
+    const val eventsVersion = "1.0-SNAPSHOT"
+    const val configUtilsVersion = "1.0-SNAPSHOT"
     const val jacksonVersion = "2.13.2"
     const val fastutilVersion = "8.5.2"
     const val nettyVersion = "4.1.80.Final"
@@ -40,7 +43,5 @@ object Versions {
     const val adventurePlatformVersion = "4.1.2"
     const val junitVersion = "4.13.1"
     const val checkerQualVersion = "3.19.0"
-    const val cumulusVersion  = "1.1.1"
-    const val eventsVersion = "1.0-SNAPSHOT"
     const val log4jVersion  = "2.17.1"
 }

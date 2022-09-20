@@ -27,6 +27,7 @@ package org.geysermc.geyser.platform.bungeecord;
 
 import io.netty.channel.Channel;
 import net.md_5.bungee.BungeeCord;
+import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.protocol.ProtocolConstants;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -35,7 +36,6 @@ import org.geysermc.geyser.GeyserBootstrap;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.api.command.Command;
 import org.geysermc.geyser.api.extension.Extension;
-import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.command.GeyserCommandManager;
 import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
@@ -52,7 +52,6 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 public class GeyserBungeePlugin extends Plugin implements GeyserBootstrap {
 
@@ -82,18 +81,35 @@ public class GeyserBungeePlugin extends Plugin implements GeyserBootstrap {
 
         GeyserLocale.init(this);
 
+        geyserLogger = new GeyserBungeeLogger(getLogger());
+
         try {
-            geyserConfig = new ConfigLoader<>("config-plugin.yml", GeyserBungeeConfiguration.class, this).load();
+            geyserConfig = new ConfigLoader<>(
+                    "config-plugin.yml",
+                    GeyserBungeeConfiguration.class,
+                    getConfigDirectory(),
+                    this
+            ).load();
         } catch (Throwable throwable) {
-            getLogger().log(Level.WARNING, GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
+            geyserLogger.error(GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
         }
 
-        this.geyserLogger = new GeyserBungeeLogger(getLogger(), geyserConfig.isDebugMode());
         this.geyser = GeyserImpl.load(PlatformType.BUNGEECORD, this);
     }
 
     @Override
     public void onEnable() {
+        Collection<ListenerInfo> listeners = getProxy().getConfig().getListeners();
+
+        if (listeners.size() > 1) {
+            geyserLogger.info("There are multiple listeners defined, we'll use the first listener");
+        }
+
+        if (!listeners.isEmpty()) {
+            ListenerInfo listener = getProxy().getConfig().getListeners().toArray(new ListenerInfo[0])[0];
+            geyserConfig.getRemote().setPort(listener.getHost().getPort());
+        }
+
         // Big hack - Bungee does not provide us an event to listen to, so schedule a repeating
         // task that waits for a field to be filled which is set after the plugin enable
         // process is complete
@@ -184,7 +200,7 @@ public class GeyserBungeePlugin extends Plugin implements GeyserBootstrap {
     }
 
     @Override
-    public Path getConfigFolder() {
+    public Path getConfigDirectory() {
         return getDataFolder().toPath();
     }
 

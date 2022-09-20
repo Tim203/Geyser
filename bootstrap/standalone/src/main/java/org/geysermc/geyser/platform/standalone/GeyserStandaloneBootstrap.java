@@ -53,6 +53,7 @@ import org.geysermc.geyser.platform.standalone.gui.GeyserStandaloneGUI;
 import org.geysermc.geyser.text.GeyserLocale;
 import org.geysermc.geyser.util.LoopbackUtil;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -190,7 +191,12 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
         LoopbackUtil.checkAndApplyLoopback(geyserLogger);
 
         try {
-            geyserConfig = new ConfigLoader<>("config-standalone.yml", GeyserStandaloneConfiguration.class).load();
+            geyserConfig = new ConfigLoader<>(
+                    "config-standalone.yml",
+                    GeyserStandaloneConfiguration.class,
+                    getConfigDirectory(),
+                    this
+            ).load();
             handleArgsConfigOptions();
         } catch (Throwable throwable) {
             geyserLogger.severe(GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
@@ -201,7 +207,6 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
                 return;
             }
         }
-        geyserLogger.setDebug(geyserConfig.isDebugMode());
 
         // Allow libraries like Protocol to have their debug information passthrough
         logger.get().setLevel(geyserConfig.isDebugMode() ? Level.DEBUG : Level.INFO);
@@ -265,7 +270,7 @@ public class GeyserStandaloneBootstrap implements GeyserBootstrap {
     }
 
     @Override
-    public Path getConfigFolder() {
+    public Path getConfigDirectory() {
         // Return the current working directory
         return Paths.get(System.getProperty("user.dir"));
     }

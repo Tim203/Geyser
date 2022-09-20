@@ -34,9 +34,9 @@ import java.nio.file.Paths;
 
 @Getter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public final class GeyserStandaloneConfiguration extends GeyserCommonConfiguration<Object> {
+public final class GeyserStandaloneConfiguration extends GeyserCommonConfiguration<GeyserStandaloneBootstrap> {
     @Override
-    public Path retrieveFloodgateKeyPath(Object ignored) {
+    public Path retrieveFloodgateKeyPath(GeyserStandaloneBootstrap ignored) {
         return Paths.get(getFloodgateKeyFile());
     }
 }

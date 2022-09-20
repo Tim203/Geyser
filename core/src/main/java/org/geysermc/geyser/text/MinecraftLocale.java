@@ -51,7 +51,7 @@ public class MinecraftLocale {
 
     static {
         // Create the locales folder
-        File localesFolder = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("locales").toFile();
+        File localesFolder = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("locales").toFile();
         //noinspection ResultOfMethodCallIgnored
         localesFolder.mkdir();
 
@@ -148,7 +148,7 @@ public class MinecraftLocale {
      * @param locale Locale to download
      */
     private static void downloadLocale(String locale) {
-        File localeFile = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("locales/" + locale + ".json").toFile();
+        File localeFile = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("locales/" + locale + ".json").toFile();
 
         // Check if we have already downloaded the locale file
         if (localeFile.exists()) {
@@ -157,7 +157,7 @@ public class MinecraftLocale {
 
             if (locale.equals("en_us")) {
                 try {
-                    File hashFile = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("locales/en_us.hash").toFile();
+                    File hashFile = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("locales/en_us.hash").toFile();
                     if (hashFile.exists()) {
                         try (BufferedReader br = new BufferedReader(new FileReader(hashFile))) {
                             curHash = br.readLine().trim();
@@ -206,7 +206,7 @@ public class MinecraftLocale {
      * @param locale Locale to load
      */
     private static boolean loadLocale(String locale) {
-        File localeFile = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("locales/" + locale + ".json").toFile();
+        File localeFile = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("locales/" + locale + ".json").toFile();
 
         // Load the locale
         if (localeFile.exists()) {
@@ -266,7 +266,7 @@ public class MinecraftLocale {
             GeyserImpl.getInstance().getLogger().debug("Download URL: " + clientJarInfo.getUrl());
 
             // Download the smallest JAR (client or server)
-            Path tmpFilePath = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("tmp_locale.jar");
+            Path tmpFilePath = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("tmp_locale.jar");
             WebUtils.downloadFile(clientJarInfo.getUrl(), tmpFilePath.toString());
 
             // Load in the JAR as a zip and extract the file
@@ -288,7 +288,7 @@ public class MinecraftLocale {
             }
 
             // Store the latest jar hash
-            FileUtils.writeFile(GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("locales/en_us.hash").toString(), clientJarInfo.getSha1().toCharArray());
+            FileUtils.writeFile(GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("locales/en_us.hash").toString(), clientJarInfo.getSha1().toCharArray());
 
             // Delete the nolonger needed client/server jar
             Files.delete(tmpFilePath);

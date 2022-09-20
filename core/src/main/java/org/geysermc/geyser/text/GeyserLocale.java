@@ -119,7 +119,7 @@ public class GeyserLocale {
         Properties localeProp = new Properties();
 
         File localLanguage;
-        Path localFolder = bootstrap.getConfigFolder().resolve("languages");
+        Path localFolder = bootstrap.getConfigDirectory().resolve("languages");
         if (Files.exists(localFolder)) {
             localLanguage = localFolder.resolve(locale + ".properties").toFile();
         } else {

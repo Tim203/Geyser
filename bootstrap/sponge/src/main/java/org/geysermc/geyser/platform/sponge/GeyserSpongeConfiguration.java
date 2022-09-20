@@ -30,25 +30,22 @@ import org.geysermc.configutils.loader.callback.CallbackResult;
 import org.geysermc.geyser.configuration.GeyserCommonConfiguration;
 import org.spongepowered.api.Sponge;
 
+import java.net.InetSocketAddress;
 import java.nio.file.Path;
 
-public final class GeyserSpongeConfiguration extends GeyserCommonConfiguration<Object> {
+public final class GeyserSpongeConfiguration extends GeyserCommonConfiguration<GeyserSpongePlugin> {
     @Getter
     private boolean autoConfiguredRemote;
 
     @Override
-    public Path retrieveFloodgateKeyPath(Object plugin) {
+    public Path retrieveFloodgateKeyPath(GeyserSpongePlugin plugin) {
         return null; // Floodgate isn't available for Sponge
     }
 
     @Override
     public CallbackResult postInitialize() {
-        if ("auto".equals(getRemote().getAddress())) {
-            Sponge.getServer().getBoundAddress().ifPresent((javaAddress) -> {
-                autoConfiguredRemote = true;
-                getRemote().setPort(javaAddress.getPort());
-            });
-        }
+        InetSocketAddress address = Sponge.getServer().getBoundAddress().get();
+        getRemote().setPort(address.getPort());
         return super.postInitialize();
     }
 }

@@ -25,13 +25,13 @@
 
 package org.geysermc.geyser.platform.sponge;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.geysermc.geyser.GeyserLogger;
 import org.slf4j.Logger;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class GeyserSpongeLogger implements GeyserLogger {
     private final Logger logger;
     @Getter @Setter

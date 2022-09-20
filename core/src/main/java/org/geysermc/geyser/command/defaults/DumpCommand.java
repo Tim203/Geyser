@@ -104,7 +104,7 @@ public class DumpCommand extends GeyserCommand {
             sender.sendMessage(GeyserLocale.getPlayerLocaleString("geyser.commands.dump.writing", sender.locale()));
 
             try {
-                FileOutputStream outputStream = new FileOutputStream(GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("dump.json").toFile());
+                FileOutputStream outputStream = new FileOutputStream(GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("dump.json").toFile());
                 outputStream.write(dumpData.getBytes());
                 outputStream.close();
             } catch (IOException e) {

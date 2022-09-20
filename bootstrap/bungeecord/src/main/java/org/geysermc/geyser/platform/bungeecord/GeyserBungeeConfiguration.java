@@ -25,14 +25,12 @@
 
 package org.geysermc.geyser.platform.bungeecord;
 
-import net.md_5.bungee.api.config.ListenerInfo;
 import net.md_5.bungee.api.plugin.Plugin;
 import org.geysermc.configutils.loader.callback.CallbackResult;
 import org.geysermc.geyser.FloodgateKeyLoader;
 import org.geysermc.geyser.configuration.GeyserCommonConfiguration;
 
 import java.nio.file.Path;
-import java.util.Collection;
 
 public final class GeyserBungeeConfiguration extends GeyserCommonConfiguration<GeyserBungeePlugin> {
     @Override
@@ -47,21 +45,8 @@ public final class GeyserBungeeConfiguration extends GeyserCommonConfiguration<G
     @Override
     public CallbackResult postInitialize(GeyserBungeePlugin plugin) {
         boolean hasFloodgate = plugin.getProxy().getPluginManager().getPlugin("floodgate") != null;
-
-        return checkForFloodgate(hasFloodgate).ifSucceeded(() -> {
-            Collection<ListenerInfo> listeners = plugin.getProxy().getConfig().getListeners();
-
-            if (listeners.size() > 1) {
-                plugin.getLogger()
-                        .fine("There are multiple listeners defined, we'll use the first listener");
-            }
-
-            if (!listeners.isEmpty()) {
-                ListenerInfo listener = plugin.getProxy().getConfig().getListeners().toArray(new ListenerInfo[0])[0];
-                getRemote().setPort(listener.getHost().getPort());
-            }
-
-            return super.postInitialize(plugin);
-        });
+        // bungee wouldn't be bungee if you didn't have to make an edge case for it.
+        // the clone remote port stuff is located in GeyserBungeePlugin's onEnable
+        return checkForFloodgate(hasFloodgate);
     }
 }

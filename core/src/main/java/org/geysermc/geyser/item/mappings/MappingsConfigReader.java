@@ -40,7 +40,7 @@ import java.util.function.BiConsumer;
 
 public class MappingsConfigReader {
     private final Int2ObjectMap<MappingsReader> mappingReaders = new Int2ObjectOpenHashMap<>();
-    private final Path customMappingsDirectory = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("custom_mappings");
+    private final Path customMappingsDirectory = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("custom_mappings");
 
     public MappingsConfigReader() {
         this.mappingReaders.put(1, new MappingsReader_v1());

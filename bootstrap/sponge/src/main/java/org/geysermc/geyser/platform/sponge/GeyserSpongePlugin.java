@@ -71,14 +71,20 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
     public void onLoad() {
         GeyserLocale.init(this);
 
+        geyserLogger = new GeyserSpongeLogger(logger);
+
         try {
-            geyserConfig = new ConfigLoader<>("config-sponge.yml", GeyserSpongeConfiguration.class).load();
+            geyserConfig = new ConfigLoader<>(
+                    "config-sponge.yml",
+                    GeyserSpongeConfiguration.class,
+                    getConfigDirectory(),
+                    this
+            ).load();
         } catch (Throwable throwable) {
             logger.warn(GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
             return;
         }
 
-        this.geyserLogger = new GeyserSpongeLogger(logger, geyserConfig.isDebugMode());
         this.geyser = GeyserImpl.load(PlatformType.SPONGE, this);
     }
 
@@ -133,7 +139,7 @@ public class GeyserSpongePlugin implements GeyserBootstrap {
     }
 
     @Override
-    public Path getConfigFolder() {
+    public Path getConfigDirectory() {
         return configDir.toPath();
     }
 

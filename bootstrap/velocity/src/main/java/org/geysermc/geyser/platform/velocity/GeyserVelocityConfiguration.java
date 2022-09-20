@@ -39,7 +39,7 @@ public final class GeyserVelocityConfiguration extends GeyserCommonConfiguration
     public Path retrieveFloodgateKeyPath(GeyserVelocityPlugin plugin) {
         Optional<PluginContainer> floodgate = plugin.getProxyServer().getPluginManager().getPlugin("floodgate");
         Path floodgateDataPath = floodgate.isPresent() ? Paths.get("plugins/floodgate/") : null;
-        return FloodgateKeyLoader.getKeyPath(this, floodgateDataPath, plugin.getConfigFolder(), plugin.getGeyserLogger());
+        return FloodgateKeyLoader.getKeyPath(this, floodgateDataPath, plugin.getConfigDirectory(), plugin.getGeyserLogger());
     }
 
     @Override

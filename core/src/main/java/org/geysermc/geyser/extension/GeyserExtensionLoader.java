@@ -54,7 +54,7 @@ public class GeyserExtensionLoader extends ExtensionLoader {
     private final Object2ObjectMap<String, Class<?>> classes = new Object2ObjectOpenHashMap<>();
     private final Map<String, GeyserExtensionClassLoader> classLoaders = new HashMap<>();
     private final Map<Extension, GeyserExtensionContainer> extensionContainers = new HashMap<>();
-    private final Path extensionsDirectory = GeyserImpl.getInstance().getBootstrap().getConfigFolder().resolve("extensions");
+    private final Path extensionsDirectory = GeyserImpl.getInstance().getBootstrap().getConfigDirectory().resolve("extensions");
 
     public GeyserExtensionContainer loadExtension(Path path, GeyserExtensionDescription description) throws InvalidExtensionException {
         if (path == null) {

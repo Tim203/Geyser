@@ -48,7 +48,6 @@ import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.adapters.spigot.SpigotAdapters;
 import org.geysermc.geyser.api.command.Command;
 import org.geysermc.geyser.api.extension.Extension;
-import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.command.GeyserCommandManager;
 import org.geysermc.geyser.configuration.ConfigLoader;
 import org.geysermc.geyser.dump.BootstrapDumpInfo;
@@ -128,15 +127,22 @@ public class GeyserSpigotPlugin extends JavaPlugin implements GeyserBootstrap {
 
         GeyserLocale.init(this);
 
+        this.geyserLogger =
+                GeyserPaperLogger.supported()
+                        ? new GeyserPaperLogger(this, getLogger())
+                        : new GeyserSpigotLogger(getLogger());
+
         // We use the ConfigUtils library for config related stuff instead of Bukkit's config utils
         try {
-            geyserConfig = new ConfigLoader<>("config-plugin.yml", GeyserSpigotConfiguration.class, this).load();
+            geyserConfig = new ConfigLoader<>(
+                    "config-plugin.yml",
+                    GeyserSpigotConfiguration.class,
+                    getConfigDirectory(),
+                    this
+            ).load();
         } catch (Throwable throwable) {
-            getLogger().log(Level.SEVERE, GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
+            geyserLogger.severe(GeyserLocale.getLocaleStringLog("geyser.config.failed"), throwable);
         }
-
-        this.geyserLogger = GeyserPaperLogger.supported() ? new GeyserPaperLogger(this, getLogger(), geyserConfig.isDebugMode())
-                : new GeyserSpigotLogger(getLogger(), geyserConfig.isDebugMode());
 
         this.geyser = GeyserImpl.load(PlatformType.SPIGOT, this);
     }
@@ -376,7 +382,7 @@ public class GeyserSpigotPlugin extends JavaPlugin implements GeyserBootstrap {
     }
 
     @Override
-    public Path getConfigFolder() {
+    public Path getConfigDirectory() {
         return getDataFolder().toPath();
     }
 

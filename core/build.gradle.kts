@@ -11,6 +11,8 @@ dependencies {
     api(projects.geyserApi)
     api(projects.common)
 
+    api("org.geysermc.configutils", "configutils", Versions.configUtilsVersion)
+
     // Jackson JSON and YAML serialization
     api("com.fasterxml.jackson.core", "jackson-annotations", Versions.jacksonVersion)
     api("com.fasterxml.jackson.core", "jackson-databind", Versions.jacksonVersion + ".1") // Extra .1 as databind is a slightly different version

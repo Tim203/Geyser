@@ -31,12 +31,13 @@ import org.geysermc.configutils.loader.callback.CallbackResult;
 import org.geysermc.configutils.loader.callback.GenericPostInitializeCallback;
 import org.geysermc.configutils.loader.validate.ValidationResult;
 import org.geysermc.configutils.loader.validate.Validator;
+import org.geysermc.geyser.GeyserBootstrap;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.api.network.AuthType;
 import org.geysermc.geyser.network.CIDRMatcher;
 import org.geysermc.geyser.text.AsteriskSerializer;
 import org.geysermc.geyser.text.GeyserLocale;
-import org.geysermc.geyser.utils.Constants;
+import org.geysermc.geyser.Constants;
 
 import java.nio.file.Path;
 import java.util.Collections;
@@ -47,8 +48,8 @@ import java.util.stream.Collectors;
 
 @Getter
 @SuppressWarnings("FieldMayBeFinal")
-public abstract class GeyserCommonConfiguration<T>
-        implements GeyserConfiguration, GenericPostInitializeCallback<T> {
+public abstract class GeyserCommonConfiguration<B extends GeyserBootstrap>
+        implements GeyserConfiguration, GenericPostInitializeCallback<B> {
 
     private BedrockConfiguration bedrock = new BedrockConfiguration();
     private RemoteConfiguration remote = new RemoteConfiguration();
@@ -130,14 +131,17 @@ public abstract class GeyserCommonConfiguration<T>
     private int configVersion = 0;
 
     @Override
-    public CallbackResult postInitialize(T callbackArgument) {
+    public CallbackResult postInitialize(B bootstrap) {
+        // we need this for the Floodgate key messages
+        bootstrap.getGeyserLogger().setDebug(isDebugMode());
+
         return postInitialize().ifSucceeded(() -> {
             // other platforms had their chance to change stuff by overriding postInitialize/0
             if (getBedrock().isCloneRemotePort()) {
                 getBedrock().setPort(getRemote().getPort());
             }
 
-            floodgateKeyPath = retrieveFloodgateKeyPath(callbackArgument);
+            floodgateKeyPath = retrieveFloodgateKeyPath(bootstrap);
             return CallbackResult.ok();
         });
     }
@@ -152,7 +156,7 @@ public abstract class GeyserCommonConfiguration<T>
             // Should only exist on 1.0
             Class.forName("org.geysermc.floodgate.FloodgateAPI");
 
-            return CallbackResult.failed(LanguageUtils.getLocaleStringLog(
+            return CallbackResult.failed(GeyserLocale.getLocaleStringLog(
                     "geyser.bootstrap.floodgate.outdated",
                     Constants.FLOODGATE_DOWNLOAD_LOCATION
             ));
@@ -160,8 +164,8 @@ public abstract class GeyserCommonConfiguration<T>
 
         if (getRemote().getAuthType() == AuthType.FLOODGATE && !hasFloodgate) {
             return CallbackResult.failed(
-                    LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.not_installed") + " " +
-                            LanguageUtils.getLocaleStringLog("geyser.bootstrap.floodgate.disabling")
+                    GeyserLocale.getLocaleStringLog("geyser.bootstrap.floodgate.not_installed") + " " +
+                            GeyserLocale.getLocaleStringLog("geyser.bootstrap.floodgate.disabling")
             );
         } else if (hasFloodgate) {
             // Auto-setting to Floodgate auth when Floodgate is installed
@@ -171,7 +175,7 @@ public abstract class GeyserCommonConfiguration<T>
         return CallbackResult.ok();
     }
 
-    abstract protected Path retrieveFloodgateKeyPath(T callbackArgument);
+    abstract protected Path retrieveFloodgateKeyPath(B bootstrap);
 
     @Getter
     public static class BedrockConfiguration implements IBedrockConfiguration {
