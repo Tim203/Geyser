@@ -70,7 +70,6 @@ import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class GeyserSpigotPlugin extends JavaPlugin implements GeyserBootstrap {
     /**
@@ -94,6 +93,8 @@ public class GeyserSpigotPlugin extends JavaPlugin implements GeyserBootstrap {
 
     @Override
     public void onLoad() {
+        GeyserLocale.init(this);
+
         try {
             // AvailableCommandsSerializer_v291 complains otherwise
             ByteBuf.class.getMethod("writeShortLE", int.class);
@@ -124,8 +125,6 @@ public class GeyserSpigotPlugin extends JavaPlugin implements GeyserBootstrap {
                 return;
             }
         }
-
-        GeyserLocale.init(this);
 
         this.geyserLogger =
                 GeyserPaperLogger.supported()

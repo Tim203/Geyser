@@ -84,9 +84,18 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
 
     @Override
     public void onEnable() {
+        try {
+            Codec.class.getMethod("codec", Codec.Decoder.class, Codec.Encoder.class);
+        } catch (NoSuchMethodException e) {
+            // velocitypowered.com has a build that is very outdated
+            logger.error("Please download Velocity from https://papermc.io/downloads#Velocity - the 'stable' Velocity version " +
+                    "that has likely been downloaded is very outdated and does not support 1.19.");
+            return;
+        }
+
         GeyserLocale.init(this);
 
-        this.geyserLogger = new GeyserVelocityLogger(logger);
+        geyserLogger = new GeyserVelocityLogger(logger);
 
         try {
             geyserConfig = new ConfigLoader<>(
@@ -100,15 +109,6 @@ public class GeyserVelocityPlugin implements GeyserBootstrap {
         }
 
         this.geyser = GeyserImpl.load(PlatformType.VELOCITY, this);
-
-        try {
-            Codec.class.getMethod("codec", Codec.Decoder.class, Codec.Encoder.class);
-        } catch (NoSuchMethodException e) {
-            // velocitypowered.com has a build that is very outdated
-            logger.error("Please download Velocity from https://papermc.io/downloads#Velocity - the 'stable' Velocity version " +
-                    "that has likely been downloaded is very outdated and does not support 1.19.");
-            return;
-        }
     }
 
     private void postStartup() {

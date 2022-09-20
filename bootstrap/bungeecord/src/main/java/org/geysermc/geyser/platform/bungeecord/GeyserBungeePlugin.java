@@ -65,6 +65,8 @@ public class GeyserBungeePlugin extends Plugin implements GeyserBootstrap {
 
     @Override
     public void onLoad() {
+        GeyserLocale.init(this);
+
         // Copied from ViaVersion.
         // https://github.com/ViaVersion/ViaVersion/blob/b8072aad86695cc8ec6f5e4103e43baf3abf6cc5/bungee/src/main/java/us/myles/ViaVersion/BungeePlugin.java#L43
         try {
@@ -78,8 +80,6 @@ public class GeyserBungeePlugin extends Plugin implements GeyserBootstrap {
             getLogger().warning(" /     o     \\");
             getLogger().warning("/_____________\\");
         }
-
-        GeyserLocale.init(this);
 
         geyserLogger = new GeyserBungeeLogger(getLogger());
 
