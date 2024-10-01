@@ -25,7 +25,6 @@
 
 package org.geysermc.geyser.translator.protocol.java.scoreboard;
 
-import java.util.Arrays;
 import org.geysermc.geyser.GeyserImpl;
 import org.geysermc.geyser.GeyserLogger;
 import org.geysermc.geyser.scoreboard.Scoreboard;
@@ -34,6 +33,7 @@ import org.geysermc.geyser.scoreboard.Team;
 import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
+import org.geysermc.geyser.translator.protocol.java.entity.player.JavaPlayerInfoUpdateTranslator;
 import org.geysermc.mcprotocollib.protocol.data.game.scoreboard.TeamAction;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.scoreboard.ClientboundSetPlayerTeamPacket;
 
@@ -43,8 +43,8 @@ public class JavaSetPlayerTeamTranslator extends PacketTranslator<ClientboundSet
 
     @Override
     public void translate(GeyserSession session, ClientboundSetPlayerTeamPacket packet) {
-        if (logger.isDebug()) {
-            logger.debug("Team packet " + packet.getTeamName() + " " + packet.getAction() + " " + Arrays.toString(packet.getPlayers()));
+        if (JavaPlayerInfoUpdateTranslator.LOG) {
+            System.out.printf("[%s] %s%n", System.currentTimeMillis(), packet);
         }
 
         if ((packet.getAction() == TeamAction.ADD_PLAYER || packet.getAction() == TeamAction.REMOVE_PLAYER) && packet.getPlayers().length == 0) {

@@ -33,7 +33,6 @@ import static org.geysermc.geyser.scoreboard.network.util.GeyserMockContextScore
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.cloudburstmc.protocol.bedrock.data.ScoreInfo;
@@ -191,7 +190,7 @@ public class CubecraftScoreboardTest {
                     ObjectiveAction.UPDATE,
                     Component.empty()
                         .append(Component.text(
-                            "CubeCraft", Style.style(NamedTextColor.WHITE, TextDecoration.BOLD))),
+                            "CubeCraft", NamedTextColor.WHITE, TextDecoration.BOLD)),
                     ScoreType.INTEGER,
                     null));
             assertNextPacket(
@@ -234,7 +233,7 @@ public class CubecraftScoreboardTest {
                 new ClientboundSetPlayerTeamPacket(
                     "SB_l-0",
                     Component.text("SB_l-0"),
-                    Component.empty().append(Component.text("", Style.style(NamedTextColor.BLACK))),
+                    Component.empty().append(Component.text("", NamedTextColor.BLACK)),
                     Component.empty(),
                     true,
                     true,

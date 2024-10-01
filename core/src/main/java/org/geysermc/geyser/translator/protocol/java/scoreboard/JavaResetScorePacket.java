@@ -32,12 +32,16 @@ import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.session.cache.WorldCache;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
+import org.geysermc.geyser.translator.protocol.java.entity.player.JavaPlayerInfoUpdateTranslator;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.scoreboard.ClientboundResetScorePacket;
 
 @Translator(packet = ClientboundResetScorePacket.class)
 public class JavaResetScorePacket extends PacketTranslator<ClientboundResetScorePacket> {
     @Override
     public void translate(GeyserSession session, ClientboundResetScorePacket packet) {
+        if (JavaPlayerInfoUpdateTranslator.LOG)
+            System.out.printf("[%s] %s%n", System.currentTimeMillis(), packet);
+
         WorldCache worldCache = session.getWorldCache();
         Scoreboard scoreboard = worldCache.getScoreboard();
         int pps = worldCache.increaseAndGetScoreboardPacketsPerSecond();
