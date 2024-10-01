@@ -25,7 +25,10 @@
 
 package org.geysermc.geyser.translator.protocol.java.entity.player;
 
-import org.geysermc.mcprotocollib.auth.GameProfile;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.cloudburstmc.math.vector.Vector3f;
 import org.cloudburstmc.protocol.bedrock.packet.PlayerListPacket;
@@ -35,19 +38,21 @@ import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.skin.SkinManager;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
+import org.geysermc.mcprotocollib.auth.GameProfile;
 import org.geysermc.mcprotocollib.protocol.data.game.PlayerListEntry;
 import org.geysermc.mcprotocollib.protocol.data.game.PlayerListEntryAction;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.ClientboundPlayerInfoUpdatePacket;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 @Translator(packet = ClientboundPlayerInfoUpdatePacket.class)
 public class JavaPlayerInfoUpdateTranslator extends PacketTranslator<ClientboundPlayerInfoUpdatePacket> {
+    public static final boolean LOG = true;
+
     @Override
     public void translate(GeyserSession session, ClientboundPlayerInfoUpdatePacket packet) {
+        if (JavaPlayerInfoUpdateTranslator.LOG) {
+            System.out.printf("[%s] %s%n", System.currentTimeMillis(), packet);
+        }
+
         Set<PlayerListEntryAction> actions = packet.getActions();
 
         if (actions.contains(PlayerListEntryAction.ADD_PLAYER)) {

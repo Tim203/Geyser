@@ -32,7 +32,6 @@ import static org.geysermc.geyser.scoreboard.network.util.GeyserMockContextScore
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.Style;
 import net.kyori.adventure.text.format.TextDecoration;
 import org.cloudburstmc.protocol.bedrock.data.ScoreInfo;
 import org.cloudburstmc.protocol.bedrock.packet.RemoveObjectivePacket;
@@ -108,7 +107,7 @@ public class BasicSidebarScoreboardTests {
                 new ClientboundSetObjectivePacket(
                     "objective",
                     ObjectiveAction.ADD,
-                    Component.text("objective", Style.style(NamedTextColor.AQUA, TextDecoration.BOLD)),
+                    Component.text("objective", NamedTextColor.AQUA, TextDecoration.BOLD),
                     ScoreType.INTEGER,
                     null
                 )

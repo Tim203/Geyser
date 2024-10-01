@@ -32,6 +32,7 @@ import org.geysermc.geyser.session.GeyserSession;
 import org.geysermc.geyser.session.cache.WorldCache;
 import org.geysermc.geyser.translator.protocol.PacketTranslator;
 import org.geysermc.geyser.translator.protocol.Translator;
+import org.geysermc.geyser.translator.protocol.java.entity.player.JavaPlayerInfoUpdateTranslator;
 import org.geysermc.mcprotocollib.protocol.data.game.scoreboard.ObjectiveAction;
 import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.scoreboard.ClientboundSetObjectivePacket;
 
@@ -39,6 +40,9 @@ import org.geysermc.mcprotocollib.protocol.packet.ingame.clientbound.scoreboard.
 public class JavaSetObjectiveTranslator extends PacketTranslator<ClientboundSetObjectivePacket> {
     @Override
     public void translate(GeyserSession session, ClientboundSetObjectivePacket packet) {
+        if (JavaPlayerInfoUpdateTranslator.LOG)
+            System.out.printf("[%s] %s%n", System.currentTimeMillis(), packet);
+
         WorldCache worldCache = session.getWorldCache();
         Scoreboard scoreboard = worldCache.getScoreboard();
         int pps = worldCache.increaseAndGetScoreboardPacketsPerSecond();
